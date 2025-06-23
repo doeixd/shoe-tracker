@@ -1,314 +1,285 @@
-# Running Shoe Tracker 🏃‍♂️👟
+# ShoeFit - Running Shoe Tracker
 
-A comprehensive running shoe tracking application built with TanStack Start and Convex DB. Track your running shoes, log your runs, monitor shoe usage, and organize your collection with Google authentication.
+A modern, PWA-enabled running shoe tracking application built with React 19, TanStack Start, and the React Compiler RC. Track your running shoes, log your runs, and gain insights into your running performance with comprehensive analytics.
 
 ## ✨ Features
 
-### 🔐 Authentication
-- **Google Sign-In**: Secure authentication with your Google account
-- **User Profiles**: Personal dashboard and settings
-- **Data Privacy**: Your data is private and secure
+### 🏃 Core Functionality
+- **Shoe Management**: Add, edit, and track multiple pairs of running shoes
+- **Run Logging**: Record runs with distance, duration, pace, and notes
+- **Mileage Tracking**: Automatic mileage accumulation per shoe
+- **Collections**: Organize shoes into custom collections
+- **Analytics**: Comprehensive insights and performance tracking
 
-### 👟 Shoe Management
-- **Detailed Tracking**: Brand, model, size, weight, heel drop, purchase info
-- **Photo Uploads**: Add photos of your shoes for easy identification
-- **Usage Monitoring**: Track current vs. maximum mileage
-- **Smart Alerts**: Get notified when shoes need replacement
-- **Retirement Tracking**: Archive old shoes while maintaining history
+### 🚀 Modern Tech Stack
+- **React 19** with latest features and performance improvements
+- **React Compiler RC** for automatic memoization and optimizations
+- **TanStack Start** for full-stack React framework
+- **TypeScript** for type safety
+- **Convex** for real-time backend and database
+- **Tailwind CSS** for styling
+- **Motion** for smooth animations
 
-### 📁 Collection Organization
-- **Custom Collections**: Group shoes by type (Road, Trail, Racing, etc.)
-- **Color Coding**: Visual organization with custom colors
-- **Flexible Organization**: Move shoes between collections easily
+### 📱 Progressive Web App (PWA)
+- **Offline Support**: Works without internet connection
+- **Install Prompt**: Add to home screen on mobile devices
+- **iOS Enhancements**: Native-like experience on iOS
+- **Push Notifications**: Stay updated with your running goals
+- **Background Sync**: Sync data when connection is restored
 
-### 🏃 Run Logging
-- **Comprehensive Metrics**: Distance, duration, pace, effort level
-- **Environmental Data**: Weather, temperature, surface type
-- **Performance Tracking**: Heart rate, calories, elevation
-- **Route Information**: Track where you run
-- **Automatic Mileage**: Shoe mileage updates when runs are logged
+### 🎨 User Experience
+- **Mobile-First Design**: Optimized for mobile usage
+- **Dark Mode Support**: Automatic theme switching
+- **Responsive Layout**: Works on all screen sizes
+- **First-Visit Animations**: Engaging onboarding experience
+- **Loading States**: Smooth loading experiences
 
-### 📊 Analytics & Insights
-- **Usage Levels**: Visual indicators (New → Good → Moderate → High → Replace)
-- **Statistics Dashboard**: Total runs, distance, time, averages
-- **Monthly Tracking**: Current month progress
-- **Shoe Performance**: Individual shoe statistics and run history
-
-## 🚀 Getting Started
+## 🛠️ Installation
 
 ### Prerequisites
+- Node.js 18+ 
+- pnpm (recommended) or npm
+- Git
 
-- Node.js 18+ and pnpm
-- A [Convex](https://convex.dev) account
-- A Google Cloud project with OAuth credentials
+### Setup
 
-### 1. Clone and Install
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd shoes-final
+   ```
 
-```bash
-git clone <your-repo-url>
-cd shoes-final
-pnpm install
-```
+2. **Install dependencies**
+   ```bash
+   pnpm install
+   ```
 
-### 2. Set Up Convex
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env.local
+   ```
+   
+   Add your Convex deployment URL and other required environment variables.
 
-```bash
-# Initialize Convex project
-npx convex dev --once
+4. **Set up Convex backend**
+   ```bash
+   npx convex dev
+   ```
 
-# This will create a new Convex deployment and give you a URL
-```
+5. **Start the development server**
+   ```bash
+   pnpm dev
+   ```
 
-### 3. Configure Google OAuth
+6. **Open your browser**
+   Navigate to `http://localhost:3000`
 
-#### 3.1 Create Google OAuth Credentials
+## 🚀 Development
 
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select an existing one
-3. Enable the Google+ API (required for authentication)
-4. Go to "Credentials" → "Create Credentials" → "OAuth 2.0 Client IDs"
-5. Set application type to "Web application"
-6. Add authorized redirect URIs:
-   - For development: `http://localhost:3000/api/auth/callback/google`
-   - For production: `https://your-domain.com/api/auth/callback/google`
+### Scripts
 
-#### 3.2 Set Environment Variables in Convex
-
-Go to your [Convex Dashboard](https://dashboard.convex.dev) and navigate to your project settings:
-
-1. **Settings** → **Environment Variables**
-2. Add the following variables:
-
-```
-AUTH_GOOGLE_ID=your_google_client_id_here
-AUTH_GOOGLE_SECRET=your_google_client_secret_here
-```
-
-### 4. Configure Local Environment
-
-Create a `.env.local` file in the project root:
-
-```bash
-# Your Convex deployment URL (from step 2)
-VITE_CONVEX_URL=https://your-deployment.convex.cloud
-```
-
-### 5. Start Development
-
-```bash
-# Start the development server
-pnpm dev
-```
-
-The app will be available at `http://localhost:3000` (or another port if 3000 is taken).
-
-## 🛠️ Development
+- `pnpm dev` - Start development server with Convex
+- `pnpm build` - Build for production
+- `pnpm start` - Start production server
+- `pnpm pwa:check` - Run PWA audit
+- `pnpm audit:animations` - Audit animation performance
 
 ### Project Structure
 
 ```
-shoes-final/
-├── convex/                 # Backend functions and schema
-│   ├── auth.config.ts     # Authentication configuration
-│   ├── auth.ts           # Auth queries
-│   ├── schema.ts         # Database schema
-│   └── shoes.ts          # Main API functions
-├── src/
-│   ├── components/       # Reusable React components
-│   │   ├── AuthProvider.tsx
-│   │   ├── FormComponents.tsx
-│   │   └── Onboarding.tsx
-│   ├── routes/          # Page components
-│   └── queries.ts       # API query hooks
-└── README.md
+src/
+├── components/          # React components
+│   ├── analytics/      # Analytics dashboards
+│   ├── loading/        # Loading states
+│   ├── navigation/     # Navigation components
+│   └── ui/            # UI components
+├── hooks/              # Custom React hooks
+├── routes/             # TanStack Router routes
+├── services/           # API and service layers
+├── styles/             # Global styles
+├── types/              # TypeScript type definitions
+└── utils/              # Utility functions
+
+convex/                 # Convex backend
+├── schema.ts          # Database schema
+├── shoes.ts           # Shoe-related functions
+└── auth.ts            # Authentication logic
 ```
-
-### Key Technologies
-
-- **Frontend**: TanStack Start (React-based meta-framework)
-- **Backend**: Convex (Reactive backend-as-a-service)
-- **Database**: Convex DB with real-time updates
-- **Authentication**: Convex Auth with Google OAuth
-- **Styling**: Tailwind CSS
-- **State Management**: TanStack Query
-- **Routing**: TanStack Router
-
-## 📱 User Guide
-
-### First Time Setup
-
-1. **Sign In**: Use your Google account to sign in
-2. **Onboarding**: Create your first collections (e.g., "Road Running", "Trail Running")
-3. **Add Shoes**: Start adding your running shoes with details
-4. **Log Runs**: Begin tracking your runs and see automatic mileage updates
-
-### Managing Collections
-
-- **Create**: Organize shoes by type, brand, or purpose
-- **Customize**: Choose colors and descriptions
-- **Archive**: Hide collections you no longer use
-
-### Tracking Shoes
-
-- **Add Details**: Brand, model, size, purchase info, max mileage
-- **Upload Photos**: Visual identification of your shoes
-- **Monitor Usage**: See usage levels and replacement alerts
-- **Retire Shoes**: Mark shoes as retired when worn out
-
-### Logging Runs
-
-- **Quick Entry**: Distance, duration, and shoe selection
-- **Detailed Metrics**: Weather, effort level, surface type
-- **Performance Data**: Heart rate, calories, elevation
-- **Auto-Calculate**: Pace calculation from distance and time
 
 ## 🔧 Configuration
 
-### Environment Variables
+### React Compiler RC
 
-#### Convex Dashboard Variables (Required)
+The project uses React Compiler RC for automatic optimizations:
+
+```typescript
+// vite.config.ts
+react({
+  babel: {
+    plugins: [["babel-plugin-react-compiler", {}]],
+  },
+})
 ```
-AUTH_GOOGLE_ID=your_google_oauth_client_id
-AUTH_GOOGLE_SECRET=your_google_oauth_client_secret
+
+### PWA Configuration
+
+PWA features are configured in `vite.config.ts` with VitePWA:
+
+```typescript
+VitePWA({
+  registerType: "autoUpdate",
+  workbox: {
+    globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+    // ... more config
+  }
+})
 ```
 
-#### Local Environment (.env.local)
-```
-VITE_CONVEX_URL=https://your-deployment.convex.cloud
-```
+## 📱 PWA Features
 
-### Customization
+### Installation
+The app can be installed on mobile devices and desktops:
+- Mobile: "Add to Home Screen" prompt
+- Desktop: Install button in browser
 
-The app is designed to be easily customizable:
+### Offline Support
+- Cached resources for offline usage
+- Background sync when connection returns
+- Offline indicator in UI
 
-- **Colors**: Update the color palette in `tailwind.config.mjs`
-- **Units**: Distance units (miles/km) can be configured per user
-- **Features**: Enable/disable features in the UI components
+### iOS Enhancements
+- Status bar styling
+- Safe area handling
+- Native-like interactions
+- Haptic feedback
+
+## 🎯 Usage
+
+### Adding Shoes
+1. Navigate to "Shoes" tab
+2. Click "Add New Shoe"
+3. Fill in shoe details (brand, model, purchase date, etc.)
+4. Optionally add to a collection
+5. Save to start tracking
+
+### Logging Runs
+1. Go to "Runs" tab
+2. Click "Log New Run"
+3. Select the shoes used
+4. Enter run details (distance, time, etc.)
+5. Add notes if desired
+6. Save to update shoe mileage
+
+### Viewing Analytics
+1. Access "Analytics" tab
+2. View running statistics
+3. See shoe performance data
+4. Track progress over time
+
+## 🔒 Authentication
+
+The app uses Convex Auth for authentication:
+- Email/password sign-up and sign-in
+- Secure session management
+- Protected routes
+- User data isolation
 
 ## 🚀 Deployment
 
-### Deploy to Vercel (Recommended)
-
-1. **Prepare for Production**:
-   ```bash
-   pnpm build
-   ```
-
-2. **Deploy to Vercel**:
-   ```bash
-   npx vercel
-   ```
-
-3. **Set Environment Variables** in Vercel dashboard:
-   - `VITE_CONVEX_URL=https://your-deployment.convex.cloud`
-
-4. **Update OAuth Redirect URLs** in Google Cloud Console:
-   - Add your production domain: `https://your-app.vercel.app/api/auth/callback/google`
-
-### Deploy Convex Backend
-
+### Build for Production
 ```bash
-# Deploy to production
-npx convex deploy
+pnpm build
 ```
 
-## 📊 Database Schema
+### Deploy to Vercel (Recommended)
+1. Connect your GitHub repository to Vercel
+2. Set environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
 
-### Collections
-- User's organizational categories for shoes
-- Custom colors and descriptions
-- Archive capability
+### Deploy to Netlify
+1. Build the project: `pnpm build`
+2. Deploy the `.output/public` directory
+3. Configure environment variables
 
-### Shoes
-- Detailed shoe information and specifications
-- Usage tracking and mileage monitoring
-- Image storage integration
-- User ownership and privacy
+## 🧪 Testing
 
-### Runs
-- Comprehensive run logging
-- Performance metrics and environmental data
-- Automatic shoe mileage updates
-- Historical tracking
+### PWA Testing
+```bash
+pnpm pwa:check
+```
 
-### Users
-- Google OAuth integration
-- User preferences and settings
-- Data privacy and isolation
+### Animation Performance
+```bash
+pnpm audit:animations
+```
 
-## 🎯 Features in Detail
+## 🤝 Contributing
 
-### Smart Usage Tracking
-- **Automatic Mileage**: Updates when runs are logged
-- **Visual Indicators**: Color-coded usage levels
-- **Replacement Alerts**: Notifications when shoes reach limits
-- **Historical Data**: Complete usage history preserved
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit your changes: `git commit -m 'Add amazing feature'`
+4. Push to the branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
 
-### Advanced Run Logging
-- **Multiple Metrics**: Distance, time, pace, effort
-- **Environmental Tracking**: Weather, temperature, surface
-- **Performance Data**: Heart rate, calories, elevation
-- **Route Information**: Where you ran
+### Development Guidelines
+- Follow TypeScript best practices
+- Use React Compiler-friendly patterns
+- Write mobile-first responsive code
+- Include appropriate loading states
+- Test PWA functionality
 
-### Real-time Synchronization
-- **Instant Updates**: Changes sync across devices immediately
-- **Optimistic UI**: Immediate feedback with background sync
-- **Conflict Resolution**: Handles concurrent edits gracefully
+## 📊 Performance
 
-## 🔒 Privacy & Security
+### React Compiler Benefits
+- Automatic memoization reduces re-renders
+- Improved component performance
+- Better memory usage
+- Optimized bundle size
 
-- **Data Isolation**: Each user's data is completely private
-- **Secure Authentication**: Google OAuth 2.0 with industry standards
-- **No Tracking**: No analytics or tracking beyond essential functionality
-- **Data Export**: Full data export capabilities (coming soon)
+### PWA Performance
+- Fast loading with service worker caching
+- Offline functionality
+- Smooth animations with Motion
+- Optimized images and assets
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-1. **Authentication Fails**
-   - Verify Google OAuth credentials in Convex dashboard
-   - Check redirect URLs in Google Cloud Console
-   - Ensure Convex deployment is active
+**React Compiler Errors**
+- Ensure code follows Rules of React
+- Check for proper dependency arrays in hooks
+- Avoid breaking React patterns
 
-2. **Database Errors**
-   - Clear browser cache and local storage
-   - Restart development server
-   - Check Convex dashboard for deployment status
+**PWA Not Installing**
+- Check manifest.json is accessible
+- Ensure HTTPS in production
+- Verify service worker registration
 
-3. **Environment Variables**
-   - Verify all required variables are set in Convex dashboard
-   - Check `.env.local` file for local development
-   - Restart development server after changes
+**Convex Connection Issues**
+- Check environment variables
+- Ensure Convex deployment is active
+- Verify network connectivity
 
-### Getting Help
+## 📝 License
 
-1. Check the [Convex Documentation](https://docs.convex.dev)
-2. Review [TanStack Start Docs](https://tanstack.com/start)
-3. Open an issue in this repository
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our contributing guidelines for details on:
-
-- Code style and standards
-- Testing requirements
-- Pull request process
-- Issue reporting
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
-- **Convex**: For the amazing backend-as-a-service platform
-- **TanStack**: For the excellent React tooling ecosystem
-- **Google**: For reliable authentication services
-- **Tailwind CSS**: For the utility-first CSS framework
+- [React Team](https://react.dev) for React 19 and React Compiler
+- [TanStack](https://tanstack.com) for the amazing router and start framework
+- [Convex](https://convex.dev) for the real-time backend
+- [Tailwind CSS](https://tailwindcss.com) for the utility-first CSS framework
+- [Motion](https://motion.dev) for smooth animations
+
+## 📞 Support
+
+If you have any questions or need help:
+- Open an issue on GitHub
+- Check the documentation
+- Review the troubleshooting section
 
 ---
 
-**Happy Running! 🏃‍♂️💨**
-
-Track your shoes, improve your runs, and never get caught with worn-out gear again!
+Built with ❤️ for runners who love their shoes!
