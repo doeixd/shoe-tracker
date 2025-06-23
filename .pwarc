@@ -1,0 +1,64 @@
+{
+  "name": "ShoeFit",
+  "shortName": "ShoeFit",
+  "description": "Track your running shoes, monitor mileage, and log your runs with comprehensive analytics and insights.",
+  "themeColor": "#3b82f6",
+  "backgroundColor": "#ffffff",
+  "startUrl": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "categories": [
+    "fitness",
+    "health",
+    "sports",
+    "lifestyle",
+    "productivity"
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop-1.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "ShoeFit Dashboard"
+    },
+    {
+      "src": "/screenshots/mobile-1.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile Dashboard"
+    }
+  ],
+  "features": [
+    "offline-support",
+    "background-sync",
+    "push-notifications",
+    "install-prompt",
+    "share-target",
+    "file-handling"
+  ],
+  "icons": {
+    "generateSizes": [
+      16,
+      32,
+      72,
+      96,
+      128,
+      144,
+      152,
+      192,
+      384,
+      512
+    ],
+    "inputIcon": "src/assets/icon.svg",
+    "outputDir": "public/"
+  },
+  "splashScreens": {
+    "generateAll": true,
+    "backgroundColor": "#3b82f6",
+    "textColor": "#ffffff",
+    "outputDir": "public/splash/"
+  }
+}

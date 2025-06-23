@@ -1,0 +1,230 @@
+import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { useCreateCollectionMutation } from "~/queries";
+import {
+  Input,
+  Textarea,
+  Button,
+  FormSection,
+} from "~/components/FormComponents";
+import type { CreateCollectionForm } from "~/types";
+import { motion } from "motion/react";
+import { Plus, Package, Palette } from "lucide-react";
+
+interface CollectionFormProps {
+  onSuccess?: (collectionId: string) => void;
+  onCancel?: () => void;
+  isModal?: boolean;
+  className?: string;
+}
+
+export function CollectionForm({
+  onSuccess,
+  onCancel,
+  isModal = false,
+  className = "",
+}: CollectionFormProps) {
+  const navigate = useNavigate();
+  const createCollectionMutation = useCreateCollectionMutation();
+
+  const [formData, setFormData] = useState<CreateCollectionForm>({
+    name: "",
+    description: "",
+    color: "#3b82f6",
+  });
+
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof CreateCollectionForm, string>>
+  >({});
+
+  const handleInputChange = (
+    field: keyof CreateCollectionForm,
+    value: string | undefined,
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Partial<Record<keyof CreateCollectionForm, string>> = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Collection name is required";
+    }
+
+    if (formData.name.length > 100) {
+      newErrors.name = "Collection name must be 100 characters or less";
+    }
+
+    if (formData.description && formData.description.length > 500) {
+      newErrors.description = "Description must be 500 characters or less";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      toast.error("Please fix the errors in the form");
+      return;
+    }
+
+    try {
+      const collectionId = await createCollectionMutation.mutateAsync({
+        ...formData,
+        description: formData.description?.trim() || undefined,
+      });
+
+      toast.success("Collection created successfully!");
+
+      if (onSuccess) {
+        onSuccess(collectionId);
+      } else {
+        navigate({
+          to: "/collections/$collectionId",
+          params: { collectionId },
+        });
+      }
+    } catch (error: any) {
+      console.error("Error creating collection:", error);
+
+      let errorMessage = "Failed to create collection. Please try again.";
+      if (error?.message?.includes("not authenticated")) {
+        errorMessage = "Authentication required. Please sign in again.";
+        navigate({ to: "/auth/signin" });
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage);
+    }
+  };
+
+  const colorOptions = [
+    { value: "#3b82f6", label: "Blue", color: "#3b82f6" },
+    { value: "#10b981", label: "Green", color: "#10b981" },
+    { value: "#f59e0b", label: "Amber", color: "#f59e0b" },
+    { value: "#ef4444", label: "Red", color: "#ef4444" },
+    { value: "#8b5cf6", label: "Purple", color: "#8b5cf6" },
+    { value: "#06b6d4", label: "Cyan", color: "#06b6d4" },
+    { value: "#84cc16", label: "Lime", color: "#84cc16" },
+    { value: "#f97316", label: "Orange", color: "#f97316" },
+    { value: "#ec4899", label: "Pink", color: "#ec4899" },
+    { value: "#6b7280", label: "Gray", color: "#6b7280" },
+  ];
+
+  return (
+    <div className={className}>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <FormSection
+          title="Collection Details"
+          description="Give your collection a name and description"
+        >
+          <Input
+            label="Collection Name"
+            required
+            value={formData.name}
+            onChange={(e) => handleInputChange("name", e.target.value)}
+            error={errors.name}
+            placeholder="Daily Trainers, Racing Shoes, Trail Runners..."
+            icon={<Package className="w-5 h-5" />}
+            helperText="Give your collection a descriptive name"
+            maxLength={100}
+          />
+
+          <Textarea
+            label="Description"
+            value={formData.description || ""}
+            onChange={(e) => handleInputChange("description", e.target.value)}
+            placeholder="Describe the purpose or characteristics of this collection..."
+            helperText="Optional - helps you remember what this collection is for"
+            maxLength={500}
+          />
+        </FormSection>
+
+        <FormSection
+          title="Collection Color"
+          description="Choose a color to help identify this collection"
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Palette className="w-5 h-5 text-gray-500" />
+              <span className="text-sm font-medium text-gray-700">
+                Selected Color
+              </span>
+              <div
+                className="w-6 h-6 rounded-full border-2 border-white shadow-sm ring-1 ring-gray-200"
+                style={{ backgroundColor: formData.color }}
+              />
+            </div>
+
+            <div className="grid grid-cols-5 sm:grid-cols-10 gap-3">
+              {colorOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => handleInputChange("color", option.value)}
+                  className={`relative w-full aspect-square rounded-xl border-2 transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                    formData.color === option.value
+                      ? "border-gray-900 scale-110 shadow-lg ring-2 ring-blue-500"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                  style={{ backgroundColor: option.color }}
+                  title={option.label}
+                >
+                  {formData.color === option.value && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-3 h-3 rounded-full bg-white/90 shadow-sm" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </FormSection>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+          className="flex flex-col sm:flex-row gap-4 pt-6"
+        >
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              if (onCancel) {
+                onCancel();
+              } else if (isModal) {
+                navigate({ to: "/collections", search: { modal: false } });
+              } else {
+                navigate({ to: "/collections", search: { modal: false } });
+              }
+            }}
+            disabled={createCollectionMutation.isPending}
+            fullWidth
+            className="sm:flex-1"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            loading={createCollectionMutation.isPending}
+            disabled={createCollectionMutation.isPending}
+            icon={<Plus className="w-5 h-5" />}
+            fullWidth
+            className="sm:flex-1"
+          >
+            Create Collection
+          </Button>
+        </motion.div>
+      </form>
+    </div>
+  );
+}
