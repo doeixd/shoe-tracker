@@ -9,7 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ThemeDemoRouteImport } from './routes/theme-demo'
+import { Route as TestPhase3RouteImport } from './routes/test-phase3'
+import { Route as TestOnboardingRouteImport } from './routes/test-onboarding'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as Phase3DemoRouteImport } from './routes/phase3-demo'
 import { Route as LoadingDemoRouteImport } from './routes/loading-demo'
 import { Route as DemoAnimationsRouteImport } from './routes/demo-animations'
 import { Route as DebugRouteImport } from './routes/debug'
@@ -29,9 +33,29 @@ import { Route as ShoesShoeIdEditRouteImport } from './routes/shoes.$shoeId.edit
 import { Route as RunsRunIdEditRouteImport } from './routes/runs.$runId.edit'
 import { Route as CollectionsCollectionIdEditRouteImport } from './routes/collections.$collectionId.edit'
 
+const ThemeDemoRoute = ThemeDemoRouteImport.update({
+  id: '/theme-demo',
+  path: '/theme-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TestPhase3Route = TestPhase3RouteImport.update({
+  id: '/test-phase3',
+  path: '/test-phase3',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TestOnboardingRoute = TestOnboardingRouteImport.update({
+  id: '/test-onboarding',
+  path: '/test-onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Phase3DemoRoute = Phase3DemoRouteImport.update({
+  id: '/phase3-demo',
+  path: '/phase3-demo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoadingDemoRoute = LoadingDemoRouteImport.update({
@@ -132,7 +156,11 @@ export interface FileRoutesByFullPath {
   '/debug': typeof DebugRoute
   '/demo-animations': typeof DemoAnimationsRoute
   '/loading-demo': typeof LoadingDemoRoute
+  '/phase3-demo': typeof Phase3DemoRoute
   '/profile': typeof ProfileRoute
+  '/test-onboarding': typeof TestOnboardingRoute
+  '/test-phase3': typeof TestPhase3Route
+  '/theme-demo': typeof ThemeDemoRoute
   '/auth/signin': typeof AuthSigninRoute
   '/collections/$collectionId': typeof CollectionsCollectionIdRouteWithChildren
   '/collections/new': typeof CollectionsNewRoute
@@ -153,7 +181,11 @@ export interface FileRoutesByTo {
   '/debug': typeof DebugRoute
   '/demo-animations': typeof DemoAnimationsRoute
   '/loading-demo': typeof LoadingDemoRoute
+  '/phase3-demo': typeof Phase3DemoRoute
   '/profile': typeof ProfileRoute
+  '/test-onboarding': typeof TestOnboardingRoute
+  '/test-phase3': typeof TestPhase3Route
+  '/theme-demo': typeof ThemeDemoRoute
   '/auth/signin': typeof AuthSigninRoute
   '/collections/$collectionId': typeof CollectionsCollectionIdRouteWithChildren
   '/collections/new': typeof CollectionsNewRoute
@@ -175,7 +207,11 @@ export interface FileRoutesById {
   '/debug': typeof DebugRoute
   '/demo-animations': typeof DemoAnimationsRoute
   '/loading-demo': typeof LoadingDemoRoute
+  '/phase3-demo': typeof Phase3DemoRoute
   '/profile': typeof ProfileRoute
+  '/test-onboarding': typeof TestOnboardingRoute
+  '/test-phase3': typeof TestPhase3Route
+  '/theme-demo': typeof ThemeDemoRoute
   '/auth/signin': typeof AuthSigninRoute
   '/collections/$collectionId': typeof CollectionsCollectionIdRouteWithChildren
   '/collections/new': typeof CollectionsNewRoute
@@ -198,7 +234,11 @@ export interface FileRouteTypes {
     | '/debug'
     | '/demo-animations'
     | '/loading-demo'
+    | '/phase3-demo'
     | '/profile'
+    | '/test-onboarding'
+    | '/test-phase3'
+    | '/theme-demo'
     | '/auth/signin'
     | '/collections/$collectionId'
     | '/collections/new'
@@ -219,7 +259,11 @@ export interface FileRouteTypes {
     | '/debug'
     | '/demo-animations'
     | '/loading-demo'
+    | '/phase3-demo'
     | '/profile'
+    | '/test-onboarding'
+    | '/test-phase3'
+    | '/theme-demo'
     | '/auth/signin'
     | '/collections/$collectionId'
     | '/collections/new'
@@ -240,7 +284,11 @@ export interface FileRouteTypes {
     | '/debug'
     | '/demo-animations'
     | '/loading-demo'
+    | '/phase3-demo'
     | '/profile'
+    | '/test-onboarding'
+    | '/test-phase3'
+    | '/theme-demo'
     | '/auth/signin'
     | '/collections/$collectionId'
     | '/collections/new'
@@ -262,7 +310,11 @@ export interface RootRouteChildren {
   DebugRoute: typeof DebugRoute
   DemoAnimationsRoute: typeof DemoAnimationsRoute
   LoadingDemoRoute: typeof LoadingDemoRoute
+  Phase3DemoRoute: typeof Phase3DemoRoute
   ProfileRoute: typeof ProfileRoute
+  TestOnboardingRoute: typeof TestOnboardingRoute
+  TestPhase3Route: typeof TestPhase3Route
+  ThemeDemoRoute: typeof ThemeDemoRoute
   AuthSigninRoute: typeof AuthSigninRoute
   CollectionsCollectionIdRoute: typeof CollectionsCollectionIdRouteWithChildren
   CollectionsNewRoute: typeof CollectionsNewRoute
@@ -277,11 +329,39 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/theme-demo': {
+      id: '/theme-demo'
+      path: '/theme-demo'
+      fullPath: '/theme-demo'
+      preLoaderRoute: typeof ThemeDemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/test-phase3': {
+      id: '/test-phase3'
+      path: '/test-phase3'
+      fullPath: '/test-phase3'
+      preLoaderRoute: typeof TestPhase3RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/test-onboarding': {
+      id: '/test-onboarding'
+      path: '/test-onboarding'
+      fullPath: '/test-onboarding'
+      preLoaderRoute: typeof TestOnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/phase3-demo': {
+      id: '/phase3-demo'
+      path: '/phase3-demo'
+      fullPath: '/phase3-demo'
+      preLoaderRoute: typeof Phase3DemoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/loading-demo': {
@@ -457,7 +537,11 @@ const rootRouteChildren: RootRouteChildren = {
   DebugRoute: DebugRoute,
   DemoAnimationsRoute: DemoAnimationsRoute,
   LoadingDemoRoute: LoadingDemoRoute,
+  Phase3DemoRoute: Phase3DemoRoute,
   ProfileRoute: ProfileRoute,
+  TestOnboardingRoute: TestOnboardingRoute,
+  TestPhase3Route: TestPhase3Route,
+  ThemeDemoRoute: ThemeDemoRoute,
   AuthSigninRoute: AuthSigninRoute,
   CollectionsCollectionIdRoute: CollectionsCollectionIdRouteWithChildren,
   CollectionsNewRoute: CollectionsNewRoute,
