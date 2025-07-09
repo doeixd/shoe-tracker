@@ -16,6 +16,7 @@ import {
 import { EnhancedLoading } from "~/components/loading/EnhancedLoading";
 import { useEffect } from "react";
 import { requireAuth } from "~/utils/auth";
+import { redirect } from "@tanstack/react-router";
 import {
   formatDistance,
   formatDuration,
@@ -55,52 +56,25 @@ import {
 } from "~/components/ui/Cards";
 import { Button } from "~/components/FormComponents";
 import { cn } from "~/components/ui/ui";
+import { AuthWrapper } from "~/components/AuthWrapper";
 import * as React from "react";
 
 function HomePage() {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full space-y-8 p-6">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Sign in required
-            </h2>
-            <p className="mt-2 text-gray-600">
-              Please sign in to access your dashboard.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <ErrorBoundary>
-      <React.Suspense fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Loading dashboard...</p>
+    <AuthWrapper>
+      <ErrorBoundary>
+        <React.Suspense fallback={
+          <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="text-center">
+              <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+              <p className="text-gray-600">Loading dashboard...</p>
+            </div>
           </div>
-        </div>
-      }>
-        <Home />
-      </React.Suspense>
-    </ErrorBoundary>
+        }>
+          <Home />
+        </React.Suspense>
+      </ErrorBoundary>
+    </AuthWrapper>
   );
 }
 
@@ -108,16 +82,101 @@ export const Route = createFileRoute("/")({
   component: HomePage,
   // Loader with authentication redirect
   loader: async ({ context: { queryClient } }) => {
-    // Require authentication - will redirect if not authenticated
-    const user = await requireAuth(queryClient);
+    try {
+      // Require authentication - will redirect if not authenticated
+      const user = await requireAuth(queryClient);
 
-    // Prefetch critical dashboard data using new app data query
-    await queryClient.ensureQueryData({
-      ...convexQuery(api.dashboard.getAppData, {}),
-      staleTime: 1000 * 60 * 5,
-    });
+      // Prefetch critical dashboard data using new app data query
+      await queryClient.ensureQueryData({
+        ...convexQuery(api.dashboard.getAppData, {}),
+        staleTime: 1000 * 60 * 5,
+      });
 
-    return { user };
+      return { user };
+    } catch (error: any) {
+      // If requireAuth throws a redirect, let it propagate
+      if (error?.message?.includes("redirect") || error?.status === 301 || error?.status === 302) {
+        throw error;
+      }
+
+      // For authentication errors, ensure redirect to sign-in
+      if (
+        error?.message?.includes("not authenticated") ||
+        error?.message?.includes("Unauthorized") ||
+        error?.message?.includes("access denied")
+      ) {
+        console.warn("Authentication error in home loader, redirecting to sign-in");
+        throw redirect({
+          to: "/auth/signin",
+          search: {
+            redirect: "/",
+          },
+        });
+      }
+
+      // For other errors, log and re-throw
+      console.error("Home page loader error:", error);
+      throw error;
+    }
+  },
+  // Add error component for loader errors
+  errorComponent: ({ error }) => {
+    console.error("Home page route error:", error);
+
+    const isAuthError = error?.message?.includes("authenticated") ||
+                       error?.message?.includes("unauthorized") ||
+                       error?.message?.includes("access denied");
+
+    if (isAuthError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="max-w-md w-full space-y-8 p-6">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle className="w-8 h-8 text-red-600" />
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                Authentication Required
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Please sign in to access your dashboard.
+              </p>
+              <Link
+                to="/auth/signin"
+                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              >
+                Sign In
+              </Link>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="max-w-md w-full space-y-8 p-6">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-8 h-8 text-red-600" />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Loading Error
+            </h2>
+            <p className="text-gray-600 mb-6">
+              There was an error loading the dashboard. Please try again.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+            >
+              <Loader2 className="w-4 h-4 mr-2" />
+              Reload Page
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   },
 });
 
