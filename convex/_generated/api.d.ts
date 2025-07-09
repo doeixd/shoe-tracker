@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as auth from "../auth.js";
+import type * as dashboard from "../dashboard.js";
 import type * as debug from "../debug.js";
 import type * as http from "../http.js";
 import type * as shoes from "../shoes.js";
@@ -28,6 +29,7 @@ import type * as shoes from "../shoes.js";
  */
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  dashboard: typeof dashboard;
   debug: typeof debug;
   http: typeof http;
   shoes: typeof shoes;

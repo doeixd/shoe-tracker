@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
 import { api } from "../convex/_generated/api";
 import { toast } from "sonner";
@@ -11,6 +11,14 @@ import type {
   RunWithShoe,
   OverallStats,
 } from "./types";
+
+// Dashboard queries
+export const dashboardQueries = {
+  data: () =>
+    withAuthErrorHandling(convexQuery(api.dashboard.getAppData, {})),
+  stats: () =>
+    withAuthErrorHandling(convexQuery(api.dashboard.getDashboardStats, {})),
+};
 
 // Error handling wrapper for queries
 const withAuthErrorHandling = <T = any>(
@@ -60,7 +68,7 @@ export const collectionQueries = {
 
 // Typed collection hooks
 export function useCollections() {
-  return useSuspenseQuery({
+  return useQuery({
     ...collectionQueries.list(),
     retry: (failureCount: number, error: any) => {
       if (error?.message?.includes("not authenticated")) {
@@ -72,7 +80,7 @@ export function useCollections() {
 }
 
 export function useCollection(id: string) {
-  return useSuspenseQuery({
+  return useQuery({
     ...collectionQueries.detail(id),
     retry: (failureCount: number, error: any) => {
       if (error?.message?.includes("not authenticated")) {
@@ -102,7 +110,7 @@ export const shoeQueries = {
 
 // Typed shoe hooks
 export function useShoes(includeRetired = false) {
-  return useSuspenseQuery({
+  return useQuery({
     ...shoeQueries.list(includeRetired),
     retry: (failureCount: number, error: any) => {
       if (error?.message?.includes("not authenticated")) {
@@ -114,7 +122,7 @@ export function useShoes(includeRetired = false) {
 }
 
 export function useShoe(id: string) {
-  return useSuspenseQuery({
+  return useQuery({
     ...shoeQueries.detail(id),
     retry: (failureCount: number, error: any) => {
       if (error?.message?.includes("not authenticated")) {
@@ -126,7 +134,7 @@ export function useShoe(id: string) {
 }
 
 export function useShoeWithStats(id: string) {
-  return useSuspenseQuery({
+  return useQuery({
     ...shoeQueries.withStats(id),
     retry: (failureCount: number, error: any) => {
       if (error?.message?.includes("not authenticated")) {
@@ -141,7 +149,7 @@ export function useShoesByCollection(
   collectionId: string,
   includeRetired = false,
 ) {
-  return useSuspenseQuery({
+  return useQuery({
     ...shoeQueries.byCollection(collectionId, includeRetired),
     retry: (failureCount: number, error: any) => {
       if (error?.message?.includes("not authenticated")) {
@@ -164,7 +172,7 @@ export const runQueries = {
 
 // Typed run hooks
 export function useRuns(limit = 50, shoeId?: string) {
-  return useSuspenseQuery({
+  return useQuery({
     ...runQueries.list(limit, shoeId),
     retry: (failureCount: number, error: any) => {
       if (error?.message?.includes("not authenticated")) {
@@ -176,7 +184,7 @@ export function useRuns(limit = 50, shoeId?: string) {
 }
 
 export function useRun(id: string) {
-  return useSuspenseQuery({
+  return useQuery({
     ...runQueries.detail(id),
     retry: (failureCount: number, error: any) => {
       if (error?.message?.includes("not authenticated")) {
@@ -188,7 +196,7 @@ export function useRun(id: string) {
 }
 
 export function useRunsWithShoes(limit = 50) {
-  return useSuspenseQuery({
+  return useQuery({
     ...runQueries.withShoes(limit),
     retry: (failureCount: number, error: any) => {
       if (error?.message?.includes("not authenticated")) {
@@ -207,15 +215,42 @@ export const statsQueries = {
 
 // Typed stats hooks
 export function useOverallStats() {
-  return useSuspenseQuery({
+  return useQuery({
     ...statsQueries.overall(),
-    retry: (failureCount: number, error: any) => {
+    retry: (failureCount, error) => {
       if (error?.message?.includes("not authenticated")) {
         return false;
       }
       return failureCount < 2;
     },
   }) as { data: OverallStats; error: any; isLoading: boolean };
+}
+
+// Dashboard hooks
+export function useDashboardData() {
+  return useQuery({
+    ...dashboardQueries.data(),
+    retry: (failureCount, error) => {
+      if (error?.message?.includes("not authenticated")) {
+        return false;
+      }
+      return failureCount < 2;
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes - dashboard data doesn't change frequently
+  });
+}
+
+export function useDashboardStats() {
+  return useQuery({
+    ...dashboardQueries.stats(),
+    retry: (failureCount, error) => {
+      if (error?.message?.includes("not authenticated")) {
+        return false;
+      }
+      return failureCount < 2;
+    },
+    staleTime: 1000 * 60 * 2, // 2 minutes for stats only
+  });
 }
 
 // Mutation error handler

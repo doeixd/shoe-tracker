@@ -1,4 +1,4 @@
-# PWA Setup Checklist for ShoeFit
+# PWA Setup Checklist for MyShoeTracker
 
 ## ✅ Core PWA Requirements
 - [x] Web App Manifest

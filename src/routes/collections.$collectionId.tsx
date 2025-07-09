@@ -1,4 +1,6 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { EnhancedLoading } from "~/components/loading/EnhancedLoading";
+import { createQueryConfig } from "~/utils/routeLoading";
 
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
@@ -8,8 +10,9 @@ import {
   statsQueries,
 } from "~/queries";
 import { Loader } from "~/components/Loader";
-import { SmartPageLoading } from "~/components/loading/RouteHolding";
-import { withAuth } from "~/components/AuthProvider";
+
+import { useAuth } from "~/components/AuthProvider";
+import { requireAuth } from "~/utils/auth";
 import { AuthErrorBoundary } from "~/components/AuthErrorBoundary";
 import { motion } from "motion/react";
 import {
@@ -26,31 +29,28 @@ import {
   EmptyStateCard,
 } from "~/components/ui/Cards";
 import { Button } from "~/components/FormComponents";
+import { BackToCollections } from "~/components/ui/BackButton";
 import {
   Footprints,
   Archive,
   Package,
   Plus,
   Edit3,
-  ArrowLeft,
   AlertTriangle,
   Gauge,
   Activity,
   Palette,
   Calendar,
+  Lock,
 } from "lucide-react";
 import { cn } from "~/components/ui/ui";
 
+function CollectionDetailPage() {
+  return <CollectionDetail />;
+}
+
 export const Route = createFileRoute("/collections/$collectionId")({
-  component: withAuth(CollectionDetail),
-  pendingComponent: () => (
-    <SmartPageLoading
-      message="Loading collection..."
-      holdDelay={1000}
-      showSkeleton={true}
-      skeletonLayout="detail"
-    />
-  ),
+  component: CollectionDetailPage,
   errorComponent: ({ error }) => {
     const isCollectionNotFound = error.message?.includes(
       "Collection not found",
@@ -114,62 +114,126 @@ export const Route = createFileRoute("/collections/$collectionId")({
       </div>
     );
   },
-  loader: async ({ context: { queryClient }, params: { collectionId } }) => {
-    try {
-      // Check if we can access authenticated data
-      const authQuery = queryClient.getQueryData([
-        "convex",
-        "auth.getUserProfile",
-        {},
-      ]);
+  // Loader with authentication redirect
+  loader: async ({ params: { collectionId }, context: { queryClient } }) => {
+    // Require authentication - will redirect if not authenticated
+    const user = await requireAuth(queryClient);
 
-      // Only preload if we have auth data or if the query is likely to succeed
-      if (authQuery) {
-        // Preload collection and related data
-        const collectionPromise = queryClient.ensureQueryData(
-          collectionQueries.detail(collectionId),
-        );
-        const shoesPromise = queryClient.ensureQueryData(
-          shoeQueries.byCollection(collectionId, true),
-        );
+    // Prefetch critical data in parallel
+    const collectionPromise = queryClient.ensureQueryData(
+      collectionQueries.detail(collectionId),
+    );
+    const shoesPromise = queryClient.ensureQueryData(
+      shoeQueries.byCollection(collectionId, true),
+    );
 
-        // Wait for critical data
-        await Promise.all([collectionPromise, shoesPromise]);
-
-        // Prefetch related data in background
-        queryClient.prefetchQuery(collectionQueries.list());
-        queryClient.prefetchQuery(shoeQueries.list(false));
-        queryClient.prefetchQuery(runQueries.withShoes(20));
-        queryClient.prefetchQuery(statsQueries.overall());
-      }
-    } catch (error) {
-      // If preloading fails due to auth, just continue - the component will handle it
-      console.debug("Preload failed (likely auth issue):", error);
-    }
+    // Wait for both queries to complete
+    await Promise.all([collectionPromise, shoesPromise]);
 
     return {
       collectionId,
+      user,
     };
   },
 });
 
 function CollectionDetail() {
+  const { isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const { collectionId } = Route.useParams();
   const loaderData = Route.useLoaderData();
 
-  const collectionQuery = useSuspenseQuery(
-    collectionQueries.detail(collectionId),
-  );
-  const shoesQuery = useSuspenseQuery(
-    shoeQueries.byCollection(collectionId, true),
+  if (isLoading) {
+    return (
+      <EnhancedLoading
+        message="Loading collection..."
+        layout="detail"
+        holdDelay={100}
+        skeletonDelay={200}
+        showProgress={true}
+      />
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="max-w-md w-full space-y-8 p-6">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Lock className="w-8 h-8 text-blue-600" />
+            </div>
+            <h2 className="text-3xl font-extrabold text-gray-900 mb-2">
+              Authentication Required
+            </h2>
+            <p className="text-sm text-gray-600">
+              Please sign in to access your collections
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const collectionQuery = useQuery(
+    createQueryConfig(collectionQueries.detail(collectionId), {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    }),
   );
 
-  const collection = collectionQuery.data;
-  const shoes = shoesQuery.data;
+  const shoesQuery = useQuery(
+    createQueryConfig(shoeQueries.byCollection(collectionId, true), {
+      staleTime: 3 * 60 * 1000, // 3 minutes (shoes data changes more frequently)
+    }),
+  );
 
-  const activeShoes = shoes.filter((shoe) => !shoe.isRetired);
-  const retiredShoes = shoes.filter((shoe) => shoe.isRetired);
+  // Handle loading states - only show loading if both queries are loading
+  const isDataLoading = collectionQuery.isLoading && shoesQuery.isLoading;
+
+  if (isDataLoading) {
+    return (
+      <EnhancedLoading
+        message="Loading collection..."
+        layout="detail"
+        holdDelay={100}
+        skeletonDelay={200}
+        showProgress={true}
+      />
+    );
+  }
+
+  // Handle errors - only throw if it's not an auth error
+  if (
+    collectionQuery.error &&
+    !collectionQuery.error.message?.includes("not authenticated")
+  ) {
+    throw collectionQuery.error;
+  }
+  if (
+    shoesQuery.error &&
+    !shoesQuery.error.message?.includes("not authenticated")
+  ) {
+    throw shoesQuery.error;
+  }
+
+  const collection = collectionQuery.data as any;
+  const shoes = (shoesQuery.data as any[]) || [];
+
+  const activeShoes = shoes.filter((shoe: any) => shoe && !shoe.isRetired);
+  const retiredShoes = shoes.filter((shoe: any) => shoe && shoe.isRetired);
+
+  // Don't render if we don't have collection data
+  if (!collection) {
+    return (
+      <EnhancedLoading
+        message="Loading collection..."
+        layout="detail"
+        holdDelay={100}
+        skeletonDelay={200}
+        showProgress={true}
+      />
+    );
+  }
 
   return (
     <AuthErrorBoundary>
@@ -183,17 +247,8 @@ function CollectionDetail() {
             className="flex flex-col space-y-6"
           >
             {/* Back Navigation */}
-            <div className="flex items-center">
-              <Button
-                variant="ghost"
-                onClick={() =>
-                  navigate({ to: "/collections", search: { modal: false } })
-                }
-                icon={<ArrowLeft className="w-4 h-4" />}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                Back to Collections
-              </Button>
+            <div className="flex items-center gap-4">
+              <BackToCollections />
             </div>
 
             {/* Collection Header Card */}
@@ -202,22 +257,22 @@ function CollectionDetail() {
                 <div className="flex items-start gap-4">
                   <div
                     className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: collection.color }}
+                    style={{ backgroundColor: collection?.color || "#3b82f6" }}
                   >
                     <Package className="w-8 h-8 text-white" />
                   </div>
                   <div className="space-y-2">
                     <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">
-                      {collection.name}
+                      {collection?.name || "Unnamed Collection"}
                     </h1>
-                    {collection.description && (
+                    {collection?.description && (
                       <p className="text-lg text-gray-600 max-w-2xl">
                         {collection.description}
                       </p>
                     )}
                     <div className="flex items-center gap-2 text-sm text-gray-500">
                       <Palette className="w-4 h-4" />
-                      <span>Color: {collection.color}</span>
+                      <span>Color: {collection?.color || "#3b82f6"}</span>
                     </div>
                   </div>
                 </div>
@@ -302,7 +357,7 @@ function CollectionDetail() {
               </div>
 
               <CardGrid cols={3} gap="lg">
-                {activeShoes.map((shoe, index) => {
+                {activeShoes.map((shoe: any, index: number) => {
                   const currentMileage = shoe.currentMileage || 0;
                   const usageLevel = getUsageLevel(
                     currentMileage,
@@ -422,7 +477,7 @@ function CollectionDetail() {
               </div>
 
               <CardGrid cols={3} gap="lg">
-                {retiredShoes.map((shoe, index) => {
+                {retiredShoes.map((shoe: any, index: number) => {
                   const currentMileage = shoe.currentMileage || 0;
 
                   return (

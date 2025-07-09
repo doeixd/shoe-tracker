@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools/production";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
   Link,
   Outlet,
@@ -53,7 +53,10 @@ import {
   WifiOff,
 } from "lucide-react";
 import { BottomTabNavigation } from "~/components/navigation/BottomTabNavigation";
-
+import { checkAuth } from "~/utils/auth";
+import { convexQuery } from "@convex-dev/react-query";
+import { api } from "../../convex/_generated/api";
+import { dashboardQueries, shoeQueries, collectionQueries, runQueries } from "~/queries";
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
@@ -92,13 +95,49 @@ export const Route = createRootRouteWithContext<{
       },
       { rel: "manifest", href: "/manifest.json" },
       { rel: "icon", href: "/favicon.ico" },
-      { name: "theme-color", content: "#3b82f6" },
+      {
+        name: "theme-color",
+        content: "#3b82f6",
+        suppressHydrationWarning: true,
+      },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
-      { name: "apple-mobile-web-app-title", content: "ShoeFit" },
+      { name: "apple-mobile-web-app-title", content: "MyShoeTracker" },
       { name: "mobile-web-app-capable", content: "yes" },
     ],
   }),
+  loader: async ({ context: { queryClient } }) => {
+    // Check authentication status first (but don't redirect here)
+    const authResult = await checkAuth(queryClient);
+
+    if (authResult.isAuthenticated) {
+      // Prefetch all critical app data in parallel
+      // This ensures instant loading across the entire app
+      await Promise.all([
+        queryClient.prefetchQuery({
+          ...dashboardQueries.data(),
+          staleTime: 1000 * 60 * 10, // 10 minutes for dashboard data
+        }),
+        queryClient.prefetchQuery({
+          ...shoeQueries.list(false),
+          staleTime: 1000 * 60 * 5, // 5 minutes for shoes
+        }),
+        queryClient.prefetchQuery({
+          ...collectionQueries.list(),
+          staleTime: 1000 * 60 * 5, // 5 minutes for collections
+        }),
+        queryClient.prefetchQuery({
+          ...runQueries.list(50),
+          staleTime: 1000 * 60 * 2, // 2 minutes for recent runs
+        }),
+      ]);
+    }
+
+    return { isAuthenticated: authResult.isAuthenticated };
+  },
+  // Cache this loader result for the entire session
+  staleTime: 1000 * 60 * 30, // 30 minutes
+  gcTime: 1000 * 60 * 60, // 1 hour
   errorComponent: (props) => {
     return (
       <RootDocument>
@@ -117,18 +156,19 @@ function RootComponent() {
   if (isLoading) {
     return (
       <RootDocument>
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
-          <div className="text-center">
-            <div className="relative mb-6">
-              <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
-              <div className="absolute inset-0 w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="min-h-screen flex items-center justify-center bg-white relative">
+          {/* Main loading content */}
+          <div className="text-center px-6 max-w-md mx-auto">
+            {/* Logo and branding */}
+            <div className="mb-8">
+              <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl mb-4 shadow-lg">
+                <span className="text-4xl">🏃‍♂️</span>
+              </div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">MyShoeTracker</h1>
+              <p className="text-gray-600 text-lg">
+                Track your running journey
+              </p>
             </div>
-            <p className="text-gray-600 font-medium">
-              Loading your dashboard...
-            </p>
-            <p className="text-gray-500 text-sm mt-2">
-              Setting up your personalized experience
-            </p>
           </div>
         </div>
       </RootDocument>
@@ -206,8 +246,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
         <IOSInstallBanner />
         <ServiceWorkerIntegration />
-        <ReactQueryDevtools />
-        <TanStackRouterDevtools position="bottom-right" />
+        {process.env.NODE_ENV === "development" && (
+          <>
+            <ReactQueryDevtools />
+            <TanStackRouterDevtools position="bottom-right" />
+          </>
+        )}
         <Scripts />
       </body>
     </html>
@@ -247,7 +291,7 @@ function HeaderCenter() {
   return (
     <Link to="/" className="contents">
       <div className="font-black text-xl sm:text-2xl text-white lg:text-left">
-        🏃‍♂️ ShoeFit
+        🏃‍♂️ MyShoeTracker
       </div>
       <div className="text-slate-400 text-xs sm:text-sm hidden sm:block lg:text-left">
         Track your running shoe stats with ease
@@ -331,6 +375,7 @@ function Navigation() {
         {!isLoading && (
           <Link
             to="/auth/signin"
+            search={{ redirect: "/" }}
             className="text-slate-300 hover:text-white transition-colors font-medium px-4 py-2 rounded-lg hover:bg-slate-800"
           >
             Sign In

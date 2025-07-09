@@ -1,13 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useAuth, withAuth } from "~/components/AuthProvider";
+import { useAuth } from "~/components/AuthProvider";
 import { Loader } from "~/components/Loader";
 import { Button, Input } from "~/components/FormComponents";
+import { requireAuth } from "~/utils/auth";
 
 export const Route = createFileRoute("/profile")({
-  component: withAuth(Profile),
-  pendingComponent: () => <Loader />,
+  component: Profile,
+  loader: async ({ context: { queryClient } }) => {
+    // Require authentication - will redirect if not authenticated
+    const user = await requireAuth(queryClient);
+    return { user };
+  },
 });
 
 function Profile() {

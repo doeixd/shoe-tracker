@@ -34,6 +34,7 @@ import {
   Route as RouteIcon,
 } from "lucide-react";
 import { EmptyStateCard } from "~/components/ui/Cards";
+import { FormBackButton } from "~/components/ui/BackButton";
 
 interface RunFormProps {
   onSuccess?: (runId: string) => void;
@@ -263,13 +264,13 @@ export function RunForm({
           />
           {isModal && (
             <div className="mt-4 text-center">
-              <Button
-                variant="ghost"
-                onClick={handleCancel}
-                className="text-gray-500"
-              >
-                Cancel
-              </Button>
+              <div className="flex justify-end items-center gap-3">
+                <FormBackButton
+                  onCancel={handleCancel}
+                  size="sm"
+                  className="text-gray-500"
+                />
+              </div>
             </div>
           )}
         </div>
@@ -514,16 +515,10 @@ export function RunForm({
           transition={{ duration: 0.3, delay: 0.4 }}
           className="flex flex-col sm:flex-row gap-4 pt-6"
         >
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleCancel}
+          <FormBackButton
+            onCancel={handleCancel}
             disabled={createRunMutation.isPending}
-            fullWidth
-            className="sm:flex-1"
-          >
-            Cancel
-          </Button>
+          />
           <Button
             type="submit"
             loading={createRunMutation.isPending}

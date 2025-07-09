@@ -28,7 +28,7 @@ function createSVGSplashScreen(width, height, deviceName) {
   <path d="M${width / 2 - 30} ${height / 2 - 50} Q${width / 2 - 20} ${height / 2 - 60} ${width / 2} ${height / 2 - 50} Q${width / 2 + 20} ${height / 2 - 60} ${width / 2 + 30} ${height / 2 - 50} L${width / 2 + 25} ${height / 2 - 20} Q${width / 2 + 30} ${height / 2 - 10} ${width / 2 + 20} ${height / 2} L${width / 2 - 20} ${height / 2} Q${width / 2 - 30} ${height / 2 - 10} ${width / 2 - 25} ${height / 2 - 20} Z" fill="#3b82f6"/>
 
   <!-- App Name -->
-  <text x="${width / 2}" y="${height / 2 + 60}" text-anchor="middle" fill="white" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="${Math.min(width, height) * 0.06}" font-weight="600">ShoeFit</text>
+  <text x="${width / 2}" y="${height / 2 + 60}" text-anchor="middle" fill="white" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="${Math.min(width, height) * 0.06}" font-weight="600">MyShoeTracker</text>
 
   <!-- Tagline -->
   <text x="${width / 2}" y="${height / 2 + 90}" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="${Math.min(width, height) * 0.035}" font-weight="400">Track Your Runs</text>

@@ -1,7 +1,7 @@
 /* Import mobile optimizations */
-@import "./mobile-optimizations.css";
-
 @tailwind base;
+/* @import "./mobile-optimizations.css"; */
+
 @tailwind components;
 @tailwind utilities;
 
@@ -721,4 +721,34 @@
     transform: translate3d(0, -5px, 0);
     animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
   }
+}
+
+/* Animation delay utilities */
+.animation-delay-0 {
+  animation-delay: 0s;
+}
+
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animation-delay-400 {
+  animation-delay: 0.4s;
+}
+
+.animation-delay-600 {
+  animation-delay: 0.6s;
+}
+
+.animation-delay-1000 {
+  animation-delay: 1s;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+/* Reverse animation utility */
+.animation-reverse {
+  animation-direction: reverse;
 }

@@ -32,12 +32,12 @@ export function PWAHead() {
       content:
         "running, shoes, tracker, fitness, health, marathon, training, analytics",
     });
-    addMetaTag({ name: "author", content: "ShoeFit" });
+    addMetaTag({ name: "author", content: "MyShoeTracker" });
     addMetaTag({ name: "robots", content: "index, follow" });
 
     // PWA Meta Tags
-    addMetaTag({ name: "application-name", content: "ShoeFit" });
-    addMetaTag({ name: "theme-color", content: "#3b82f6" });
+    addMetaTag({ name: "application-name", content: "MyShoeTracker" });
+    // theme-color moved to static JSX to prevent hydration mismatch
     addMetaTag({ name: "color-scheme", content: "light dark" });
     addMetaTag({ name: "supported-color-schemes", content: "light dark" });
 
@@ -47,7 +47,7 @@ export function PWAHead() {
       name: "apple-mobile-web-app-status-bar-style",
       content: "default",
     });
-    addMetaTag({ name: "apple-mobile-web-app-title", content: "ShoeFit" });
+    addMetaTag({ name: "apple-mobile-web-app-title", content: "MyShoeTracker" });
     addMetaTag({ name: "apple-touch-fullscreen", content: "yes" });
     addMetaTag({ name: "format-detection", content: "telephone=no" });
 
@@ -71,39 +71,40 @@ export function PWAHead() {
 
     // Open Graph / Social Media
     addMetaTag({ property: "og:type", content: "website" });
-    addMetaTag({ property: "og:site_name", content: "ShoeFit" });
+    addMetaTag({ property: "og:site_name", content: "MyShoeTracker" });
     addMetaTag({
       property: "og:title",
-      content: "ShoeFit - Running Shoe Tracker",
+      content: "MyShoeTracker",
     });
     addMetaTag({
       property: "og:description",
       content:
         "Track your running shoes, monitor mileage, and log your runs with comprehensive analytics and insights.",
     });
-    addMetaTag({ property: "og:image", content: "/og-image.png" });
+    addMetaTag({ property: "og:url", content: "https://myshoetracker.fun" });
+    addMetaTag({ property: "og:image", content: "https://myshoetracker.fun/og-image.png" });
     addMetaTag({ property: "og:image:width", content: "1200" });
     addMetaTag({ property: "og:image:height", content: "630" });
     addMetaTag({
       property: "og:image:alt",
-      content: "ShoeFit - Running Shoe Tracker",
+      content: "MyShoeTracker",
     });
     addMetaTag({ property: "og:locale", content: "en_US" });
 
     // Twitter Card
     addMetaTag({ name: "twitter:card", content: "summary_large_image" });
-    addMetaTag({ name: "twitter:site", content: "@shoefit" });
-    addMetaTag({ name: "twitter:creator", content: "@shoefit" });
+    addMetaTag({ name: "twitter:site", content: "@myshoetracker" });
+    addMetaTag({ name: "twitter:creator", content: "@myshoetracker" });
     addMetaTag({
       name: "twitter:title",
-      content: "ShoeFit - Running Shoe Tracker",
+      content: "MyShoeTracker",
     });
     addMetaTag({
       name: "twitter:description",
       content:
         "Track your running shoes, monitor mileage, and log your runs with comprehensive analytics and insights.",
     });
-    addMetaTag({ name: "twitter:image", content: "/twitter-card.png" });
+    addMetaTag({ name: "twitter:image", content: "https://myshoetracker.fun/twitter-card.png" });
 
     // CSP and Security
     addMetaTag({ httpEquiv: "X-Content-Type-Options", content: "nosniff" });
@@ -132,6 +133,18 @@ export function PWAHead() {
         rel="preconnect"
         href="https://fonts.gstatic.com"
         crossOrigin="anonymous"
+      />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+      />
+      <link rel="canonical" href="https://myshoetracker.fun" />
+
+      {/* Fix hydration mismatch for dynamic theme-color */}
+      <meta
+        name="theme-color"
+        content="#3b82f6"
+        suppressHydrationWarning={true}
       />
       <link rel="dns-prefetch" href="https://api.convex.cloud" />
       <link rel="manifest" href="/manifest.json" />
@@ -276,14 +289,6 @@ export function PWAHead() {
         href="/splash/ipad-pro-12-landscape.png"
       />
       {/* Performance and Optimization */}
-      <link
-        rel="preload"
-        href="/fonts/inter-var.woff2"
-        as="font"
-        type="font/woff2"
-        crossOrigin="anonymous"
-      />
-      <link rel="modulepreload" href="/src/main.tsx" />
 
       {/* Structured Data for Search Engines */}
       <script
@@ -292,7 +297,8 @@ export function PWAHead() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "MobileApplication",
-            name: "ShoeFit",
+            name: "MyShoeTracker",
+            url: "https://myshoetracker.fun",
             description:
               "Track your running shoes, monitor mileage, and log your runs with comprehensive analytics and insights.",
             applicationCategory: "HealthApplication",

@@ -2,7 +2,7 @@
   "ci": {
     "collect": {
       "url": [
-        "http://localhost:3000"
+        "https://myshoetracker.fun"
       ],
       "numberOfRuns": 1,
       "settings": {

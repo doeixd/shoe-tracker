@@ -399,7 +399,7 @@ export function PWAStatus({ showDetails = false, onClose }: PWAStatusProps) {
               <p className="text-xs text-blue-700 dark:text-blue-300">
                 {pwaInfo.platform === "iOS"
                   ? 'Tap the Share button and select "Add to Home Screen" to install.'
-                  : "Click the install button in your browser to add ShoeFit to your home screen."}
+                  : "Click the install button in your browser to add MyShoeTracker to your home screen."}
               </p>
             </div>
           </div>

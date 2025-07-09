@@ -32,8 +32,8 @@ export function Card({
     none: "",
     sm: "p-3",
     md: "p-4 sm:p-6",
-    lg: "p-6 sm:p-8",
-    xl: "p-8 sm:p-10",
+    lg: "p-4 sm:p-6",
+    xl: "p-6 sm:p-6",
   };
 
   const shadowClasses = {
@@ -117,12 +117,12 @@ export function MetricCard({
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-gray-600 truncate">{title}</p>
-          <div className="mt-2 flex items-baseline @[140px]:flex-col @[140px]:items-start">
-            <span className="text-2xl sm:text-3xl @[120px]:text-xl @[100px]:text-lg font-bold text-gray-900">
+          <div className="mt-2 flex flex-col items-start">
+            <span className="text-3xl @[120px]:text-2xl @[100px]:text-xl font-bold text-gray-900">
               {value}
             </span>
             {subtitle && (
-              <span className="ml-2 @[140px]:ml-0 @[140px]:mt-1 text-sm @[100px]:text-xs text-gray-500">
+              <span className="mt-1 text-sm @[100px]:text-xs text-gray-500">
                 {subtitle}
               </span>
             )}

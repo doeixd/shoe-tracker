@@ -23,7 +23,6 @@ function EditRunPage() {
 
 export const Route = createFileRoute("/runs/$runId/edit")({
   component: withAuth(EditRunPage),
-  pendingComponent: () => <Loader />,
   validateSearch: (search: Record<string, unknown>) => {
     return {
       modal: search?.modal === true || search?.modal === "true" || false,

@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log("🚀 Setting up PWA for ShoeFit...\n");
+console.log("🚀 Setting up PWA for MyShoeTracker...\n");
 
 // Directories to create
 const directories = ["public/splash", "public/icons", "src/utils/pwa"];
@@ -44,7 +44,7 @@ console.log("✓ Created browserconfig.xml");
 const robotsTxt = `User-agent: *
 Allow: /
 
-Sitemap: https://your-domain.com/sitemap.xml`;
+Sitemap: https://myshoetracker.fun/sitemap.xml`;
 
 fs.writeFileSync(path.join(__dirname, "..", "public", "robots.txt"), robotsTxt);
 console.log("✓ Created robots.txt");
@@ -52,8 +52,8 @@ console.log("✓ Created robots.txt");
 // Create PWA utilities
 const pwaUtils = `// PWA Utilities
 export const PWA_CONFIG = {
-  APP_NAME: 'ShoeFit',
-  APP_SHORT_NAME: 'ShoeFit',
+  APP_NAME: 'MyShoeTracker',
+  APP_SHORT_NAME: 'MyShoeTracker',
   APP_DESCRIPTION: 'Track your running shoes, monitor mileage, and log your runs with comprehensive analytics and insights.',
   THEME_COLOR: '#3b82f6',
   BACKGROUND_COLOR: '#ffffff',
@@ -305,7 +305,7 @@ packageJson.scripts = {
   "pwa:generate-splash": "bun scripts/generate-splash-screens.js",
   "pwa:setup": "bun scripts/setup-pwa.js",
   "pwa:check":
-    'lighthouse --chrome-flags="--headless" --output=html --output-path=./pwa-audit.html http://localhost:3000',
+    'lighthouse --chrome-flags="--headless" --output=html --output-path=./pwa-audit.html https://myshoetracker.fun',
   "pwa:serve": "bunx serve .output/public -s",
 };
 
@@ -314,8 +314,8 @@ console.log("✓ Updated package.json with PWA scripts");
 
 // Create .pwarc configuration
 const pwaConfig = {
-  name: "ShoeFit",
-  shortName: "ShoeFit",
+  name: "MyShoeTracker",
+  shortName: "MyShoeTracker",
   description:
     "Track your running shoes, monitor mileage, and log your runs with comprehensive analytics and insights.",
   themeColor: "#3b82f6",
@@ -331,7 +331,7 @@ const pwaConfig = {
       sizes: "1280x800",
       type: "image/png",
       form_factor: "wide",
-      label: "ShoeFit Dashboard",
+      label: "MyShoeTracker Dashboard",
     },
     {
       src: "/screenshots/mobile-1.png",
@@ -425,7 +425,7 @@ console.log("✓ Created GitHub workflow for PWA testing");
 const lighthouseConfig = {
   ci: {
     collect: {
-      url: ["http://localhost:3000"],
+      url: ["https://myshoetracker.fun"],
       numberOfRuns: 1,
       settings: {
         chromeFlags: "--no-sandbox --headless",
@@ -453,7 +453,7 @@ fs.writeFileSync(
 console.log("✓ Created Lighthouse configuration");
 
 // Create PWA checklist
-const pwaChecklist = `# PWA Setup Checklist for ShoeFit
+const pwaChecklist = `# PWA Setup Checklist for MyShoeTracker
 
 ## ✅ Core PWA Requirements
 - [x] Web App Manifest

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyShoeTracker Dashboard Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.pass {
+            background: #4CAF50;
+            color: white;
+        }
+        .status.fail {
+            background: #f44336;
+            color: white;
+        }
+        .status.warning {
+            background: #ff9800;
+            color: white;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button.secondary {
+            background: #2196F3;
+        }
+        button.secondary:hover {
+            background: #1976D2;
+        }
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏃‍♂️ MyShoeTracker Dashboard Test</h1>
+
+        <div class="test-section">
+            <h3>🔍 Environment Check</h3>
+            <p>JavaScript: <span id="js-status" class="status">Checking...</span></p>
+            <p>Local Storage: <span id="storage-status" class="status">Checking...</span></p>
+            <p>Service Worker Support: <span id="sw-status" class="status">Checking...</span></p>
+            <p>React DevTools Conflict: <span id="devtools-status" class="status">Checking...</span></p>
+        </div>
+
+        <div class="test-section">
+            <h3>🌐 Network Test</h3>
+            <p>Convex Connection: <span id="convex-status" class="status">Checking...</span></p>
+            <p>Internet Connection: <span id="network-status" class="status">Checking...</span></p>
+            <button onclick="testNetwork()">Test Network</button>
+        </div>
+
+        <div class="test-section">
+            <h3>🚀 Dashboard Loading Test</h3>
+            <p>This test loads the main dashboard in an iframe to isolate issues.</p>
+            <button onclick="loadDashboard()">Load Dashboard</button>
+            <button class="secondary" onclick="loadDebugDashboard()">Load Debug Dashboard</button>
+            <div id="dashboard-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Console Logs</h3>
+            <button onclick="clearLogs()">Clear Logs</button>
+            <div id="console-log" class="log"></div>
+        </div>
+
+        <div class="actions">
+            <button onclick="runAllTests()">🔄 Run All Tests</button>
+            <button class="secondary" onclick="location.reload()">🔄 Refresh Page</button>
+        </div>
+    </div>
+
+    <script>
+        let logs = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            logs.push(logEntry);
+            updateConsoleLog();
+            console.log(logEntry);
+        }
+
+        function updateConsoleLog() {
+            const logElement = document.getElementById('console-log');
+            logElement.innerHTML = logs.slice(-20).join('\n');
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function setStatus(elementId, status, text) {
+            const element = document.getElementById(elementId);
+            element.className = `status ${status}`;
+            element.textContent = text || status.toUpperCase();
+        }
+
+        function clearLogs() {
+            logs = [];
+            updateConsoleLog();
+        }
+
+        // Environment checks
+        function checkEnvironment() {
+            log('Starting environment checks...');
+
+            // JavaScript
+            try {
+                setStatus('js-status', 'pass', 'Working');
+                log('JavaScript is working correctly');
+            } catch (e) {
+                setStatus('js-status', 'fail', 'Error');
+                log('JavaScript error: ' + e.message, 'error');
+            }
+
+            // Local Storage
+            try {
+                localStorage.setItem('test', 'value');
+                localStorage.removeItem('test');
+                setStatus('storage-status', 'pass', 'Available');
+                log('Local Storage is available');
+            } catch (e) {
+                setStatus('storage-status', 'fail', 'Unavailable');
+                log('Local Storage error: ' + e.message, 'error');
+            }
+
+            // Service Worker
+            if ('serviceWorker' in navigator) {
+                setStatus('sw-status', 'pass', 'Supported');
+                log('Service Worker is supported');
+            } else {
+                setStatus('sw-status', 'warning', 'Not Supported');
+                log('Service Worker not supported', 'warning');
+            }
+
+            // React DevTools Conflict Check
+            if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
+                setStatus('devtools-status', 'warning', 'DevTools Detected');
+                log('React DevTools global hook detected - potential conflict source', 'warning');
+            } else if (typeof window.injectIntoGlobalHook !== 'undefined') {
+                setStatus('devtools-status', 'warning', 'Hook Function Detected');
+                log('injectIntoGlobalHook function detected - potential conflict source', 'warning');
+            } else {
+                setStatus('devtools-status', 'pass', 'No Conflicts');
+                log('No React DevTools conflicts detected');
+            }
+        }
+
+        function testNetwork() {
+            log('Testing network connectivity...');
+
+            // Test basic internet
+            fetch('https://httpbin.org/get', { mode: 'cors' })
+                .then(response => {
+                    if (response.ok) {
+                        setStatus('network-status', 'pass', 'Connected');
+                        log('Internet connection is working');
+                    } else {
+                        setStatus('network-status', 'fail', 'Poor Connection');
+                        log('Internet connection is poor', 'warning');
+                    }
+                })
+                .catch(error => {
+                    setStatus('network-status', 'fail', 'No Connection');
+                    log('Internet connection failed: ' + error.message, 'error');
+                });
+
+            // Test Convex (if URL is available)
+            const convexUrl = 'https://festive-crab-299.convex.cloud';
+            if (convexUrl && !convexUrl.includes('your-deployment')) {
+                fetch(convexUrl + '/', { mode: 'no-cors' })
+                    .then(() => {
+                        setStatus('convex-status', 'pass', 'Reachable');
+                        log('Convex backend is reachable');
+                    })
+                    .catch(error => {
+                        setStatus('convex-status', 'fail', 'Unreachable');
+                        log('Convex connection failed: ' + error.message, 'error');
+                    });
+            } else {
+                setStatus('convex-status', 'warning', 'Not Configured');
+                log('Convex URL not configured', 'warning');
+            }
+        }
+
+        function loadDashboard() {
+            log('Attempting to load main dashboard...');
+            const resultDiv = document.getElementById('dashboard-result');
+
+            // Clear previous results
+            resultDiv.innerHTML = '';
+
+            // Create iframe to load dashboard
+            const iframe = document.createElement('iframe');
+            iframe.src = '/';
+            iframe.style.width = '100%';
+            iframe.style.height = '400px';
+            iframe.style.border = '1px solid rgba(255,255,255,0.3)';
+            iframe.style.borderRadius = '8px';
+            iframe.style.marginTop = '15px';
+
+            let loadTimeout;
+
+            iframe.onload = function() {
+                clearTimeout(loadTimeout);
+                log('Dashboard loaded successfully in iframe');
+
+                // Check for errors in iframe
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    const errors = iframeDoc.querySelectorAll('[data-error]');
+                    if (errors.length > 0) {
+                        log('Dashboard loaded but contains errors', 'warning');
+                    } else {
+                        log('Dashboard appears to be working correctly');
+                    }
+                } catch (e) {
+                    log('Cannot inspect iframe content (CORS), but it loaded', 'warning');
+                }
+            };
+
+            iframe.onerror = function() {
+                clearTimeout(loadTimeout);
+                log('Dashboard failed to load in iframe', 'error');
+            };
+
+            // Set timeout for loading
+            loadTimeout = setTimeout(() => {
+                log('Dashboard loading timed out after 10 seconds', 'error');
+            }, 10000);
+
+            resultDiv.appendChild(iframe);
+        }
+
+        function loadDebugDashboard() {
+            log('Opening debug dashboard in new tab...');
+            window.open('/debug-dashboard', '_blank');
+        }
+
+        function runAllTests() {
+            log('Running comprehensive test suite...');
+            clearLogs();
+            setTimeout(() => {
+                checkEnvironment();
+                setTimeout(() => {
+                    testNetwork();
+                }, 1000);
+            }, 100);
+        }
+
+        // Capture and log JavaScript errors
+        window.addEventListener('error', function(event) {
+            log(`JavaScript Error: ${event.message} at ${event.filename}:${event.lineno}`, 'error');
+        });
+
+        window.addEventListener('unhandledrejection', function(event) {
+            log(`Unhandled Promise Rejection: ${event.reason}`, 'error');
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Test page loaded successfully');
+            setTimeout(runAllTests, 500);
+        });
+    </script>
+</body>
+</html>

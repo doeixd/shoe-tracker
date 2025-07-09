@@ -84,7 +84,7 @@ export function IOSInstallBanner() {
               Add to Home Screen
             </h3>
             <p className="text-sm text-gray-600 mb-3">
-              Install ShoeFit for the best experience. Tap the Share button
+              Install MyShoeTracker for the best experience. Tap the Share button
               <ArrowUp className="inline w-4 h-4 mx-1" />
               then "Add to Home Screen".
             </p>
@@ -400,7 +400,7 @@ export function AppUpdateBanner() {
           <div>
             <div className="font-medium">App Update Available</div>
             <div className="text-sm text-blue-100">
-              A new version of ShoeFit is ready
+              A new version of MyShoeTracker is ready
             </div>
           </div>
         </div>

@@ -1,8 +1,8 @@
-# ShoeFit Architecture: Data Flow, Caching, and Offline Support
+# MyShoeTracker Architecture: Data Flow, Caching, and Offline Support
 
 ## Overview
 
-This document explains how ShoeFit's data architecture works, covering the intersection of TanStack Router loaders, Convex real-time database, React Query caching, service workers, and offline support. Understanding these interactions is crucial for maintaining performance and reliability.
+This document explains how MyShoeTracker's data architecture works, covering the intersection of TanStack Router loaders, Convex real-time database, React Query caching, service workers, and offline support. Understanding these interactions is crucial for maintaining performance and reliability.
 
 ## Architecture Layers
 

@@ -23,7 +23,6 @@ function EditCollectionPage() {
 
 export const Route = createFileRoute("/collections/$collectionId/edit")({
   component: withAuth(EditCollectionPage),
-  pendingComponent: () => <Loader />,
   validateSearch: (search: Record<string, unknown>) => {
     return {
       modal: search?.modal === true || search?.modal === "true" || false,

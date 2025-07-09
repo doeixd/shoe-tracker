@@ -1,7 +1,7 @@
 // PWA Utilities
 export const PWA_CONFIG = {
-  APP_NAME: 'ShoeFit',
-  APP_SHORT_NAME: 'ShoeFit',
+  APP_NAME: 'MyShoeTracker',
+  APP_SHORT_NAME: 'MyShoeTracker',
   APP_DESCRIPTION: 'Track your running shoes, monitor mileage, and log your runs with comprehensive analytics and insights.',
   THEME_COLOR: '#3b82f6',
   BACKGROUND_COLOR: '#ffffff',

@@ -7,7 +7,6 @@ import {
   runQueries,
   statsQueries,
 } from "../queries";
-import { getPrefetcher } from "./prefetch";
 
 export interface LoaderContext {
   queryClient: QueryClient;
@@ -39,34 +38,12 @@ export async function createAuthAwareLoader(
 
   return async ({ context }: { context: LoaderContext }) => {
     const { queryClient } = context;
-    const prefetcher = getPrefetcher();
 
-    // Check auth state if required
-    if (requireAuth && prefetcher) {
-      const authState = prefetcher.getAuthState();
-
-      // If still loading auth, wait a bit
-      if (authState.isLoading) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        const updatedAuthState = prefetcher.getAuthState();
-
-        if (updatedAuthState.isLoading) {
-          // Still loading after wait, allow through but don't prefetch
-          console.warn("Auth state still loading, proceeding without prefetch");
-          return {};
-        }
-      }
-
-      // Check final auth state
-      if (!prefetcher.isAuthenticated()) {
-        // Not authenticated, redirect
-        console.info("User not authenticated, redirecting to sign in");
-        throw redirect({ to: redirectTo });
-      }
-    }
+    // TanStack Router and Convex handle auth state automatically
+    // Just handle the critical queries
 
     try {
-      // Execute critical queries first
+      // Execute critical queries if provided
       if (criticalQueries.length > 0) {
         const criticalPromises = criticalQueries.map((queryFn) =>
           queryClient.ensureQueryData(queryFn()),
@@ -81,22 +58,10 @@ export async function createAuthAwareLoader(
         ]);
       }
 
-      // Start background prefetching if enabled
-      if (prefetchInBackground && backgroundQueries.length > 0) {
-        // Don't await these - let them run in background
-        backgroundQueries.forEach((queryFn) => {
-          queryClient.prefetchQuery(queryFn()).catch((error) => {
-            // Silently handle background prefetch errors
-            console.debug("Background prefetch failed:", error);
-          });
-        });
-      }
-
       return {};
     } catch (error: any) {
-      // Handle specific error types
+      // Handle authentication errors
       if (error?.message?.includes("not authenticated")) {
-        console.info("Authentication error in loader, redirecting");
         throw redirect({ to: redirectTo });
       }
 
@@ -112,24 +77,21 @@ export async function createAuthAwareLoader(
   };
 }
 
-// Predefined loaders for common routes
+// Simplified loaders that just prefetch critical data
 export const shoesIndexLoader = async ({
   context,
 }: {
   context: LoaderContext;
 }) => {
-  const loader = await createAuthAwareLoader({
-    criticalQueries: [
-      () => shoeQueries.list(false),
-      () => shoeQueries.list(true),
-      () => collectionQueries.list(),
-    ],
-    backgroundQueries: [
-      () => runQueries.withShoes(20),
-      () => statsQueries.overall(),
-    ],
-  });
-  return loader({ context });
+  const { queryClient } = context;
+
+  // Prefetch critical data - TanStack Router handles auth automatically
+  await Promise.allSettled([
+    queryClient.prefetchQuery(shoeQueries.list(true)),
+    queryClient.prefetchQuery(collectionQueries.list()),
+  ]);
+
+  return {};
 };
 
 export const runsIndexLoader = async ({
@@ -137,17 +99,14 @@ export const runsIndexLoader = async ({
 }: {
   context: LoaderContext;
 }) => {
-  const loader = await createAuthAwareLoader({
-    criticalQueries: [
-      () => runQueries.withShoes(50),
-      () => shoeQueries.list(false),
-    ],
-    backgroundQueries: [
-      () => collectionQueries.list(),
-      () => statsQueries.overall(),
-    ],
-  });
-  return loader({ context });
+  const { queryClient } = context;
+
+  await Promise.allSettled([
+    queryClient.prefetchQuery(runQueries.withShoes(50)),
+    queryClient.prefetchQuery(shoeQueries.list(false)),
+  ]);
+
+  return {};
 };
 
 export const collectionsIndexLoader = async ({
@@ -155,17 +114,14 @@ export const collectionsIndexLoader = async ({
 }: {
   context: LoaderContext;
 }) => {
-  const loader = await createAuthAwareLoader({
-    criticalQueries: [
-      () => collectionQueries.list(),
-      () => collectionQueries.archived(),
-    ],
-    backgroundQueries: [
-      () => shoeQueries.list(false),
-      () => runQueries.withShoes(20),
-    ],
-  });
-  return loader({ context });
+  const { queryClient } = context;
+
+  await Promise.allSettled([
+    queryClient.prefetchQuery(collectionQueries.list()),
+    queryClient.prefetchQuery(collectionQueries.archived()),
+  ]);
+
+  return {};
 };
 
 export const analyticsLoader = async ({
@@ -173,167 +129,61 @@ export const analyticsLoader = async ({
 }: {
   context: LoaderContext;
 }) => {
-  const loader = await createAuthAwareLoader({
-    criticalQueries: [() => statsQueries.overall()],
-    backgroundQueries: [
-      () => runQueries.withShoes(200),
-      () => shoeQueries.list(false),
-      () => collectionQueries.list(),
-    ],
-  });
-  return loader({ context });
+  const { queryClient } = context;
+
+  await queryClient.prefetchQuery(statsQueries.overall());
+
+  return {};
 };
 
-// Dynamic loaders that accept parameters
+// Simplified dynamic loaders
 export function createShoeDetailLoader(shoeId: string) {
   return async ({ context }: { context: LoaderContext }) => {
-    const loader = await createAuthAwareLoader({
-      criticalQueries: [
-        () => shoeQueries.detail(shoeId),
-        () => shoeQueries.withStats(shoeId),
-      ],
-      backgroundQueries: [
-        () => runQueries.list(50, shoeId),
-        () => collectionQueries.list(),
-      ],
-    });
-    return loader({ context });
+    const { queryClient } = context;
+
+    await Promise.allSettled([
+      queryClient.prefetchQuery(shoeQueries.detail(shoeId)),
+      queryClient.prefetchQuery(shoeQueries.withStats(shoeId)),
+    ]);
+
+    return {};
   };
 }
 
 export function createCollectionDetailLoader(collectionId: string) {
   return async ({ context }: { context: LoaderContext }) => {
-    const loader = await createAuthAwareLoader({
-      criticalQueries: [
-        () => collectionQueries.detail(collectionId),
-        () => shoeQueries.byCollection(collectionId, false),
-      ],
-      backgroundQueries: [
-        () => shoeQueries.byCollection(collectionId, true),
-        () => runQueries.withShoes(50),
-      ],
-    });
-    return loader({ context });
+    const { queryClient } = context;
+
+    await Promise.allSettled([
+      queryClient.prefetchQuery(collectionQueries.detail(collectionId)),
+      queryClient.prefetchQuery(shoeQueries.byCollection(collectionId, false)),
+    ]);
+
+    return {};
   };
 }
 
 export function createRunDetailLoader(runId: string) {
   return async ({ context }: { context: LoaderContext }) => {
-    const loader = await createAuthAwareLoader({
-      criticalQueries: [() => runQueries.detail(runId)],
-      backgroundQueries: [
-        () => shoeQueries.list(false),
-        () => runQueries.withShoes(20),
-      ],
-    });
-    return loader({ context });
+    const { queryClient } = context;
+
+    await queryClient.prefetchQuery(runQueries.detail(runId));
+
+    return {};
   };
 }
 
-// Utility for route-specific prefetching
-export async function prefetchForRoute(
-  queryClient: QueryClient,
-  route: string,
-  params?: Record<string, string>,
-) {
-  const prefetcher = getPrefetcher();
-
-  if (!prefetcher?.isAuthenticated()) {
-    return;
-  }
-
-  try {
-    switch (route) {
-      case "/shoes":
-        await Promise.allSettled([
-          queryClient.prefetchQuery(shoeQueries.list(false)),
-          queryClient.prefetchQuery(collectionQueries.list()),
-        ]);
-        break;
-
-      case "/shoes/:shoeId":
-        if (params?.shoeId) {
-          await Promise.allSettled([
-            queryClient.prefetchQuery(shoeQueries.detail(params.shoeId)),
-            queryClient.prefetchQuery(shoeQueries.withStats(params.shoeId)),
-          ]);
-        }
-        break;
-
-      case "/runs":
-        await Promise.allSettled([
-          queryClient.prefetchQuery(runQueries.withShoes(50)),
-          queryClient.prefetchQuery(shoeQueries.list(false)),
-        ]);
-        break;
-
-      case "/runs/:runId":
-        if (params?.runId) {
-          await queryClient.prefetchQuery(runQueries.detail(params.runId));
-        }
-        break;
-
-      case "/collections":
-        await Promise.allSettled([
-          queryClient.prefetchQuery(collectionQueries.list()),
-          queryClient.prefetchQuery(shoeQueries.list(false)),
-        ]);
-        break;
-
-      case "/collections/:collectionId":
-        if (params?.collectionId) {
-          await Promise.allSettled([
-            queryClient.prefetchQuery(
-              collectionQueries.detail(params.collectionId),
-            ),
-            queryClient.prefetchQuery(
-              shoeQueries.byCollection(params.collectionId, false),
-            ),
-          ]);
-        }
-        break;
-
-      case "/analytics":
-        await Promise.allSettled([
-          queryClient.prefetchQuery(statsQueries.overall()),
-          queryClient.prefetchQuery(runQueries.withShoes(100)),
-        ]);
-        break;
-
-      default:
-        // Default prefetch for unknown routes
-        await Promise.allSettled([
-          queryClient.prefetchQuery(shoeQueries.list(false)),
-          queryClient.prefetchQuery(collectionQueries.list()),
-        ]);
-    }
-  } catch (error) {
-    console.debug("Route prefetch failed:", error);
-  }
-}
-
-// Error boundary helper for loaders
+// Simple error boundary helper for loaders
 export function handleLoaderError(error: any, route: string) {
   console.error(`Loader error on ${route}:`, error);
 
   if (error?.message?.includes("not authenticated")) {
-    return redirect({ to: "/auth/signin" });
+    throw redirect({ to: "/auth/signin", search: { redirect: "/" } });
   }
 
-  if (error?.message?.includes("not found")) {
-    toast.error("The requested resource was not found");
-    return redirect({ to: "/" });
-  }
-
-  if (error?.message?.includes("network")) {
-    toast.error("Network error. Please check your connection.");
-  }
-
-  // For other errors, let the error boundary handle it
+  // For other errors, let TanStack Router's error boundary handle it
   throw error;
 }
-
-// Performance monitoring for loaders
 export class LoaderPerformanceMonitor {
   private static timings: Map<string, number[]> = new Map();
 

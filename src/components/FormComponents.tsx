@@ -81,65 +81,85 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
 
         <div className="relative">
-          {/* Icon */}
-          {icon && (
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-gray-400">
-              {icon}
-            </div>
-          )}
-
-          {/* Input */}
-          <input
-            ref={ref}
-            type={inputType}
+          {/* Flex container for icon and input */}
+          <div
             className={cn(
-              // Base styles
-              "w-full rounded-2xl border transition-colors duration-200 relative",
+              "flex items-center rounded-2xl border transition-colors duration-200 relative bg-white",
               sizeClasses[size],
-              // Padding
-              icon ? "pl-12" : "pl-4",
-              isPassword ? "pr-12" : "pr-4",
               // Focus and state styles
-              "focus:outline-none focus:ring-2 focus:ring-primary-500/20",
+              "focus-within:outline-none focus-within:ring-1 focus-within:ring-primary-500/50",
               // Default state
               !error && !success
-                ? "border-gray-200 focus:border-primary-500"
+                ? "border-gray-200 focus-within:border-primary-500 hover:border-gray-300"
                 : "",
               // Error state
-              error ? "border-red-300 focus:border-red-500 bg-red-50/30" : "",
+              error
+                ? "border-red-300 focus-within:border-red-500 bg-red-50/30"
+                : "",
               // Success state
               success
-                ? "border-green-300 focus:border-green-500 bg-green-50/30"
+                ? "border-green-300 focus-within:border-green-500 bg-green-50/30"
                 : "",
-              // Hover state
-              "hover:border-gray-300",
-              // Text color
-              "text-gray-900 placeholder:text-gray-400",
-              // Background
-              "bg-white",
-              className,
             )}
-            onFocus={props.onFocus}
-            onBlur={props.onBlur}
-            onChange={handleInputChange}
-            placeholder={props.placeholder}
-            {...props}
-          />
+          >
+            {/* Icon */}
+            {icon && (
+              <div
+                className={cn(
+                  "flex items-center justify-center text-gray-400 flex-shrink-0",
+                  size === "sm"
+                    ? "ml-3 w-4 h-4"
+                    : size === "lg"
+                      ? "ml-4 w-6 h-6"
+                      : "ml-4 w-5 h-5",
+                )}
+              >
+                {icon}
+              </div>
+            )}
 
-          {/* Password Toggle */}
-          {isPassword && (
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              {showPassword ? (
-                <EyeOff className="h-5 w-5" />
-              ) : (
-                <Eye className="h-5 w-5" />
+            {/* Input */}
+            <input
+              ref={ref}
+              type={inputType}
+              className={cn(
+                // Base styles
+                "w-full bg-transparent border-0 outline-none transition-colors duration-200 py-0",
+                // Padding with gap from icon
+                icon ? "pl-3.5" : "pl-4",
+                isPassword ? "pr-12" : "pr-4",
+                // Text color
+                "text-gray-900 placeholder:text-gray-400",
+                // Font size matching the container
+                size === "sm"
+                  ? "text-sm"
+                  : size === "lg"
+                    ? "text-lg"
+                    : "text-base",
+                className,
               )}
-            </button>
-          )}
+              onFocus={props.onFocus}
+              onBlur={props.onBlur}
+              onChange={handleInputChange}
+              placeholder={props.placeholder}
+              {...props}
+            />
+
+            {/* Password Toggle */}
+            {isPassword && (
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Error Message */}
@@ -320,7 +340,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         <div className="relative">
           {/* Icon */}
           {icon && (
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-gray-400">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-gray-400 pointer-events-none">
               {icon}
             </div>
           )}
@@ -330,7 +350,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             className={cn(
               // Base styles
-              "w-full rounded-2xl border transition-all duration-300 ease-out relative pr-12 appearance-none cursor-pointer",
+              "w-full rounded-2xl border transition-all duration-300 ease-out relative pr-12 appearance-none cursor-pointer z-10",
               sizeClasses[size],
               // Padding
               icon ? "pl-12" : "pl-4",

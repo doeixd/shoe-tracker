@@ -1,12 +1,10 @@
-import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import {
-  statsQueries,
-  collectionQueries,
-  shoeQueries,
-  runQueries,
-} from "~/queries";
-import { withAuth } from "~/components/AuthProvider";
+import { useAppData, useHasUserData } from "~/hooks/useAppData";
+import { useAppDataSuspense, useHasUserDataSuspense } from "~/hooks/useSuspenseQueries";
+import { convexQuery } from "@convex-dev/react-query";
+import { api } from "../../convex/_generated/api";
+import { useAuth } from "~/components/AuthProvider";
 import { Onboarding } from "~/components/Onboarding";
 import { ErrorBoundary } from "~/components/ErrorBoundary";
 import {
@@ -16,6 +14,8 @@ import {
   ErrorState,
 } from "~/components/LoadingStates";
 import { EnhancedLoading } from "~/components/loading/EnhancedLoading";
+import { useEffect } from "react";
+import { requireAuth } from "~/utils/auth";
 import {
   formatDistance,
   formatDuration,
@@ -27,6 +27,7 @@ import {
   BarChart3,
   Footprints,
   Timer,
+  Loader2,
   Activity,
   AlertTriangle,
   TrendingUp,
@@ -45,6 +46,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useFirstVisit, getAnimationProps } from "~/hooks/useFirstVisit";
+import { PageHeader, PageContainer } from "~/components/PageHeader";
 import {
   MetricCard,
   FeatureCard,
@@ -53,50 +55,69 @@ import {
 } from "~/components/ui/Cards";
 import { Button } from "~/components/FormComponents";
 import { cn } from "~/components/ui/ui";
+import * as React from "react";
 
 function HomePage() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="max-w-md w-full space-y-8 p-6">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Sign in required
+            </h2>
+            <p className="mt-2 text-gray-600">
+              Please sign in to access your dashboard.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <ErrorBoundary>
-      <Home />
+      <React.Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Loading dashboard...</p>
+          </div>
+        </div>
+      }>
+        <Home />
+      </React.Suspense>
     </ErrorBoundary>
   );
 }
 
 export const Route = createFileRoute("/")({
-  component: withAuth(HomePage),
-  pendingComponent: () => (
-    <EnhancedLoading
-      message="Loading your dashboard..."
-      layout="dashboard"
-      holdDelay={200}
-      skeletonDelay={300}
-      showProgress={true}
-    />
-  ),
+  component: HomePage,
+  // Loader with authentication redirect
   loader: async ({ context: { queryClient } }) => {
-    try {
-      // Preload critical dashboard data
-      const statsPromise = queryClient.ensureQueryData(statsQueries.overall());
-      const collectionsPromise = queryClient.ensureQueryData(
-        collectionQueries.list(),
-      );
-      const shoesPromise = queryClient.ensureQueryData(shoeQueries.list(false));
+    // Require authentication - will redirect if not authenticated
+    const user = await requireAuth(queryClient);
 
-      // Wait for critical data
-      await Promise.all([statsPromise, collectionsPromise, shoesPromise]);
+    // Prefetch critical dashboard data using new app data query
+    await queryClient.ensureQueryData({
+      ...convexQuery(api.dashboard.getAppData, {}),
+      staleTime: 1000 * 60 * 5,
+    });
 
-      // Prefetch additional data in background
-      queryClient.prefetchQuery(runQueries.withShoes(10)).catch(() => {});
-      queryClient.prefetchQuery(shoeQueries.list(true)).catch(() => {});
-
-      return {};
-    } catch (error: any) {
-      // If auth error, let the component handle it
-      if (error?.message?.includes("Not authenticated")) {
-        return {};
-      }
-      throw error;
-    }
+    return { user };
   },
 });
 
@@ -105,150 +126,101 @@ function Home() {
   const queryClient = useQueryClient();
   const { isFirstVisit } = useFirstVisit();
 
-  // Wrap queries with error handling
-  const statsQuery = useSuspenseQuery({
-    ...statsQueries.overall(),
-    retry: (failureCount, error) => {
-      if (error?.message?.includes("not authenticated")) {
-        return false;
-      }
-      return failureCount < 2;
-    },
-  });
+  console.log("🔍 Dashboard Home component rendering...");
 
-  const collectionsQuery = useSuspenseQuery({
-    ...collectionQueries.list(),
-    retry: (failureCount, error) => {
-      if (error?.message?.includes("not authenticated")) {
-        return false;
-      }
-      return failureCount < 2;
-    },
-  });
+  // Use suspense query for instant loading - no loading states needed
+  const { data: appData } = useAppDataSuspense();
 
-  const shoesQuery = useSuspenseQuery({
-    ...shoeQueries.list(),
-    retry: (failureCount, error) => {
-      if (error?.message?.includes("not authenticated")) {
-        return false;
-      }
-      return failureCount < 2;
-    },
-  });
+  // Extract data from the suspense query with safe defaults
+  const {
+    collections = [],
+    shoes = [],
+    runs: recentRuns = [],
+    stats,
+    shoesNeedingReplacement = [],
+  } = appData || {};
 
-  const recentRunsQuery = useSuspenseQuery({
-    ...runQueries.withShoes(10),
-    retry: (failureCount, error) => {
-      if (error?.message?.includes("not authenticated")) {
-        return false;
-      }
-      return failureCount < 2;
-    },
-  });
-
-  // Safely access data with fallbacks
-  const stats = statsQuery.data || {
-    totalCollections: 0,
-    totalShoes: 0,
-    activeShoes: 0,
-    retiredShoes: 0,
-    totalRuns: 0,
-    totalDistance: 0,
-    totalDuration: 0,
-    avgDistance: 0,
-    monthlyRuns: 0,
-    monthlyDistance: 0,
-    shoesNeedingReplacement: 0,
-  };
-
-  const collections = collectionsQuery.data || [];
-  const shoes = shoesQuery.data || [];
-  const recentRuns = recentRunsQuery.data || [];
+  // Check if user has any data for onboarding
+  const { data: hasDataCheck } = useHasUserDataSuspense();
 
   // Show onboarding if user has no data at all (collections, shoes, or runs)
-  const hasAnyData =
-    collections.length > 0 || shoes.length > 0 || recentRuns.length > 0;
-  if (!hasAnyData) {
+  const hasAnyData = hasDataCheck?.hasAnyData || false;
+  if (!hasAnyData && hasDataCheck) {
     return (
       <Onboarding
         onComplete={() => {
-          // Invalidate all relevant queries to refresh data
-          queryClient.invalidateQueries({ queryKey: ["convex"] });
+          // Invalidate app data query to refresh data
+          queryClient.invalidateQueries({
+            queryKey: ["convex", "dashboard", "getAppData", {}],
+          });
         }}
       />
     );
   }
 
-  // Get shoes needing replacement with safety check
-  const shoesNeedingReplacement = shoes.filter((shoe) => {
-    if (
-      !shoe ||
-      typeof shoe.currentMileage !== "number" ||
-      typeof shoe.maxMileage !== "number"
-    ) {
-      return false;
-    }
-    const currentMileage = shoe.currentMileage || 0;
-    return currentMileage / shoe.maxMileage >= 0.9;
-  });
+  // Provide immediate fallback data to prevent any loading states
+  const safeStats = stats || {
+    totalCollections: collections?.length || 0,
+    totalShoes: shoes?.length || 0,
+    activeShoes: shoes?.filter((shoe) => !shoe.isRetired)?.length || 0,
+    retiredShoes: shoes?.filter((shoe) => shoe.isRetired)?.length || 0,
+    totalRuns: recentRuns?.length || 0,
+    totalDistance: 0,
+    totalDuration: 0,
+    avgDistance: 0,
+    monthlyRuns: 0,
+    monthlyDistance: 0,
+    shoesNeedingReplacement: shoesNeedingReplacement?.length || 0,
+  };
 
-  // Calculate this month's distance
-  const monthlyDistance = stats.monthlyDistance || 0;
+  // Monthly distance is already calculated server-side
+  const monthlyDistance = safeStats.monthlyDistance || 0;
 
   return (
     <div className="min-h-dvh bg-gradient-to-br from-gray-50 via-white to-blue-50/30 pb-safe">
-      <div className="max-w-7xl mx-auto p-4 space-y-8">
-        {/* Header */}
-        <motion.div
-          {...getAnimationProps(isFirstVisit, {
-            initial: { opacity: 0, y: 10 },
-            animate: { opacity: 1, y: 0 },
-            transition: { duration: 0.2, ease: "easeOut" },
-          })}
-          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-        >
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Dashboard</h1>
-            <p className="text-lg text-gray-600">
-              Track your running shoes and monitor your progress
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              onClick={() =>
-                navigate({
-                  to: "/shoes",
-                  search: {
-                    showRetired: false,
-                    collection: "",
-                    sortBy: "name" as const,
-                    brand: "",
-                    usageLevel: "",
-                    dateRange: "all" as const,
-                    modal: true,
-                  },
-                })
-              }
-              variant="outline"
-              icon={<Plus className="w-5 h-5" />}
-              className="sm:w-auto"
-            >
-              Add Shoe
-            </Button>
-            <Button
-              onClick={() =>
-                navigate({
-                  to: "/runs",
-                  search: { modal: true },
-                })
-              }
-              icon={<Plus className="w-5 h-5" />}
-              className="sm:w-auto"
-            >
-              Log Run
-            </Button>
-          </div>
-        </motion.div>
+      <PageContainer>
+        <PageHeader
+          title="Dashboard"
+          description="Track your running shoes and monitor your progress"
+          animate={false}
+          actions={
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button
+                onClick={() =>
+                  navigate({
+                    to: "/shoes",
+                    search: {
+                      showRetired: false,
+                      collection: "",
+                      sortBy: "name" as const,
+                      brand: "",
+                      usageLevel: "",
+                      dateRange: "all" as const,
+                      modal: true,
+                    },
+                  })
+                }
+                variant="outline"
+                icon={<Plus className="w-5 h-5" />}
+                className="sm:w-auto"
+              >
+                Add Shoe
+              </Button>
+              <Button
+                onClick={() =>
+                  navigate({
+                    to: "/runs",
+                    search: { modal: true },
+                  })
+                }
+                icon={<Plus className="w-5 h-5" />}
+                className="sm:w-auto"
+              >
+                Log Run
+              </Button>
+            </div>
+          }
+        />
 
         {/* Stats Grid */}
         <motion.div
@@ -259,19 +231,13 @@ function Home() {
           })}
         >
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.15 }}
-            >
-              <MetricCard
-                title="Total Shoes"
-                value={stats.totalShoes || 0}
-                subtitle="Active pairs"
-                icon={<Footprints className="w-6 h-6" />}
-                color="primary"
-              />
-            </motion.div>
+            <MetricCard
+              title="Total Shoes"
+              value={safeStats.totalShoes || 0}
+              subtitle="Active pairs"
+              icon={<Footprints className="w-6 h-6" />}
+              color="primary"
+            />
             <motion.div
               {...getAnimationProps(isFirstVisit, {
                 initial: { opacity: 0, y: 20 },
@@ -281,7 +247,7 @@ function Home() {
             >
               <MetricCard
                 title="Total Runs"
-                value={stats.totalRuns || 0}
+                value={safeStats.totalRuns || 0}
                 subtitle="All time"
                 icon={<Activity className="w-6 h-6" />}
                 color="success"
@@ -297,7 +263,7 @@ function Home() {
             >
               <MetricCard
                 title="Total Distance"
-                value={formatDistance(stats.totalDistance || 0)}
+                value={formatDistance(safeStats.totalDistance || 0)}
                 subtitle="Miles logged"
                 icon={<MapPin className="w-6 h-6" />}
                 color="warning"
@@ -313,7 +279,7 @@ function Home() {
             >
               <MetricCard
                 title="This Month"
-                value={`${stats.monthlyRuns || 0}`}
+                value={`${safeStats.monthlyRuns || 0}`}
                 subtitle={`${formatDistance(monthlyDistance)} miles`}
                 icon={<Calendar className="w-6 h-6" />}
                 color="neutral"
@@ -670,7 +636,7 @@ function Home() {
             />
           </div>
         </motion.div>
-      </div>
+      </PageContainer>
     </div>
   );
 }

@@ -81,7 +81,7 @@ interface OfflineDBSchema extends DBSchema {
 
 class OfflineDB {
   private db: IDBPDatabase<OfflineDBSchema> | null = null;
-  private readonly DB_NAME = "ShoeFitOfflineDB";
+  private readonly DB_NAME = "MyShoeTrackerOfflineDB";
   private readonly DB_VERSION = 1;
   private readonly MAX_CACHE_SIZE = 100 * 1024 * 1024; // 100MB
   private readonly MAX_RETRY_COUNT = 3;

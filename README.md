@@ -1,4 +1,4 @@
-# ShoeFit - Running Shoe Tracker
+# MyShoeTracker
 
 A modern, PWA-enabled running shoe tracking application built with React 19, TanStack Start, and the React Compiler RC. Track your running shoes, log your runs, and gain insights into your running performance with comprehensive analytics.
 

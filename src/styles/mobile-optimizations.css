@@ -254,16 +254,16 @@ body {
     will-change: transform;
   }
 
-  /* Better mobile form validation */
-  input:invalid {
+  /* Better mobile form validation - disabled to prevent conflicts with flexbox container borders */
+  /* input:invalid {
     border-color: #ef4444;
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
   }
 
   input:valid {
-    border-color: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-  }
+    /* border-color: #10b981; */
+    /* box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); */
+  } */
 }
 
 /* Better mobile form elements */
@@ -276,19 +276,34 @@ body {
   input[type="tel"],
   input[type="url"],
   input[type="search"] {
-    font-size: 16px; /* Prevents zoom on iOS */
-    padding: 12px;
-    border-radius: 8px;
+    /* font-size: 16px; /* Prevents zoom on iOS */
+    /* padding-top: 12px;
+    padding-bottom: 12px;
+    padding-right: 12px; */
+    /* Don't override left padding - preserve icon spacing from Tailwind classes */
+    /* border-radius: 8px; */
     /* iOS-specific styling */
     -webkit-appearance: none;
     appearance: none;
-    background-color: white;
-    border: 1px solid #d1d5db;
+    /* background-color: white; */
+    /* border: 1px solid #d1d5db; */
     /* Fix iOS inner shadow */
     -webkit-box-shadow: none;
     box-shadow: none;
     /* iOS background clip fix */
-    background-clip: padding-box;
+    background-clip: padding-box; */
+  }
+
+  /* Set default left padding for inputs without Tailwind padding classes */
+  select:not([class*="pl-"]),
+  input[type="text"]:not([class*="pl-"]),
+  input[type="email"]:not([class*="pl-"]),
+  input[type="number"]:not([class*="pl-"]),
+  input[type="password"]:not([class*="pl-"]),
+  input[type="tel"]:not([class*="pl-"]),
+  input[type="url"]:not([class*="pl-"]),
+  input[type="search"]:not([class*="pl-"]) {
+    padding-left: 12px;
   }
 
   /* iOS select styling */
@@ -300,14 +315,14 @@ body {
     padding-right: 40px;
   }
 
-  /* iOS form validation styling */
-  input:valid {
-    border-color: #10b981;
+  /* iOS form validation styling - disabled to prevent conflicts with flexbox container borders */
+  /* input:valid {
+    /* border-color: #10b981; */
   }
 
   input:invalid {
     border-color: #ef4444;
-  }
+  } */
 
   /* iOS placeholder styling */
   ::placeholder {

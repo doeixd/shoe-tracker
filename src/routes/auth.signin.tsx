@@ -1,20 +1,34 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useNavigate,
+  useSearch,
+} from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "~/components/AuthProvider";
+import { getRedirectUrl } from "~/utils/auth";
 
 export const Route = createFileRoute("/auth/signin")({
   component: SignIn,
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      redirect: (search?.redirect as string) || "/",
+    };
+  },
 });
 
 function SignIn() {
   const { signIn, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const search = useSearch({ from: "/auth/signin" });
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate({ to: "/" });
+      const redirectUrl = getRedirectUrl(
+        new URLSearchParams({ redirect: search.redirect }),
+      );
+      navigate({ to: redirectUrl });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, search.redirect]);
 
   if (isAuthenticated) {
     return null;

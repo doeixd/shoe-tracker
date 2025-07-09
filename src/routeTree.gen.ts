@@ -16,6 +16,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as Phase3DemoRouteImport } from './routes/phase3-demo'
 import { Route as LoadingDemoRouteImport } from './routes/loading-demo'
 import { Route as DemoAnimationsRouteImport } from './routes/demo-animations'
+import { Route as DebugDashboardRouteImport } from './routes/debug-dashboard'
 import { Route as DebugRouteImport } from './routes/debug'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
@@ -66,6 +67,11 @@ const LoadingDemoRoute = LoadingDemoRouteImport.update({
 const DemoAnimationsRoute = DemoAnimationsRouteImport.update({
   id: '/demo-animations',
   path: '/demo-animations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DebugDashboardRoute = DebugDashboardRouteImport.update({
+  id: '/debug-dashboard',
+  path: '/debug-dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DebugRoute = DebugRouteImport.update({
@@ -154,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
   '/debug': typeof DebugRoute
+  '/debug-dashboard': typeof DebugDashboardRoute
   '/demo-animations': typeof DemoAnimationsRoute
   '/loading-demo': typeof LoadingDemoRoute
   '/phase3-demo': typeof Phase3DemoRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
   '/debug': typeof DebugRoute
+  '/debug-dashboard': typeof DebugDashboardRoute
   '/demo-animations': typeof DemoAnimationsRoute
   '/loading-demo': typeof LoadingDemoRoute
   '/phase3-demo': typeof Phase3DemoRoute
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
   '/debug': typeof DebugRoute
+  '/debug-dashboard': typeof DebugDashboardRoute
   '/demo-animations': typeof DemoAnimationsRoute
   '/loading-demo': typeof LoadingDemoRoute
   '/phase3-demo': typeof Phase3DemoRoute
@@ -232,6 +241,7 @@ export interface FileRouteTypes {
     | '/'
     | '/analytics'
     | '/debug'
+    | '/debug-dashboard'
     | '/demo-animations'
     | '/loading-demo'
     | '/phase3-demo'
@@ -257,6 +267,7 @@ export interface FileRouteTypes {
     | '/'
     | '/analytics'
     | '/debug'
+    | '/debug-dashboard'
     | '/demo-animations'
     | '/loading-demo'
     | '/phase3-demo'
@@ -282,6 +293,7 @@ export interface FileRouteTypes {
     | '/'
     | '/analytics'
     | '/debug'
+    | '/debug-dashboard'
     | '/demo-animations'
     | '/loading-demo'
     | '/phase3-demo'
@@ -308,6 +320,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnalyticsRoute: typeof AnalyticsRoute
   DebugRoute: typeof DebugRoute
+  DebugDashboardRoute: typeof DebugDashboardRoute
   DemoAnimationsRoute: typeof DemoAnimationsRoute
   LoadingDemoRoute: typeof LoadingDemoRoute
   Phase3DemoRoute: typeof Phase3DemoRoute
@@ -376,6 +389,13 @@ declare module '@tanstack/react-router' {
       path: '/demo-animations'
       fullPath: '/demo-animations'
       preLoaderRoute: typeof DemoAnimationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/debug-dashboard': {
+      id: '/debug-dashboard'
+      path: '/debug-dashboard'
+      fullPath: '/debug-dashboard'
+      preLoaderRoute: typeof DebugDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/debug': {
@@ -535,6 +555,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalyticsRoute: AnalyticsRoute,
   DebugRoute: DebugRoute,
+  DebugDashboardRoute: DebugDashboardRoute,
   DemoAnimationsRoute: DemoAnimationsRoute,
   LoadingDemoRoute: LoadingDemoRoute,
   Phase3DemoRoute: Phase3DemoRoute,

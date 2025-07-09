@@ -1,8 +1,8 @@
-# ShoeFit Architecture: Convex-Powered Improvements & Strategy
+# MyShoeTracker Architecture: Convex-Powered Improvements & Strategy
 
 ## Executive Summary
 
-After analyzing Convex's powerful capabilities and TanStack Router's advanced preloading features, this document outlines strategic improvements for ShoeFit that leverage these technologies' full potential. The current architecture is solid but underutilizes several key features that could dramatically improve performance and user experience.
+After analyzing Convex's powerful capabilities and TanStack Router's advanced preloading features, this document outlines strategic improvements for MyShoeTracker that leverage these technologies' full potential. The current architecture is solid but underutilizes several key features that could dramatically improve performance and user experience.
 
 ## Current State Assessment
 
@@ -470,7 +470,7 @@ TanStack Router Preloading → Convex (Auto-cached + Reactive) → Smart Offline
 
 ## Conclusion
 
-The current ShoeFit architecture is well-built but significantly over-engineered. By leveraging Convex's automatic caching and real-time features alongside TanStack Router's built-in preloading, we can:
+The current MyShoeTracker architecture is well-built but significantly over-engineered. By leveraging Convex's automatic caching and real-time features alongside TanStack Router's built-in preloading, we can:
 
 1. **Reduce complexity by 50%** while improving performance
 2. **Achieve instant navigation** for most user interactions
@@ -485,4 +485,4 @@ The key insight is to stop fighting these powerful tools and instead embrace the
 3. Gradually implement advanced features
 4. Monitor user experience metrics
 
-This roadmap transforms ShoeFit from a well-architected app into a showcase of modern web application capabilities.
+This roadmap transforms MyShoeTracker from a well-architected app into a showcase of modern web application capabilities.

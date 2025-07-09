@@ -32,8 +32,8 @@ import {
   Timer,
   Target,
   Save,
-  ArrowLeft,
 } from "lucide-react";
+import { FormBackButton } from "~/components/ui/BackButton";
 
 interface EditRunFormProps {
   run: Run;
@@ -464,23 +464,16 @@ export function EditRunForm({
           transition={{ duration: 0.3, delay: 0.2 }}
           className="flex flex-col sm:flex-row gap-4 pt-6"
         >
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
+          <FormBackButton
+            onCancel={() => {
               if (onCancel) {
                 onCancel();
               } else {
-                navigate({ to: "/runs/$runId", params: { runId: run.id } });
+                navigate({ to: `/runs/${run.id}` });
               }
             }}
             disabled={updateRunMutation.isPending}
-            icon={<ArrowLeft className="w-5 h-5" />}
-            fullWidth
-            className="sm:flex-1"
-          >
-            Cancel
-          </Button>
+          />
           <Button
             type="submit"
             loading={updateRunMutation.isPending}

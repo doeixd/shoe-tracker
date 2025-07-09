@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { withAuth } from "~/components/AuthProvider";
 import { ErrorBoundary } from "~/components/ErrorBoundary";
 import { PageLoading } from "~/components/LoadingStates";
 import { AnalyticsDashboard } from "~/components/analytics/AnalyticsDashboard";
 import { SmartPageLoading } from "~/components/loading/RouteHolding";
+import { requireAuth } from "~/utils/auth";
 
 import {
   statsQueries,
@@ -21,38 +21,41 @@ function AnalyticsPage() {
 }
 
 export const Route = createFileRoute("/analytics")({
-  component: withAuth(AnalyticsPage),
-  pendingComponent: () => (
-    <SmartPageLoading
-      message="Loading analytics..."
-      holdDelay={1000}
-      showSkeleton={true}
-      skeletonLayout="detail"
-    />
-  ),
-  loader: async ({ context: { queryClient } }) => {
-    try {
-      // Preload analytics data and related information
-      const statsPromise = queryClient.ensureQueryData(statsQueries.overall());
-      const runsPromise = queryClient.ensureQueryData(
-        runQueries.withShoes(200),
-      );
-      const shoesPromise = queryClient.ensureQueryData(shoeQueries.list(true));
+  component: AnalyticsPage,
+  beforeLoad: async ({ context: { queryClient } }) => {
+    // Start prefetching related data before the route loads
+    const prefetchPromises = [
+      queryClient.prefetchQuery({
+        ...runQueries.list(100),
+        staleTime: 1000 * 60 * 2,
+      }),
+      queryClient.prefetchQuery({
+        ...collectionQueries.list(),
+        staleTime: 1000 * 60 * 5,
+      }),
+    ];
 
-      // Wait for critical data
-      await Promise.all([statsPromise, runsPromise, shoesPromise]);
+    // Fire and forget - don't block navigation
+    Promise.all(prefetchPromises).catch(() => {});
 
-      // Prefetch related data in background
-      queryClient.prefetchQuery(collectionQueries.list()).catch(() => {});
-      queryClient.prefetchQuery(runQueries.list(100)).catch(() => {});
-
-      return {};
-    } catch (error: any) {
-      // If auth error, let the component handle it
-      if (error?.message?.includes("Not authenticated")) {
-        return {};
-      }
-      throw error;
-    }
+    return {};
   },
+  loader: async ({ context: { queryClient } }) => {
+    // Require authentication - will redirect if not authenticated
+    const user = await requireAuth(queryClient);
+
+    // Preload analytics data and related information
+    const statsPromise = queryClient.ensureQueryData(statsQueries.overall());
+    const runsPromise = queryClient.ensureQueryData(runQueries.withShoes(200));
+    const shoesPromise = queryClient.ensureQueryData(shoeQueries.list(true));
+
+    // Wait for critical data
+    await Promise.all([statsPromise, runsPromise, shoesPromise]);
+
+    return { user };
+  },
+  // Route-level caching configuration
+  staleTime: 1000 * 60 * 5,
+  gcTime: 1000 * 60 * 10,
+  shouldReload: false, // Don't reload if data is fresh
 });

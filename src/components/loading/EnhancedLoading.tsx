@@ -6,7 +6,7 @@ import {
   ShoesListingSkeleton,
   ListingSkeleton,
   DetailPageSkeleton,
-  NavigationSkeleton
+  NavigationSkeleton,
 } from "./PageSkeletons";
 
 // Enhanced loading phases
@@ -27,15 +27,15 @@ interface EnhancedLoadingProps {
 
 export function EnhancedLoading({
   message = "Loading...",
-  holdDelay = 200, // Reduced from 1000ms
-  skeletonDelay = 300,
-  spinnerDelay = 1500,
-  minShowTime = 300,
+  holdDelay = 50, // Further reduced for faster loading
+  skeletonDelay = 100,
+  spinnerDelay = 800,
+  minShowTime = 100,
   showProgress = false,
   layout = "list",
   error = null,
   onRetry,
-  children
+  children,
 }: EnhancedLoadingProps) {
   const [phase, setPhase] = useState<LoadingPhase>("instant");
   const [progress, setProgress] = useState(0);
@@ -45,7 +45,7 @@ export function EnhancedLoading({
   // Clear all timers on unmount
   useEffect(() => {
     return () => {
-      phaseTimerRef.current.forEach(timer => clearTimeout(timer));
+      phaseTimerRef.current.forEach((timer) => clearTimeout(timer));
     };
   }, []);
 
@@ -72,17 +72,20 @@ export function EnhancedLoading({
     timers.push(skeletonTimer);
 
     // Phase 3: Show spinner if still loading
-    const spinnerTimer = setTimeout(() => {
-      if (phase !== "complete") {
-        setPhase("spinner");
-      }
-    }, holdDelay + skeletonDelay + spinnerDelay);
+    const spinnerTimer = setTimeout(
+      () => {
+        if (phase !== "complete") {
+          setPhase("spinner");
+        }
+      },
+      holdDelay + skeletonDelay + spinnerDelay,
+    );
     timers.push(spinnerTimer);
 
     phaseTimerRef.current = timers;
 
     return () => {
-      timers.forEach(timer => clearTimeout(timer));
+      timers.forEach((timer) => clearTimeout(timer));
     };
   }, [error, holdDelay, skeletonDelay, spinnerDelay, phase]);
 
@@ -91,7 +94,7 @@ export function EnhancedLoading({
     if (!showProgress || phase === "complete" || phase === "error") return;
 
     const progressInterval = setInterval(() => {
-      setProgress(prev => {
+      setProgress((prev) => {
         // Asymptotic approach to 100%
         const remaining = 100 - prev;
         const increment = remaining * 0.1 + Math.random() * 2;
@@ -231,7 +234,7 @@ function ProgressBar({ progress }: { progress: number }) {
 // Spinner display component
 function SpinnerDisplay({
   message,
-  layout
+  layout,
 }: {
   message: string;
   layout: string;
@@ -283,20 +286,22 @@ function ErrorDisplay({
   error,
   message,
   onRetry,
-  layout
+  layout,
 }: {
   error: Error | null;
   message: string;
   onRetry?: () => void;
   layout: string;
 }) {
-  const isNetworkError = error?.message?.includes("network") ||
-                         error?.message?.includes("fetch") ||
-                         error?.message?.includes("offline");
+  const isNetworkError =
+    error?.message?.includes("network") ||
+    error?.message?.includes("fetch") ||
+    error?.message?.includes("offline");
 
-  const isAuthError = error?.message?.includes("not authenticated") ||
-                      error?.message?.includes("Unauthorized") ||
-                      error?.message?.includes("access denied");
+  const isAuthError =
+    error?.message?.includes("not authenticated") ||
+    error?.message?.includes("Unauthorized") ||
+    error?.message?.includes("access denied");
 
   const getErrorInfo = () => {
     if (isAuthError) {
@@ -304,7 +309,7 @@ function ErrorDisplay({
         title: "Authentication Required",
         description: "Please sign in to access this content.",
         icon: <AlertCircle className="w-8 h-8 text-amber-500" />,
-        color: "amber"
+        color: "amber",
       };
     }
 
@@ -313,7 +318,7 @@ function ErrorDisplay({
         title: "Connection Problem",
         description: "Unable to load content. Check your internet connection.",
         icon: <WifiOff className="w-8 h-8 text-red-500" />,
-        color: "red"
+        color: "red",
       };
     }
 
@@ -321,7 +326,7 @@ function ErrorDisplay({
       title: "Something went wrong",
       description: error?.message || "An unexpected error occurred.",
       icon: <AlertCircle className="w-8 h-8 text-red-500" />,
-      color: "red"
+      color: "red",
     };
   };
 
@@ -355,7 +360,9 @@ function ErrorDisplay({
         transition={{ duration: 0.3 }}
         className="text-center max-w-md"
       >
-        <div className={`w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center bg-${errorInfo.color}-50 border border-${errorInfo.color}-200`}>
+        <div
+          className={`w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center bg-${errorInfo.color}-50 border border-${errorInfo.color}-200`}
+        >
           {errorInfo.icon}
         </div>
 
@@ -381,7 +388,7 @@ function ErrorDisplay({
 
         {isAuthError && (
           <motion.button
-            onClick={() => window.location.href = "/auth/signin"}
+            onClick={() => (window.location.href = "/auth/signin")}
             className="inline-flex items-center px-6 py-3 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-colors"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -398,7 +405,7 @@ function ErrorDisplay({
 export function useProgressiveLoading<T>(
   data: T | undefined,
   isLoading: boolean,
-  error: Error | null = null
+  error: Error | null = null,
 ) {
   const [phase, setPhase] = useState<LoadingPhase>("instant");
   const [cachedData, setCachedData] = useState<T | undefined>(data);
@@ -435,7 +442,7 @@ export function useProgressiveLoading<T>(
   return {
     phase,
     displayData: cachedData || data,
-    isStale: isLoading && !!cachedData
+    isStale: isLoading && !!cachedData,
   };
 }
 
@@ -446,7 +453,7 @@ export function RouteLoadingWrapper({
   error,
   layout = "list",
   message = "Loading...",
-  onRetry
+  onRetry,
 }: {
   children: React.ReactNode;
   isLoading: boolean;
@@ -465,10 +472,10 @@ export function RouteLoadingWrapper({
       layout={layout}
       error={error}
       onRetry={onRetry}
-      holdDelay={200}
-      skeletonDelay={300}
-      spinnerDelay={1200}
-      showProgress={true}
+      holdDelay={50}
+      skeletonDelay={100}
+      spinnerDelay={600}
+      showProgress={false}
     >
       {!isLoading ? children : null}
     </EnhancedLoading>

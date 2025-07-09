@@ -23,8 +23,11 @@ import {
   TabsList,
   TabsTrigger,
   TabsContent,
-  Button,
 } from "../ui/ui";
+import { Button } from "../FormComponents";
+import { motion } from "motion/react";
+import { useFirstVisit, getAnimationProps } from "~/hooks/useFirstVisit";
+import { PageHeader, PageContainer } from "../PageHeader";
 import {
   generateTimeSeriesData,
   analyzeShoePerformance,
@@ -168,65 +171,57 @@ export function AnalyticsDashboard() {
         />
       </div>
 
-      <div className="p-4 sm:p-6 lg:p-8 space-y-8 animate-fade-in relative z-10">
-        {/* Enhanced Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-soft">
-                <BarChart3 className="w-6 h-6 text-white" />
-              </div>
-              <h1 className="text-3xl sm:text-4xl font-black text-gradient">
-                Analytics Dashboard
-              </h1>
+      <PageContainer>
+        <PageHeader
+          title="Analytics Dashboard"
+          description="Comprehensive insights into your running performance and shoe usage"
+          gradient={true}
+          size="large"
+          actions={
+            <div className="relative">
+              <Button
+                variant="outline"
+                size="md"
+                onClick={() => setShowPeriodDropdown(!showPeriodDropdown)}
+                className="w-full sm:w-auto justify-between min-w-[160px] bg-white border-gray-300 hover:border-primary-300 hover:bg-primary-50/50 shadow-soft hover:shadow-medium transition-all duration-300"
+              >
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-primary-600" />
+                  <span className="text-sm font-semibold text-gray-800">
+                    {getCurrentPeriodLabel()}
+                  </span>
+                </div>
+                <ChevronDown
+                  className={`w-4 h-4 text-gray-600 transition-transform ${
+                    showPeriodDropdown ? "rotate-180" : ""
+                  }`}
+                />
+              </Button>
+
+              {showPeriodDropdown && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200/50 py-2 z-50 backdrop-blur-sm">
+                  {periodOptions.map((period) => (
+                    <button
+                      key={period.value}
+                      onClick={() => {
+                        setSelectedPeriod(period.value);
+                        setShowPeriodDropdown(false);
+                      }}
+                      className={`w-full text-left px-4 py-3 text-sm transition-colors ${
+                        selectedPeriod === period.value
+                          ? "bg-primary-50 text-primary-700 font-medium"
+                          : "text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      <span className="text-base">{period.emoji}</span>
+                      <span className="ml-2">{period.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            <p className="text-gray-700 text-base sm:text-lg font-medium">
-              Detailed insights into your running performance 📈
-            </p>
-          </div>
-
-          {/* Enhanced Period Filter */}
-          <div className="relative">
-            <Button
-              variant="outline"
-              size="default"
-              onClick={() => setShowPeriodDropdown(!showPeriodDropdown)}
-              className="w-full sm:w-auto justify-between min-w-[160px] bg-white border-gray-300 hover:border-primary-300 hover:bg-primary-50/50 shadow-soft hover:shadow-medium transition-all duration-300"
-            >
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-primary-600" />
-                <span className="text-sm font-semibold text-gray-800">
-                  {getCurrentPeriodLabel()}
-                </span>
-              </div>
-              <ChevronDown
-                className={`w-4 h-4 text-gray-600 transition-transform ${showPeriodDropdown ? "rotate-180" : ""}`}
-              />
-            </Button>
-
-            {showPeriodDropdown && (
-              <div className="absolute top-full left-0 right-0 sm:left-auto sm:right-0 sm:w-56 mt-2 bg-white border border-gray-200 rounded-2xl shadow-large z-10 overflow-hidden">
-                {periodOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => {
-                      setSelectedPeriod(option.value);
-                      setShowPeriodDropdown(false);
-                    }}
-                    className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-50 transition-colors flex items-center gap-3 ${
-                      selectedPeriod === option.value
-                        ? "bg-primary-50 text-primary-700 font-semibold"
-                        : "text-gray-800 hover:text-primary-600"
-                    }`}
-                  >
-                    <span className="text-base">{option.emoji}</span>
-                    <span>{option.label}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+          }
+        />
 
         {/* Enhanced Key Metrics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -428,7 +423,7 @@ export function AnalyticsDashboard() {
                         description="Start logging your runs to see detailed analytics and insights about your performance."
                         action={
                           <Button
-                            variant="gradient"
+                            variant="primary"
                             size="lg"
                             className="flex items-center gap-2"
                             onClick={() => (window.location.href = "/runs/new")}
@@ -735,7 +730,7 @@ export function AnalyticsDashboard() {
             </TabsContent>
           </Tabs>
         </div>
-      </div>
+      </PageContainer>
     </div>
   );
 }

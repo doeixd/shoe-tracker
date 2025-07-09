@@ -3,7 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "../../convex/_generated/api";
 import { collectionQueries, shoeQueries } from "~/queries";
-import { withAuth, useAuth } from "~/components/AuthProvider";
+import { useAuth } from "~/components/AuthProvider";
 import { useConvexMutation } from "@convex-dev/react-query";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
@@ -173,8 +173,42 @@ const checkStorageQuota = async () => {
   }
 };
 
+function DebugPageWrapper() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="max-w-md w-full space-y-8 p-6">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Sign in required
+            </h2>
+            <p className="mt-2 text-gray-600">
+              Please sign in to access debug information.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return <DebugPage />;
+}
+
 export const Route = createFileRoute("/debug")({
-  component: withAuth(DebugPage),
+  component: DebugPageWrapper,
 });
 
 function DebugPage() {

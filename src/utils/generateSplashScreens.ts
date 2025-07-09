@@ -377,7 +377,7 @@ export function generateSplashScreen(config: SplashScreenConfig): string {
   ctx.font = `${Math.min(canvas.width, canvas.height) * 0.06}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('ShoeFit', centerX, centerY + iconSize * 0.8);
+  ctx.fillText('MyShoeTracker', centerX, centerY + iconSize * 0.8);
 
   // Add tagline
   ctx.font = `${Math.min(canvas.width, canvas.height) * 0.035}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;

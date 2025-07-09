@@ -55,7 +55,6 @@ function NewRunPage() {
 
 export const Route = createFileRoute("/runs/new")({
   component: withAuth(NewRunPage),
-  pendingComponent: () => <Loader />,
   validateSearch: (search: Record<string, unknown>) => {
     return {
       modal: search?.modal === true || search?.modal === "true" || false,

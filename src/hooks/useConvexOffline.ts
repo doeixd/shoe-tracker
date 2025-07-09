@@ -9,11 +9,11 @@ import {
   type OfflineOperation,
 } from "../utils/convex-offline-manager";
 import { useUserBehaviorTracking } from "./useUserBehaviorTracking";
-import {
-  useIntelligentSyncPrioritizationAction,
-  useResolveOfflineConflictsAction,
-  useOptimizeOfflineCacheAction,
-} from "../queries";
+// import {
+//   useIntelligentSyncPrioritizationAction,
+//   useResolveOfflineConflictsAction,
+//   useOptimizeOfflineCacheAction,
+// } from "../queries";
 
 // Types for the Convex offline hook
 interface ConvexOfflineHookState {
@@ -65,9 +65,9 @@ export function useConvexOffline(
 ) {
   const router = useRouter();
   const { behaviorPatterns, sessionData } = useUserBehaviorTracking();
-  const intelligentSync = useIntelligentSyncPrioritizationAction();
-  const resolveConflicts = useResolveOfflineConflictsAction();
-  const optimizeCache = useOptimizeOfflineCacheAction();
+  // const intelligentSync = useIntelligentSyncPrioritizationAction();
+  // const resolveConflicts = useResolveOfflineConflictsAction();
+  // const optimizeCache = useOptimizeOfflineCacheAction();
 
   // Configuration with defaults
   const finalConfig: ConvexOfflineConfig = {
@@ -249,24 +249,27 @@ export function useConvexOffline(
       };
 
       // Get intelligent sync prioritization
-      const prioritization = await intelligentSync.execute({
-        syncQueue,
-        userContext,
-      });
+      // const prioritization = await intelligentSync.execute({
+      //   syncQueue,
+      //   userContext,
+      // });
 
-      console.log(
-        "[useConvexOffline] Intelligent sync prioritization:",
-        prioritization,
-      );
+      // console.log(
+      //   "[useConvexOffline] Intelligent sync prioritization:",
+      //   prioritization,
+      // );
 
       // Execute manual sync with the prioritized information
       await managerRef.current.manualSync();
     } catch (error) {
       console.error("[useConvexOffline] Intelligent sync failed:", error);
       // Fallback to regular sync
-      await managerRef.current.manualSync();
+      // await managerRef.current.manualSync();
     }
-  }, [router.state.location.pathname, behaviorPatterns, intelligentSync]);
+  }, [
+    router.state.location.pathname,
+    behaviorPatterns /* , intelligentSync */,
+  ]);
 
   // Queue an operation for offline execution
   const queueOperation = useCallback(
@@ -379,10 +382,10 @@ export function useConvexOffline(
         oldestEntry: Date.now() - 24 * 60 * 60 * 1000,
       };
 
-      const optimization = await optimizeCache.execute({
-        userContext,
-        cacheStats,
-      });
+      // const optimization = await optimizeCache.execute({
+      //   userContext,
+      //   cacheStats,
+      // });
 
       console.log("[useConvexOffline] Cache optimization:", optimization);
       return optimization;
@@ -390,7 +393,7 @@ export function useConvexOffline(
       console.error("[useConvexOffline] Cache optimization failed:", error);
       return null;
     }
-  }, [behaviorPatterns, optimizeCache]);
+  }, [behaviorPatterns /* , optimizeCache */]);
 
   // Get connection diagnostics
   const getConnectionDiagnostics = useCallback(() => {

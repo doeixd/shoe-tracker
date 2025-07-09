@@ -45,17 +45,12 @@ export function ShoeCard({
   const milesRemaining = Math.max(0, shoe.maxMileage - currentMileage);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.1 }}
-      className={className}
-    >
+    <div className={className}>
       <Card
         className={cn(
           "mt-0 group relative overflow-hidden transition-all duration-300 h-full",
           "hover:shadow-glow hover:-translate-y-1",
-          "w-full w-max-[300px]",
+          "w-full",
           "flex flex-row md:flex-col md:h-auto", // Horizontal layout on mobile, vertical on desktop
           shoe.isRetired ? "opacity-80 hover:opacity-100" : "",
         )}
@@ -131,7 +126,7 @@ export function ShoeCard({
         </div>
 
         {/* Content Section */}
-        <div className="p-4 md:p-6 bg-white flex-1 flex flex-col justify-between">
+        <div className="p-4 md:p-6 bg-white flex-1 flex flex-col justify-between w-full">
           {/* Header */}
           <div className="mb-2 md:mb-4">
             <div className="flex items-start justify-between mb-1 md:mb-2">
@@ -266,7 +261,7 @@ export function ShoeCard({
           <div className="absolute inset-1 bg-gradient-to-br from-white/10 to-transparent rounded-3xl" />
         </div>
       </Card>
-    </motion.div>
+    </div>
   );
 }
 

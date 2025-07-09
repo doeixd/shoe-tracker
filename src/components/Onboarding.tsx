@@ -61,7 +61,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       toast.error("Please sign in to continue");
-      navigate({ to: "/auth/signin" });
+      navigate({ to: "/auth/signin", search: { redirect: "/" } });
     }
   }, [authLoading, isAuthenticated, navigate]);
 
@@ -239,7 +239,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   const handleCreateCollections = async () => {
     if (!isAuthenticated || !user) {
       toast.error("Authentication required. Please sign in again.");
-      navigate({ to: "/auth/signin" });
+      navigate({ to: "/auth/signin", search: { redirect: "/" } });
       return;
     }
 
@@ -283,7 +283,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
           if (collectionError?.message?.includes("not authenticated")) {
             toast.error("Session expired. Please sign in again.");
-            navigate({ to: "/auth/signin" });
+            navigate({ to: "/auth/signin", search: { redirect: "/" } });
             return;
           }
 
@@ -370,7 +370,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
       if (error?.message?.includes("not authenticated")) {
         errorMessage = "Authentication expired. Please sign in again.";
-        navigate({ to: "/auth/signin" });
+        navigate({ to: "/auth/signin", search: { redirect: "/" } });
       } else if (error?.message?.includes("network")) {
         errorMessage = "Network error. Please check your connection.";
       }
@@ -385,7 +385,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   const handleSkip = () => {
     if (!isAuthenticated) {
       toast.error("Authentication required");
-      navigate({ to: "/auth/signin" });
+      navigate({ to: "/auth/signin", search: { redirect: "/" } });
       return;
     }
     onComplete();

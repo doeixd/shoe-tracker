@@ -1,4 +1,4 @@
-# Running Shoe Tracker - Improvements Documentation
+# MyShoeTracker - Improvements Documentation
 
 ## 🔄 Major Improvements Made
 

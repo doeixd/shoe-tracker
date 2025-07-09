@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide covers the comprehensive PWA debugging capabilities added to the ShoeFit application's `/debug` route. The PWA debugging section provides real-time diagnostics, testing tools, and recommendations for Progressive Web App development.
+This guide covers the comprehensive PWA debugging capabilities added to the MyShoeTracker application's `/debug` route. The PWA debugging section provides real-time diagnostics, testing tools, and recommendations for Progressive Web App development.
 
 ## Features
 

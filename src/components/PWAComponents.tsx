@@ -87,7 +87,7 @@ export function PWAInstallPrompt() {
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="text-sm font-medium text-gray-900">
-              Install ShoeFit App
+              Install MyShoeTracker App
             </h3>
             <p className="text-sm text-gray-500 mt-1">
               Get the full app experience with offline access and faster
@@ -351,7 +351,7 @@ export function UpdateAvailableBanner() {
           <div>
             <div className="font-medium">App Update Available</div>
             <div className="text-sm text-blue-100">
-              A new version of ShoeFit is ready to install
+              A new version of MyShoeTracker is ready to install
             </div>
           </div>
         </div>
@@ -409,7 +409,7 @@ export function PWAFeaturesCard() {
           Get the Full Experience
         </h3>
         <p className="text-sm text-gray-600">
-          Install ShoeFit as an app for the best experience
+          Install MyShoeTracker as an app for the best experience
         </p>
       </div>
 

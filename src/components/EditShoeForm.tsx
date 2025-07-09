@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { useCollections, useUpdateShoeMutation } from "~/queries";
+import {
+  useCollections,
+  useUpdateShoeMutation,
+  useRetireShoeMutation,
+} from "~/queries";
 import {
   FormSection,
   Input,
@@ -27,8 +31,8 @@ import {
   ArrowDown,
   Sparkles,
   Save,
-  ArrowLeft,
 } from "lucide-react";
+import { FormBackButton } from "~/components/ui/BackButton";
 import { EmptyStateCard } from "~/components/ui/Cards";
 
 interface EditShoeFormProps {
@@ -49,6 +53,7 @@ export function EditShoeForm({
   const navigate = useNavigate();
   const { data: collections } = useCollections();
   const updateShoeMutation = useUpdateShoeMutation();
+  const retireShoeMutation = useRetireShoeMutation();
   const { imageState, handleImageUploaded, handleImageRemoved } =
     useImageUpload();
   const imageUploadService = useImageUploadService();
@@ -219,7 +224,10 @@ export function EditShoeForm({
       let errorMessage = "Failed to update shoe. Please try again.";
       if (error?.message?.includes("not authenticated")) {
         errorMessage = "Authentication required. Please sign in again.";
-        navigate({ to: "/auth/signin" });
+        navigate({
+          to: "/auth/signin",
+          search: { redirect: window.location.pathname },
+        });
       } else if (error?.message) {
         errorMessage = error.message;
       }
@@ -234,8 +242,7 @@ export function EditShoeForm({
     }
 
     try {
-      // This would need a retire mutation - assuming it exists
-      // await retireShoeMutation.mutateAsync({ id: shoe.id });
+      await retireShoeMutation.mutateAsync({ id: shoe.id });
       toast.success("Shoe retired successfully!");
       navigate({ to: "/shoes/$shoeId", params: { shoeId: shoe.id } });
     } catch (error) {
@@ -265,14 +272,12 @@ export function EditShoeForm({
             >
               Create Collection
             </Button>
-            <Button
-              variant="secondary"
-              onClick={() =>
+            <FormBackButton
+              onCancel={() =>
                 navigate({ to: "/shoes/$shoeId", params: { shoeId: shoe.id } })
               }
-            >
-              Go Back
-            </Button>
+              label="Go Back"
+            />
           </div>
         </div>
       </div>
@@ -566,7 +571,23 @@ export function EditShoeForm({
           />
         </FormSection>
 
-        <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t">
+        <div className="flex flex-col sm:flex-row gap-4 pt-6">
+          <FormBackButton
+            onCancel={() =>
+              onCancel
+                ? onCancel()
+                : navigate({
+                    to: "/shoes/$shoeId",
+                    params: { shoeId: shoe.id },
+                  })
+            }
+            disabled={
+              updateShoeMutation.isPending ||
+              imageUploadService.isUploading ||
+              shoeImageUpdate.isUpdating
+            }
+          />
+
           <Button
             type="submit"
             loading={
@@ -589,29 +610,6 @@ export function EditShoeForm({
                 ? "Updating..."
                 : "Update Shoe"}
           </Button>
-
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() =>
-              onCancel
-                ? onCancel()
-                : navigate({
-                    to: "/shoes/$shoeId",
-                    params: { shoeId: shoe.id },
-                  })
-            }
-            disabled={
-              updateShoeMutation.isPending ||
-              imageUploadService.isUploading ||
-              shoeImageUpdate.isUpdating
-            }
-            icon={<ArrowLeft className="w-5 h-5" />}
-            fullWidth
-            className="sm:flex-1"
-          >
-            Cancel
-          </Button>
         </div>
 
         {/* Retire Button - Optional */}
@@ -624,7 +622,8 @@ export function EditShoeForm({
             disabled={
               updateShoeMutation.isPending ||
               imageUploadService.isUploading ||
-              shoeImageUpdate.isUpdating
+              shoeImageUpdate.isUpdating ||
+              retireShoeMutation.isPending
             }
           >
             Retire This Shoe

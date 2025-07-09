@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Running Shoe Tracker Setup Script
+# MyShoeTracker Setup Script
 # This script helps set up the development environment for the shoe tracker app
 
 set -e
 
-echo "🏃‍♂️ Running Shoe Tracker Setup"
+echo "🏃‍♂️ MyShoeTracker Setup"
 echo "================================="
 
 # Colors for output
@@ -110,7 +110,7 @@ show_setup_instructions() {
     echo "   - Create OAuth 2.0 credentials"
     echo "   - Add these redirect URIs:"
     echo "     • Development: http://localhost:3000/api/auth/callback/google"
-    echo "     • Production: https://your-domain.com/api/auth/callback/google"
+    echo "     • Production: https://myshoetracker.fun/api/auth/callback/google"
     echo ""
     echo "3. UPDATE LOCAL ENVIRONMENT:"
     echo "   Edit .env.local and replace the Convex URL with your actual deployment URL"
@@ -178,7 +178,7 @@ main() {
 
 # Help function
 show_help() {
-    echo "Running Shoe Tracker Setup Script"
+    echo "MyShoeTracker Setup Script"
     echo ""
     echo "Usage: $0 [OPTIONS]"
     echo ""

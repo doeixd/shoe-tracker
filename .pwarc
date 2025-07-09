@@ -1,6 +1,6 @@
 {
-  "name": "ShoeFit",
-  "shortName": "ShoeFit",
+  "name": "MyShoeTracker",
+  "shortName": "MyShoeTracker",
   "description": "Track your running shoes, monitor mileage, and log your runs with comprehensive analytics and insights.",
   "themeColor": "#3b82f6",
   "backgroundColor": "#ffffff",
@@ -21,7 +21,7 @@
       "sizes": "1280x800",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "ShoeFit Dashboard"
+      "label": "MyShoeTracker Dashboard"
     },
     {
       "src": "/screenshots/mobile-1.png",

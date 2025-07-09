@@ -63,7 +63,7 @@ export function useFirstVisit(options: FirstVisitOptions = {}) {
     setIsHydrated(true);
   }, []);
 
-  const isFirstVisit = isHydrated ? !visitedRoutes.has(targetRoute) : false;
+  const isFirstVisit = false; // Disabled animations for route navigation
 
   const markAsVisited = useCallback(() => {
     setVisitedRoutes((prev) => {

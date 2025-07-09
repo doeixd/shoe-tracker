@@ -1,17 +1,26 @@
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import React from "react";
 import {
-  useShoeWithStats,
-  useRuns,
-  useCollections,
+  Link,
+  createFileRoute,
+  useNavigate,
+  useSearch,
+  Outlet,
+  useMatches,
+} from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import {
   shoeQueries,
   collectionQueries,
   runQueries,
   statsQueries,
+  useRetireShoeMutation,
 } from "~/queries";
-import { Loader } from "~/components/Loader";
-import { SmartPageLoading } from "~/components/loading/RouteHolding";
-import { withAuth } from "~/components/AuthProvider";
+import { toast } from "sonner";
+import { EnhancedLoading } from "~/components/loading/EnhancedLoading";
+import { createQueryConfig } from "~/utils/routeLoading";
+import { useAuth } from "~/components/AuthProvider";
 import { AuthErrorBoundary } from "~/components/AuthErrorBoundary";
+import { requireAuth } from "~/utils/auth";
 import { ImageDisplay } from "~/components/ImageHandler";
 import { motion } from "motion/react";
 import {
@@ -31,6 +40,10 @@ import {
   EmptyStateCard,
 } from "~/components/ui/Cards";
 import { Button } from "~/components/FormComponents";
+import { BackToShoes } from "~/components/ui/BackButton";
+import { FormModalSheet } from "~/components/navigation/ModalSheet";
+import { EditShoeForm } from "~/components/EditShoeForm";
+import { useIsMobile } from "~/hooks/useIsMobile";
 import {
   Footprints,
   Clock,
@@ -44,76 +57,283 @@ import {
   Play,
   Edit3,
   BarChart3,
-  ArrowLeft,
   AlertTriangle,
   Trophy,
   Activity,
+  Lock,
 } from "lucide-react";
 import { cn } from "~/components/ui/ui";
 
+function ShoeDetailPage() {
+  return <ShoeDetail />;
+}
+
 export const Route = createFileRoute("/shoes/$shoeId")({
-  component: withAuth(ShoeDetail),
-  pendingComponent: () => (
-    <SmartPageLoading
-      message="Loading shoe details..."
-      holdDelay={1000}
-      showSkeleton={true}
-      skeletonLayout="detail"
-    />
-  ),
-  loader: async ({ context: { queryClient }, params: { shoeId } }) => {
-    try {
-      // Check if we can access authenticated data
-      const authQuery = queryClient.getQueryData([
-        "convex",
-        "auth.getUserProfile",
-        {},
-      ]);
+  component: ShoeDetailPage,
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      editModal: Boolean(search?.editModal),
+    };
+  },
+  errorComponent: ({ error }) => {
+    const isShoeNotFound = error.message?.includes("Shoe not found");
 
-      // Only preload if we have auth data or if the query is likely to succeed
-      if (authQuery) {
-        // Preload shoe data and related information
-        const shoePromise = queryClient.ensureQueryData(
-          shoeQueries.detail(shoeId),
-        );
-        const shoeStatsPromise = queryClient.ensureQueryData(
-          shoeQueries.withStats(shoeId),
-        );
-        const runsPromise = queryClient.ensureQueryData(
-          runQueries.list(50, shoeId),
-        );
-
-        // Wait for critical data
-        await Promise.all([shoePromise, shoeStatsPromise, runsPromise]);
-
-        // Prefetch related data in background
-        queryClient.prefetchQuery(shoeQueries.list(false));
-        queryClient.prefetchQuery(collectionQueries.list());
-        queryClient.prefetchQuery(runQueries.withShoes(20));
-        queryClient.prefetchQuery(statsQueries.overall());
-      }
-    } catch (error) {
-      // If preloading fails due to auth, just continue - the component will handle it
-      console.debug("Preload failed (likely auth issue):", error);
+    if (isShoeNotFound) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+          <div className="max-w-md w-full space-y-8 text-center">
+            <div className="space-y-6">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+                <AlertTriangle className="w-8 h-8 text-blue-600" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Shoe Not Found
+                </h2>
+                <p className="text-gray-600">
+                  The shoe you're looking for doesn't exist or has been removed.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link
+                  to="/shoes"
+                  search={{
+                    showRetired: true,
+                    collection: "",
+                    sortBy: "name",
+                    modal: false,
+                    brand: "",
+                    usageLevel: "",
+                    dateRange: "all",
+                  }}
+                >
+                  <Button className="flex-1 sm:flex-none">View Shoes</Button>
+                </Link>
+                <Link to="/">
+                  <Button variant="secondary" className="flex-1 sm:flex-none">
+                    Go Home
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
     }
+
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="max-w-md w-full space-y-8 text-center">
+          <div className="space-y-6">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
+              <AlertTriangle className="w-8 h-8 text-red-600" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Something went wrong
+              </h2>
+              <p className="text-gray-600">{error.message}</p>
+            </div>
+            <div className="flex justify-center">
+              <Link to="/">
+                <Button>Go Home</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  },
+  loader: async ({ context: { queryClient }, params: { shoeId } }) => {
+    // Require authentication - will redirect if not authenticated
+    const user = await requireAuth(queryClient);
+
+    // Prefetch critical data in parallel
+    const shoePromise = queryClient.ensureQueryData(shoeQueries.detail(shoeId));
+    const shoeStatsPromise = queryClient.ensureQueryData(
+      shoeQueries.withStats(shoeId),
+    );
+    const runsPromise = queryClient.ensureQueryData(
+      runQueries.list(50, shoeId),
+    );
+
+    // Wait for critical data
+    await Promise.all([shoePromise, shoeStatsPromise, runsPromise]);
+
+    // Prefetch related data in background (non-blocking)
+    queryClient.prefetchQuery(shoeQueries.list(false)).catch(() => {});
+    queryClient.prefetchQuery(collectionQueries.list()).catch(() => {});
+    queryClient.prefetchQuery(runQueries.withShoes(20)).catch(() => {});
+    queryClient.prefetchQuery(statsQueries.overall()).catch(() => {});
 
     return {
       shoeId,
+      user,
     };
   },
 });
 
 function ShoeDetail() {
+  const { isAuthenticated, isLoading, user } = useAuth();
   const navigate = useNavigate();
   const { shoeId } = Route.useParams();
+  const search = useSearch({ from: "/shoes/$shoeId" });
+  const isMobile = useIsMobile();
   const loaderData = Route.useLoaderData();
-  const { data: shoeData } = useShoeWithStats(shoeId);
-  const { data: recentRuns } = useRuns(10, shoeId);
-  const { data: collections } = useCollections();
+  const matches = useMatches();
+
+  // Check if we're on the edit route
+  const isEditRoute = matches.some(
+    (match) => match.id === "/edit"
+  ) || window.location.pathname.includes("/edit");
+
+  // Debug logging
+  console.log("Debug - Route matching:", {
+    currentPath: window.location.pathname,
+    matches: matches.map(m => ({ id: m.id, pathname: m.pathname, fullPath: m.fullPath })),
+    isEditRoute,
+    isMobile,
+    matchIds: matches.map(m => m.id),
+    hasEditInPath: window.location.pathname.includes("/edit"),
+  });
+
+  // All hooks must be called before any early returns
+  const retireShoeMutation = useRetireShoeMutation();
+
+  const shoeStatsQuery = useQuery(
+    createQueryConfig(shoeQueries.withStats(shoeId), {
+      staleTime: 3 * 60 * 1000, // 3 minutes
+    }),
+  );
+
+  const runsQuery = useQuery(
+    createQueryConfig(runQueries.list(10, shoeId), {
+      staleTime: 2 * 60 * 1000, // 2 minutes
+    }),
+  );
+
+  const collectionsQuery = useQuery(
+    createQueryConfig(collectionQueries.list(), {
+      staleTime: 10 * 60 * 1000, // 10 minutes
+    }),
+  );
+
+  // Handle retire mutation
+  React.useEffect(() => {
+    if (retireShoeMutation.isSuccess) {
+      toast.success("Shoe retired successfully!");
+      shoeStatsQuery.refetch();
+    }
+    if (retireShoeMutation.isError) {
+      toast.error("Failed to retire shoe");
+    }
+  }, [
+    retireShoeMutation.isSuccess,
+    retireShoeMutation.isError,
+    shoeStatsQuery,
+  ]);
+
+  if (isLoading) {
+    return (
+      <EnhancedLoading
+        message="Loading shoe details..."
+        layout="detail"
+        holdDelay={100}
+        skeletonDelay={200}
+        showProgress={true}
+      />
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="max-w-md w-full space-y-8 p-6">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Lock className="w-8 h-8 text-blue-600" />
+            </div>
+            <h2 className="text-3xl font-extrabold text-gray-900 mb-2">
+              Authentication Required
+            </h2>
+            <p className="text-sm text-gray-600">
+              Please sign in to access your shoes
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle loading states
+  const isDataLoading =
+    shoeStatsQuery.isLoading ||
+    runsQuery.isLoading ||
+    collectionsQuery.isLoading;
+
+  if (isDataLoading) {
+    return (
+      <EnhancedLoading
+        message="Loading shoe details..."
+        layout="detail"
+        holdDelay={100}
+        skeletonDelay={200}
+        showProgress={true}
+      />
+    );
+  }
+
+  // Handle errors
+  if (
+    shoeStatsQuery.error &&
+    !shoeStatsQuery.error.message?.includes("not authenticated")
+  ) {
+    throw shoeStatsQuery.error;
+  }
+  if (
+    runsQuery.error &&
+    !runsQuery.error.message?.includes("not authenticated")
+  ) {
+    throw runsQuery.error;
+  }
+  if (
+    collectionsQuery.error &&
+    !collectionsQuery.error.message?.includes("not authenticated")
+  ) {
+    throw collectionsQuery.error;
+  }
+
+  const shoeData = shoeStatsQuery.data as any;
+  const recentRuns = (runsQuery.data as any[]) || [];
+  const collections = (collectionsQuery.data as any[]) || [];
+
+  if (!shoeData) {
+    return (
+      <EnhancedLoading
+        message="Loading shoe details..."
+        layout="detail"
+        holdDelay={100}
+        skeletonDelay={200}
+        showProgress={true}
+      />
+    );
+  }
 
   const collection = collections.find(
-    (c: Collection) => c.id === shoeData.collectionId,
+    (c: any) => c?.id === shoeData?.collectionId,
   );
+
+  // If we're on the edit route, render the outlet instead of the detail view
+  if (isEditRoute) {
+    console.log("Rendering outlet for edit route - isEditRoute:", isEditRoute, "isMobile:", isMobile);
+    return (
+      <AuthErrorBoundary>
+        <div className="min-h-dvh bg-gradient-to-br from-gray-50 via-white to-gray-50 p-4 pb-safe">
+          <Outlet />
+        </div>
+      </AuthErrorBoundary>
+    );
+  }
 
   return (
     <AuthErrorBoundary>
@@ -127,28 +347,8 @@ function ShoeDetail() {
             className="flex flex-col space-y-6"
           >
             {/* Back Navigation */}
-            <div className="flex items-center">
-              <Button
-                variant="ghost"
-                onClick={() =>
-                  navigate({
-                    to: "/shoes",
-                    search: {
-                      showRetired: true,
-                      collection: "",
-                      sortBy: "name",
-                      modal: false,
-                      brand: "",
-                      usageLevel: "",
-                      dateRange: "all",
-                    },
-                  })
-                }
-                icon={<ArrowLeft className="w-4 h-4" />}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                Back to Shoes
-              </Button>
+            <div className="flex items-center gap-4">
+              <BackToShoes />
             </div>
 
             {/* Shoe Header Card */}
@@ -219,16 +419,51 @@ function ShoeDetail() {
                       </Button>
                       <Button
                         variant="secondary"
-                        onClick={() =>
-                          navigate({
-                            to: "/shoes/$shoeId/edit",
-                            params: { shoeId },
-                          })
-                        }
+                        onClick={() => {
+                          console.log(
+                            "Edit button clicked, isMobile:",
+                            isMobile,
+                          );
+                          if (isMobile) {
+                            console.log("Navigating to modal");
+                            navigate({
+                              to: "/shoes/$shoeId",
+                              params: { shoeId },
+                              search: { editModal: true },
+                            });
+                          } else {
+                            console.log("Navigating to edit page");
+                            navigate({
+                              to: "/shoes/$shoeId/edit",
+                              params: { shoeId },
+                              search: { modal: false },
+                            });
+                          }
+                        }}
                         icon={<Edit3 className="w-4 h-4" />}
                       >
                         Edit Shoe
                       </Button>
+
+                      {!shoeData.isRetired && (
+                        <Button
+                          variant="danger"
+                          onClick={() => {
+                            if (
+                              confirm(
+                                "Are you sure you want to retire this shoe?",
+                              )
+                            ) {
+                              retireShoeMutation.mutate({ id: shoeId });
+                            }
+                          }}
+                          disabled={retireShoeMutation.isPending}
+                        >
+                          {retireShoeMutation.isPending
+                            ? "Retiring..."
+                            : "Retire Shoe"}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -294,13 +529,21 @@ function ShoeDetail() {
                   <span
                     className={cn(
                       "inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium",
-                      USAGE_LEVEL_COLORS[shoeData.stats.usageLevel],
+                      USAGE_LEVEL_COLORS[
+                        shoeData.stats
+                          .usageLevel as keyof typeof USAGE_LEVEL_COLORS
+                      ],
                     )}
                   >
                     {shoeData.stats.usageLevel === "replace" && (
                       <AlertTriangle className="w-4 h-4 mr-1" />
                     )}
-                    {USAGE_LEVEL_LABELS[shoeData.stats.usageLevel]}
+                    {
+                      USAGE_LEVEL_LABELS[
+                        shoeData.stats
+                          .usageLevel as keyof typeof USAGE_LEVEL_LABELS
+                      ]
+                    }
                   </span>
                   <div className="text-right">
                     <div className="text-sm font-medium text-gray-900">
@@ -569,6 +812,44 @@ function ShoeDetail() {
           </motion.div>
         </div>
       </div>
+
+      {/* Edit Modal for Mobile */}
+      {isMobile && search.editModal && (
+        <FormModalSheet
+          isOpen={search.editModal}
+          onClose={() => {
+            navigate({
+              to: "/shoes/$shoeId",
+              params: { shoeId },
+              search: { editModal: false },
+            });
+          }}
+          title="Edit Shoe"
+          description="Update the details of your running shoe"
+          formHeight="large"
+        >
+          <EditShoeForm
+            shoe={shoeData}
+            onSuccess={(updatedShoeId) => {
+              navigate({
+                to: "/shoes/$shoeId",
+                params: { shoeId: updatedShoeId },
+                search: { editModal: false },
+              });
+            }}
+            onCancel={() => {
+              navigate({
+                to: "/shoes/$shoeId",
+                params: { shoeId },
+                search: { editModal: false },
+              });
+            }}
+            isModal={true}
+          />
+        </FormModalSheet>
+      )}
+
+
     </AuthErrorBoundary>
   );
 }

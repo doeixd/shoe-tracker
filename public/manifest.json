@@ -1,6 +1,6 @@
 {
-  "name": "ShoeFit - Running Shoe Tracker",
-  "short_name": "ShoeFit",
+  "name": "MyShoeTracker",
+  "short_name": "MyShoeTracker",
   "description": "Track your running shoes, monitor mileage, and log your runs with comprehensive analytics and insights.",
   "version": "1.0.0",
   "start_url": "/",
@@ -89,7 +89,7 @@
   },
   "protocol_handlers": [
     {
-      "protocol": "web+shoefit",
+      "protocol": "web+myshoetracker",
       "url": "/import?data=%s"
     }
   ],
@@ -116,12 +116,12 @@
   "related_applications": [
     {
       "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=com.shoefit.app",
-      "id": "com.shoefit.app"
+      "url": "https://play.google.com/store/apps/details?id=com.myshoetracker.app",
+      "id": "com.myshoetracker.app"
     },
     {
       "platform": "itunes",
-      "url": "https://apps.apple.com/app/shoefit/id123456789"
+      "url": "https://apps.apple.com/app/myshoetracker/id123456789"
     }
   ],
   "capture_links": "new-client"

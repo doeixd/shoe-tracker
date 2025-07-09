@@ -1,5 +1,5 @@
 {
-  "name": "running-shoe-tracker",
+  "name": "myshoetracker",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -9,11 +9,15 @@
     "dev:convex": "convex dev",
     "build": "vite build",
     "start": "vite start",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "test:ui": "vitest --ui",
     "audit:animations": "node scripts/find-animations.cjs",
     "pwa:generate-icons": "bun scripts/generate-icons.js",
     "pwa:generate-splash": "bun scripts/generate-splash-screens.js",
     "pwa:setup": "bun scripts/setup-pwa.js",
-    "pwa:check": "lighthouse --chrome-flags=\"--headless\" --output=html --output-path=./pwa-audit.html http://localhost:3000",
+    "pwa:check": "lighthouse --chrome-flags=\"--headless\" --output=html --output-path=./pwa-audit.html https://myshoetracker.fun",
     "pwa:serve": "bunx serve .output/public -s"
   },
   "dependencies": {
@@ -62,17 +66,22 @@
     "@babel/preset-react": "^7.27.1",
     "@babel/preset-typescript": "^7.27.1",
     "@tailwindcss/container-queries": "^0.1.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.6.0",
     "autoprefixer": "^10.4.20",
     "babel-plugin-react-compiler": "19.1.0-rc.2",
     "eslint-plugin-react-hooks": "6.0.0-rc.1",
+    "jsdom": "^26.1.0",
     "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.2",
     "vinxi": "^0.5.7",
     "vite": "^6.3.5",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4"
   }
 }

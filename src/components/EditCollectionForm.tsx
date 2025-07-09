@@ -10,7 +10,8 @@ import {
 } from "~/components/FormComponents";
 import type { CreateCollectionForm, Collection } from "~/types";
 import { motion } from "motion/react";
-import { Save, ArrowLeft, Package, Palette } from "lucide-react";
+import { Save, Package, Palette } from "lucide-react";
+import { FormBackButton } from "~/components/ui/BackButton";
 
 interface EditCollectionFormProps {
   collection: Collection;
@@ -209,10 +210,8 @@ export function EditCollectionForm({
           transition={{ duration: 0.3, delay: 0.2 }}
           className="flex flex-col sm:flex-row gap-4 pt-6"
         >
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
+          <FormBackButton
+            onCancel={() => {
               if (onCancel) {
                 onCancel();
               } else {
@@ -223,12 +222,7 @@ export function EditCollectionForm({
               }
             }}
             disabled={updateCollectionMutation.isPending}
-            icon={<ArrowLeft className="w-5 h-5" />}
-            fullWidth
-            className="sm:flex-1"
-          >
-            Cancel
-          </Button>
+          />
           <Button
             type="submit"
             loading={updateCollectionMutation.isPending}

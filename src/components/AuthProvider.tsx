@@ -5,7 +5,12 @@ import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
 import { Lock, Loader2, AlertCircle } from "lucide-react";
-import { triggerAuthStateChange, type AuthState } from "../utils/prefetch";
+// Simple auth state type for internal use
+interface AuthState {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  userId?: string;
+}
 
 interface User {
   id: string;
@@ -81,16 +86,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [isAuthenticated, userSetupComplete, authError, setupUserDataMutation]);
 
   // Update prefetcher with auth state changes
-  useEffect(() => {
-    const authState: AuthState = {
-      isAuthenticated: isAuthenticated && !authError,
-      isLoading: userQuery.isLoading || isLoading,
-      userId: user?._id,
-    };
-
-    // Trigger auth state change for prefetcher
-    triggerAuthStateChange(authState);
-  }, [isAuthenticated, userQuery.isLoading, isLoading, authError, user?._id]);
+  // Auth state is now handled internally by TanStack Router
+  // No need for external prefetch state management
 
   useEffect(() => {
     // Set loading to false once we've determined auth state
@@ -137,11 +134,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       toast.error(errorMessage);
       setIsLoading(false);
 
-      // Trigger auth state change for failed sign in
-      triggerAuthStateChange({
-        isAuthenticated: false,
-        isLoading: false,
-      });
+      // Auth state handled by TanStack Router automatically
     }
   };
 
@@ -150,12 +143,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setAuthError(null);
 
     try {
-      // Trigger auth state change immediately for sign out
-      triggerAuthStateChange({
-        isAuthenticated: false,
-        isLoading: true,
-      });
-
       await convexSignOut();
       toast.success("Signed out successfully");
     } catch (error: any) {
@@ -169,11 +156,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsLoading(false);
       setUserSetupComplete(false); // Reset setup state
     } finally {
-      // Ensure final auth state is set
-      triggerAuthStateChange({
-        isAuthenticated: false,
-        isLoading: false,
-      });
+      // Auth state handled automatically
     }
   };
 
@@ -218,7 +201,9 @@ export function useAuthGuard() {
 }
 
 // Higher-order component for protecting routes
-export function withAuth<P extends object>(Component: React.ComponentType<P>) {
+export function withAuth<P extends object>(
+  Component: React.ComponentType<P>,
+): React.ComponentType<P> {
   return function AuthenticatedComponent(props: P) {
     const { isAuthenticated, isLoading } = useAuth();
 

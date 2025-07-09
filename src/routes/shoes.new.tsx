@@ -17,7 +17,6 @@ function NewShoePage() {
 
 export const Route = createFileRoute("/shoes/new")({
   component: withAuth(NewShoePage),
-  pendingComponent: () => <Loader />,
 });
 
 function NewShoe() {

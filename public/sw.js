@@ -1,11 +1,11 @@
-// Service Worker for ShoeFit - Running Shoe Tracker PWA
+// Service Worker for MyShoeTracker PWA
 // Version 1.0.0
 
-const CACHE_NAME = 'shoefit-v1.0.0';
-const STATIC_CACHE = 'shoefit-static-v1.0.0';
-const DYNAMIC_CACHE = 'shoefit-dynamic-v1.0.0';
-const IMAGE_CACHE = 'shoefit-images-v1.0.0';
-const API_CACHE = 'shoefit-api-v1.0.0';
+const CACHE_NAME = 'myshoetracker-v1.0.0';
+const STATIC_CACHE = 'myshoetracker-static-v1.0.0';
+const DYNAMIC_CACHE = 'myshoetracker-dynamic-v1.0.0';
+const IMAGE_CACHE = 'myshoetracker-images-v1.0.0';
+const API_CACHE = 'myshoetracker-api-v1.0.0';
 
 // Cache configuration
 const CACHE_CONFIG = {
@@ -25,11 +25,13 @@ const CACHE_CONFIG = {
 // Static assets to cache immediately
 const STATIC_ASSETS = [
   '/',
-  '/index.html',
   '/manifest.json',
   '/favicon.ico',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
+  '/android-chrome-192x192.png',
+  '/android-chrome-512x512.png',
+  '/apple-touch-icon.png',
+  '/favicon-16x16.png',
+  '/favicon-32x32.png',
   // Add other static assets as needed
 ];
 
@@ -59,7 +61,15 @@ self.addEventListener('install', (event) => {
       // Cache static assets
       caches.open(STATIC_CACHE).then((cache) => {
         console.log('[SW] Caching static assets');
-        return cache.addAll(STATIC_ASSETS);
+        return cache.addAll(STATIC_ASSETS).catch(error => {
+          console.warn('[SW] Failed to cache some static assets:', error);
+          // Cache assets individually to avoid complete failure
+          return Promise.allSettled(
+            STATIC_ASSETS.map(asset => cache.add(asset).catch(err => {
+              console.warn('[SW] Failed to cache asset:', asset, err);
+            }))
+          );
+        });
       }),
 
       // Skip waiting to activate immediately
@@ -348,7 +358,7 @@ function createOfflineResponse(request) {
     `<!DOCTYPE html>
     <html>
       <head>
-        <title>Offline - ShoeFit</title>
+        <title>Offline - MyShoeTracker</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
           body {
@@ -399,7 +409,7 @@ function createOfflineResponse(request) {
         <div class="container">
           <div class="icon">📱</div>
           <h1>You're Offline</h1>
-          <p>It looks like you're offline. ShoeFit works offline too! You can still view your cached data and add new entries.</p>
+          <p>It looks like you're offline. MyShoeTracker works offline too! You can still view your cached data and add new entries.</p>
           <p>Your changes will be synced when you're back online.</p>
           <button class="retry-btn" onclick="window.location.reload()">Try Again</button>
         </div>
@@ -481,7 +491,7 @@ self.addEventListener('push', (event) => {
     };
 
     event.waitUntil(
-      self.registration.showNotification(data.title || 'ShoeFit', options)
+      self.registration.showNotification(data.title || 'MyShoeTracker', options)
     );
   }
 });

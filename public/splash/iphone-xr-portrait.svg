@@ -17,7 +17,7 @@
   <path d="M384 846 Q394 836 414 846 Q434 836 444 846 L439 876 Q444 886 434 896 L394 896 Q384 886 389 876 Z" fill="#3b82f6"/>
 
   <!-- App Name -->
-  <text x="414" y="956" text-anchor="middle" fill="white" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="49.68" font-weight="600">ShoeFit</text>
+  <text x="414" y="956" text-anchor="middle" fill="white" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="49.68" font-weight="600">MyShoeTracker</text>
 
   <!-- Tagline -->
   <text x="414" y="986" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28.980000000000004" font-weight="400">Track Your Runs</text>

@@ -46,8 +46,8 @@ var app_config_default = defineConfig({
           ]
         },
         manifest: {
-          name: "ShoeFit - Running Shoe Tracker",
-          short_name: "ShoeFit",
+          name: "MyShoeTracker",
+          short_name: "MyShoeTracker",
           description: "Track your running shoes, monitor mileage, and log your runs with comprehensive analytics and insights.",
           theme_color: "#3b82f6",
           background_color: "#ffffff",
