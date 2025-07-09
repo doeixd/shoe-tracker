@@ -14,13 +14,13 @@
   "categories": ["fitness", "health", "sports", "lifestyle", "productivity"],
   "icons": [
     {
-      "src": "/favicon-16x16.png",
+      "src": "https://fav.farm/🏃🏼‍♀️",
       "sizes": "16x16",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/favicon-32x32.png",
+      "src": "https://fav.farm/🏃🏼‍♀️",
       "sizes": "32x32",
       "type": "image/png",
       "purpose": "any"

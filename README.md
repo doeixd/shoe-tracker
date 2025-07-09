@@ -4,7 +4,7 @@ A modern, PWA-enabled running shoe tracking application built with React 19, Tan
 
 ## ✨ Features
 
-### 🏃 Core Functionality
+### 🏃🏼‍♀️ Core Functionality
 - **Shoe Management**: Add, edit, and track multiple pairs of running shoes
 - **Run Logging**: Record runs with distance, duration, pace, and notes
 - **Mileage Tracking**: Automatic mileage accumulation per shoe

@@ -121,7 +121,7 @@ export function DashboardLoading({
                   transition={{ duration: 0.6, delay: 0.4 }}
                   className="text-2xl font-bold text-gray-900 mb-2"
                 >
-                  🏃‍♂️ MyShoeTracker
+                  🏃🏼‍♀️ MyShoeTracker
                 </motion.h1>
 
                 <motion.p
@@ -329,7 +329,7 @@ export function AuthLoadingScreen() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="text-3xl font-bold text-gray-900 mb-3"
         >
-          🏃‍♂️ MyShoeTracker
+          🏃🏼‍♀️ MyShoeTracker
         </motion.h1>
 
         <motion.p

@@ -85,16 +85,16 @@ export const Route = createRootRouteWithContext<{
         rel: "icon",
         type: "image/png",
         sizes: "32x32",
-        href: "/favicon-32x32.png",
+        href: "https://fav.farm/🏃🏼‍♀️",
       },
       {
         rel: "icon",
         type: "image/png",
         sizes: "16x16",
-        href: "/favicon-16x16.png",
+        href: "https://fav.farm/🏃🏼‍♀️",
       },
       { rel: "manifest", href: "/manifest.json" },
-      { rel: "icon", href: "/favicon.ico" },
+      { rel: "icon", href: "https://fav.farm/🏃🏼‍♀️" },
       {
         name: "theme-color",
         content: "#3b82f6",
@@ -162,7 +162,7 @@ function RootComponent() {
             {/* Logo and branding */}
             <div className="mb-8">
               <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl mb-4 shadow-lg">
-                <span className="text-4xl">🏃‍♂️</span>
+                <span className="text-4xl">🏃🏼‍♀️</span>
               </div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">MyShoeTracker</h1>
               <p className="text-gray-600 text-lg">
@@ -291,7 +291,7 @@ function HeaderCenter() {
   return (
     <Link to="/" className="contents">
       <div className="font-black text-xl sm:text-2xl text-white lg:text-left">
-        🏃‍♂️ MyShoeTracker
+        🏃🏼‍♀️ MyShoeTracker
       </div>
       <div className="text-slate-400 text-xs sm:text-sm hidden sm:block lg:text-left">
         Track your running shoe stats with ease

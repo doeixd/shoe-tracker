@@ -148,18 +148,18 @@ export function PWAHead() {
       />
       <link rel="dns-prefetch" href="https://api.convex.cloud" />
       <link rel="manifest" href="/manifest.json" />
-      <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+      <link rel="icon" type="image/x-icon" href="https://fav.farm/🏃🏼‍♀️" />
       <link
         rel="icon"
         type="image/png"
         sizes="16x16"
-        href="/favicon-16x16.png"
+        href="https://fav.farm/🏃🏼‍♀️"
       />
       <link
         rel="icon"
         type="image/png"
         sizes="32x32"
-        href="/favicon-32x32.png"
+        href="https://fav.farm/🏃🏼‍♀️"
       />
       <link
         rel="apple-touch-icon"

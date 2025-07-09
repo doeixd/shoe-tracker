@@ -486,7 +486,7 @@ export const AnalyticsCharts = memo(
           <Card variant="default" hover="lift">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                🏃 Surface Distribution
+                🏃🏼‍♀️ Surface Distribution
               </CardTitle>
               <CardDescription>Running surface breakdown</CardDescription>
             </CardHeader>

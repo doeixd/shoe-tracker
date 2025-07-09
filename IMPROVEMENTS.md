@@ -249,7 +249,7 @@ This document outlines all the significant improvements made to transform the Tr
 
 ### **Further Enhancements**
 - 📈 **Analytics dashboard** with charts and trends
-- 🏃 **Integration with fitness APIs** (Strava, Garmin, etc.)
+- 🏃🏼‍♀️ **Integration with fitness APIs** (Strava, Garmin, etc.)
 - 📱 **PWA capabilities** for mobile app-like experience
 - 🔔 **Push notifications** for shoe replacement reminders
 

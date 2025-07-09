@@ -482,7 +482,7 @@ export function AnalyticsDashboard() {
             >
               <div className="space-y-6 animate-slide-up">
                 <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                  🏃‍♂️ Performance Analytics
+                  🏃🏼‍♀️ Performance Analytics
                 </h2>
 
                 {analytics.metrics.totalRuns === 0 ? (
