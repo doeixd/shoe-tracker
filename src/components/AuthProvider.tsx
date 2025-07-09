@@ -54,6 +54,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     },
     staleTime: 30 * 1000, // 30 seconds
     refetchOnWindowFocus: false,
+    refetchInterval: false, // Don't auto-refetch
+    refetchOnReconnect: true, // Refetch when reconnecting
   });
 
   const user = userQuery.data;
@@ -92,23 +94,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     // Set loading to false once we've determined auth state
     if (!userQuery.isLoading) {
-      // Add a small delay in production to allow OAuth flow to complete
-      const delay = process.env.NODE_ENV === 'production' ? 1000 : 0;
-      
-      setTimeout(() => {
-        setIsLoading(false);
+      setIsLoading(false);
 
-        // Handle auth errors
-        if (userQuery.error) {
-          const errorMessage = userQuery.error?.message || "Authentication error";
-          if (!errorMessage.includes("not authenticated")) {
-            setAuthError(errorMessage);
-            toast.error("Authentication error. Please try signing in again.");
-          }
-        } else {
-          setAuthError(null);
+      // Handle auth errors
+      if (userQuery.error) {
+        const errorMessage = userQuery.error?.message || "Authentication error";
+        if (!errorMessage.includes("not authenticated")) {
+          setAuthError(errorMessage);
+          toast.error("Authentication error. Please try signing in again.");
         }
-      }, delay);
+      } else {
+        setAuthError(null);
+      }
     }
   }, [userQuery.isLoading, userQuery.error]);
 

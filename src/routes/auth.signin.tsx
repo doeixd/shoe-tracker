@@ -22,13 +22,16 @@ function SignIn() {
   const search = useSearch({ from: "/auth/signin" });
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !isLoading) {
       const redirectUrl = getRedirectUrl(
         new URLSearchParams({ redirect: search.redirect }),
       );
-      navigate({ to: redirectUrl });
+      // Add a small delay to ensure auth state is fully settled
+      setTimeout(() => {
+        navigate({ to: redirectUrl });
+      }, 100);
     }
-  }, [isAuthenticated, navigate, search.redirect]);
+  }, [isAuthenticated, isLoading, navigate, search.redirect]);
 
   if (isAuthenticated) {
     return null;
