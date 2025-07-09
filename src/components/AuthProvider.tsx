@@ -92,18 +92,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     // Set loading to false once we've determined auth state
     if (!userQuery.isLoading) {
-      setIsLoading(false);
+      // Add a small delay in production to allow OAuth flow to complete
+      const delay = process.env.NODE_ENV === 'production' ? 1000 : 0;
+      
+      setTimeout(() => {
+        setIsLoading(false);
 
-      // Handle auth errors
-      if (userQuery.error) {
-        const errorMessage = userQuery.error?.message || "Authentication error";
-        if (!errorMessage.includes("not authenticated")) {
-          setAuthError(errorMessage);
-          toast.error("Authentication error. Please try signing in again.");
+        // Handle auth errors
+        if (userQuery.error) {
+          const errorMessage = userQuery.error?.message || "Authentication error";
+          if (!errorMessage.includes("not authenticated")) {
+            setAuthError(errorMessage);
+            toast.error("Authentication error. Please try signing in again.");
+          }
+        } else {
+          setAuthError(null);
         }
-      } else {
-        setAuthError(null);
-      }
+      }, delay);
     }
   }, [userQuery.isLoading, userQuery.error]);
 
