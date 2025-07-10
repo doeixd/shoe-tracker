@@ -15,7 +15,7 @@ import {
 } from "~/components/LoadingStates";
 import { EnhancedLoading } from "~/components/loading/EnhancedLoading";
 import { useEffect } from "react";
-import { requireAuth } from "~/utils/auth";
+import { checkAuth } from "~/utils/auth";
 import { redirect } from "@tanstack/react-router";
 import {
   formatDistance,
@@ -44,6 +44,9 @@ import {
   ArrowRight,
   ChevronRight,
   Gauge,
+  Star,
+  Shield,
+  Smartphone,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useFirstVisit, getAnimationProps } from "~/hooks/useFirstVisit";
@@ -60,127 +63,217 @@ import { AuthWrapper } from "~/components/AuthWrapper";
 import * as React from "react";
 
 function HomePage() {
-  return (
-    <AuthWrapper>
-      <ErrorBoundary>
-        <React.Suspense fallback={
-          <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="text-center">
-              <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-              <p className="text-gray-600">Loading dashboard...</p>
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If authenticated, show dashboard
+  if (isAuthenticated) {
+    return (
+      <AuthWrapper>
+        <ErrorBoundary>
+          <React.Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+              <div className="text-center">
+                <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+                <p className="text-gray-600">Loading dashboard...</p>
+              </div>
             </div>
-          </div>
-        }>
-          <Home />
-        </React.Suspense>
-      </ErrorBoundary>
-    </AuthWrapper>
-  );
+          }>
+            <Dashboard />
+          </React.Suspense>
+        </ErrorBoundary>
+      </AuthWrapper>
+    );
+  }
+
+  // If not authenticated, show landing page
+  return <LandingPage />;
 }
 
 export const Route = createFileRoute("/")({
   component: HomePage,
-  // Loader with authentication redirect
+  // Optional auth loader - doesn't require authentication
   loader: async ({ context: { queryClient } }) => {
     try {
-      // Require authentication - will redirect if not authenticated
-      const user = await requireAuth(queryClient);
-
-      // Prefetch critical dashboard data using new app data query
-      await queryClient.ensureQueryData({
-        ...convexQuery(api.dashboard.getAppData, {}),
-        staleTime: 1000 * 60 * 5,
-      });
-
-      return { user };
-    } catch (error: any) {
-      // If requireAuth throws a redirect, let it propagate
-      if (error?.message?.includes("redirect") || error?.status === 301 || error?.status === 302) {
-        throw error;
-      }
-
-      // For authentication errors, ensure redirect to sign-in
-      if (
-        error?.message?.includes("not authenticated") ||
-        error?.message?.includes("Unauthorized") ||
-        error?.message?.includes("access denied")
-      ) {
-        console.warn("Authentication error in home loader, redirecting to sign-in");
-        throw redirect({
-          to: "/auth/signin",
-          search: {
-            redirect: "/",
-          },
+      // Check auth status without requiring it
+      const authResult = await checkAuth(queryClient);
+      
+      // If authenticated, prefetch dashboard data
+      if (authResult.isAuthenticated) {
+        await queryClient.ensureQueryData({
+          ...convexQuery(api.dashboard.getAppData, {}),
+          staleTime: 1000 * 60 * 5,
         });
       }
 
-      // For other errors, log and re-throw
-      console.error("Home page loader error:", error);
-      throw error;
+      return { auth: authResult };
+    } catch (error: any) {
+      // For errors, assume not authenticated and continue
+      console.warn("Auth check failed in home loader:", error);
+      return { auth: { isAuthenticated: false, user: null } };
     }
-  },
-  // Add error component for loader errors
-  errorComponent: ({ error }) => {
-    console.error("Home page route error:", error);
-
-    const isAuthError = error?.message?.includes("authenticated") ||
-                       error?.message?.includes("unauthorized") ||
-                       error?.message?.includes("access denied");
-
-    if (isAuthError) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="max-w-md w-full space-y-8 p-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertTriangle className="w-8 h-8 text-red-600" />
-              </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                Authentication Required
-              </h2>
-              <p className="text-gray-600 mb-6">
-                Please sign in to access your dashboard.
-              </p>
-              <Link
-                to="/auth/signin"
-                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-              >
-                Sign In
-              </Link>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full space-y-8 p-6">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertTriangle className="w-8 h-8 text-red-600" />
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              Loading Error
-            </h2>
-            <p className="text-gray-600 mb-6">
-              There was an error loading the dashboard. Please try again.
-            </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-            >
-              <Loader2 className="w-4 h-4 mr-2" />
-              Reload Page
-            </button>
-          </div>
-        </div>
-      </div>
-    );
   },
 });
 
-function Home() {
+// Landing page for unauthenticated users
+function LandingPage() {
+  const navigate = useNavigate();
+  
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        {/* Navigation */}
+        <nav className="relative z-10 bg-white/80 backdrop-blur-sm border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center">
+                <Footprints className="w-8 h-8 text-blue-600 mr-2" />
+                <span className="text-xl font-bold text-gray-900">Shoe Tracker</span>
+              </div>
+              <Button
+                onClick={() => navigate({ to: "/auth/signin" })}
+                variant="primary"
+                className="px-6 py-2"
+              >
+                Sign In
+              </Button>
+            </div>
+          </div>
+        </nav>
+
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <div className="text-center">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-4xl md:text-6xl font-bold text-gray-900 mb-6"
+            >
+              Track Your Running Shoes
+              <span className="text-blue-600 block">Like a Pro</span>
+            </motion.h1>
+            
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto"
+            >
+              Monitor mileage, track wear patterns, and know exactly when to replace your running shoes. 
+              Keep your feet happy and your runs safer.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
+              <Button
+                onClick={() => navigate({ to: "/auth/signin" })}
+                variant="primary"
+                icon={<Footprints className="w-5 h-5" />}
+                className="px-8 py-3 text-lg"
+              >
+                Start Tracking
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width=%2260%22%20height=%2260%22%20viewBox=%220%200%2060%2060%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg%20fill=%22none%22%20fill-rule=%22evenodd%22%3E%3Cg%20fill=%22%239C92AC%22%20fill-opacity=%220.05%22%3E%3Cpath%20d=%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
+      </div>
+
+      {/* Features Section */}
+      <div className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Everything You Need to Track Your Shoes
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              From casual joggers to marathon runners, our app helps you get the most out of your running shoes.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <FeatureCard
+                icon={<Activity className="w-8 h-8 text-blue-600" />}
+                title="Mileage Tracking"
+                description="Log every run and automatically track the miles on each pair of shoes"
+              />
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <FeatureCard
+                icon={<AlertTriangle className="w-8 h-8 text-orange-600" />}
+                title="Replacement Alerts"
+                description="Get notified when your shoes are nearing their recommended replacement mileage"
+              />
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <FeatureCard
+                icon={<BarChart3 className="w-8 h-8 text-green-600" />}
+                title="Analytics & Insights"
+                description="View detailed analytics about your running patterns and shoe performance"
+              />
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="py-24 bg-blue-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Ready to Start Tracking?
+          </h2>
+          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+            Join thousands of runners who are already using Shoe Tracker to maximize their shoe lifespan and running performance.
+          </p>
+          <Button
+            onClick={() => navigate({ to: "/auth/signin" })}
+            variant="secondary"
+            icon={<Footprints className="w-5 h-5" />}
+            className="px-8 py-3 text-lg bg-white text-blue-600 hover:bg-gray-50"
+          >
+            Get Started Free
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Dashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isFirstVisit } = useFirstVisit();
