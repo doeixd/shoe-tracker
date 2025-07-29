@@ -1,7 +1,10 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAppData, useHasUserData } from "~/hooks/useAppData";
-import { useAppDataSuspense, useHasUserDataSuspense } from "~/hooks/useSuspenseQueries";
+import {
+  useAppDataSuspense,
+  useHasUserDataSuspense,
+} from "~/hooks/useSuspenseQueries";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "~/components/AuthProvider";
@@ -64,6 +67,7 @@ import * as React from "react";
 
 function HomePage() {
   const { isAuthenticated, isLoading } = useAuth();
+  console.log({ isAuthenticated, isLoading });
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -82,14 +86,16 @@ function HomePage() {
     return (
       <AuthWrapper>
         <ErrorBoundary>
-          <React.Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-              <div className="text-center">
-                <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-                <p className="text-gray-600">Loading dashboard...</p>
+          <React.Suspense
+            fallback={
+              <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                  <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+                  <p className="text-gray-600">Loading dashboard...</p>
+                </div>
               </div>
-            </div>
-          }>
+            }
+          >
             <Dashboard />
           </React.Suspense>
         </ErrorBoundary>
@@ -108,7 +114,8 @@ export const Route = createFileRoute("/")({
     try {
       // Check auth status without requiring it
       const authResult = await checkAuth(queryClient);
-      
+      console.log({ authResult });
+
       // If authenticated, prefetch dashboard data
       if (authResult.isAuthenticated) {
         await queryClient.ensureQueryData({
@@ -129,30 +136,11 @@ export const Route = createFileRoute("/")({
 // Landing page for unauthenticated users
 function LandingPage() {
   const navigate = useNavigate();
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        {/* Navigation */}
-        <nav className="relative z-10 bg-white/80 backdrop-blur-sm border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              <div className="flex items-center">
-                <Footprints className="w-8 h-8 text-blue-600 mr-2" />
-                <span className="text-xl font-bold text-gray-900">Shoe Tracker</span>
-              </div>
-              <Button
-                onClick={() => navigate({ to: "/auth/signin" })}
-                variant="primary"
-                className="px-6 py-2"
-              >
-                Sign In
-              </Button>
-            </div>
-          </div>
-        </nav>
-
         {/* Hero Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
@@ -165,15 +153,16 @@ function LandingPage() {
               Track Your Running Shoes
               <span className="text-blue-600 block">Like a Pro</span>
             </motion.h1>
-            
+
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto"
             >
-              Monitor mileage, track wear patterns, and know exactly when to replace your running shoes. 
-              Keep your feet happy and your runs safer.
+              Monitor mileage, track wear patterns, and know exactly when to
+              replace your running shoes. Keep your feet happy and your runs
+              safer.
             </motion.p>
 
             <motion.div
@@ -206,7 +195,8 @@ function LandingPage() {
               Everything You Need to Track Your Shoes
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              From casual joggers to marathon runners, our app helps you get the most out of your running shoes.
+              From casual joggers to marathon runners, our app helps you get the
+              most out of your running shoes.
             </p>
           </div>
 
@@ -222,7 +212,7 @@ function LandingPage() {
                 description="Log every run and automatically track the miles on each pair of shoes"
               />
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -234,7 +224,7 @@ function LandingPage() {
                 description="Get notified when your shoes are nearing their recommended replacement mileage"
               />
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -257,7 +247,8 @@ function LandingPage() {
             Ready to Start Tracking?
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of runners who are already using Shoe Tracker to maximize their shoe lifespan and running performance.
+            Join thousands of runners who are already using Shoe Tracker to
+            maximize their shoe lifespan and running performance.
           </p>
           <Button
             onClick={() => navigate({ to: "/auth/signin" })}
