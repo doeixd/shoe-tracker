@@ -11,6 +11,9 @@ const DEBUG_PREFIX = "[AUTH]";
 const isProduction = import.meta.env.PROD;
 const isDevelopment = import.meta.env.DEV;
 
+// Force production logging for debugging
+const FORCE_PRODUCTION_LOGGING = true;
+
 interface AuthDebugEvent {
   timestamp: number;
   event: string;
@@ -77,20 +80,61 @@ function authLog(
         console.error(logMessage);
         break;
     }
-  } else if (isProduction && (level === "warn" || level === "error")) {
-    // Only warn/error in production, sanitized data
+  } else if (
+    isProduction &&
+    (FORCE_PRODUCTION_LOGGING || level === "warn" || level === "error")
+  ) {
+    // Enhanced production logging for debugging
     const sanitizedData = data
       ? {
-          error: data?.message || "Unknown error",
-          type: data?.name || "Unknown",
+          error: data?.message || data?.error || "Unknown error",
+          type: data?.name || data?.type || "Unknown",
+          code: data?.code,
+          status: data?.status,
+          stack:
+            level === "error" && data?.stack
+              ? data.stack.slice(0, 200) + "..."
+              : undefined,
         }
       : undefined;
-    const prodMessage = `${DEBUG_PREFIX} ${event}${sanitizedData ? ` - ${JSON.stringify(sanitizedData)}` : ""}`;
 
-    if (level === "warn") {
-      console.warn(prodMessage);
-    } else {
-      console.error(prodMessage);
+    const prodMessage = `${DEBUG_PREFIX} [${level.toUpperCase()}] ${event}${sanitizedData ? ` - ${JSON.stringify(sanitizedData)}` : ""}`;
+
+    // Always log to console in production when debugging
+    switch (level) {
+      case "debug":
+        console.log(prodMessage);
+        break;
+      case "info":
+        console.info(prodMessage);
+        break;
+      case "warn":
+        console.warn(prodMessage);
+        break;
+      case "error":
+        console.error(prodMessage);
+        break;
+    }
+
+    // Also log to localStorage for debugging
+    try {
+      const existingLogs = JSON.parse(
+        localStorage.getItem("auth-debug-logs") || "[]",
+      );
+      existingLogs.push({
+        timestamp: Date.now(),
+        level,
+        event,
+        data: sanitizedData,
+        url: window.location.href,
+      });
+      // Keep only last 50 logs
+      if (existingLogs.length > 50) {
+        existingLogs.splice(0, existingLogs.length - 50);
+      }
+      localStorage.setItem("auth-debug-logs", JSON.stringify(existingLogs));
+    } catch (e) {
+      // Ignore localStorage errors
     }
   }
 
@@ -162,6 +206,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
       environment: isProduction ? "production" : "development",
       convexUrl: import.meta.env.VITE_CONVEX_URL ? "configured" : "missing",
       timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+      forceLogging: FORCE_PRODUCTION_LOGGING,
+    });
+
+    // Log initial browser state
+    authLog("debug", "browser_state", {
+      cookiesEnabled: navigator.cookieEnabled,
+      language: navigator.language,
+      platform: navigator.platform,
+      onLine: navigator.onLine,
+      localStorage: typeof Storage !== "undefined",
     });
 
     return () => {
@@ -325,12 +381,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
     authLog("info", "sign_in_started", {
       provider,
       timestamp: new Date().toISOString(),
+      environment: isProduction ? "production" : "development",
+      currentUrl: window.location.href,
+      referrer: document.referrer,
     });
 
     setIsLoading(true);
     setAuthError(null);
 
     try {
+      authLog("debug", "calling_convex_signin", {
+        provider,
+        convexUrl: import.meta.env.VITE_CONVEX_URL ? "configured" : "missing",
+      });
+
       await convexSignIn(provider);
 
       const duration = Date.now() - startTime;
@@ -339,6 +403,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       authLog("info", "sign_in_success", {
         provider,
         duration,
+        environment: isProduction ? "production" : "development",
       });
 
       setUserSetupComplete(false); // Reset setup state for new sign in
@@ -347,40 +412,62 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const duration = Date.now() - startTime;
       authMetrics.signInFailures++;
 
+      // Enhanced error logging for production debugging
       authLog("error", "sign_in_error", {
         provider,
         duration,
         errorMessage: error?.message,
         errorType: error?.name,
         errorCode: error?.code,
-        stack: isDevelopment ? error?.stack : undefined,
+        errorDetails: error?.details,
+        convexUrl: import.meta.env.VITE_CONVEX_URL ? "configured" : "missing",
+        currentUrl: window.location.href,
+        userAgent: navigator.userAgent,
+        stack: error?.stack,
+        environment: isProduction ? "production" : "development",
       });
 
       let errorMessage = "Failed to sign in. Please try again.";
       let errorCategory = "unknown";
 
       if (error?.message) {
-        if (error.message.includes("popup_closed_by_user")) {
+        const msg = error.message.toLowerCase();
+        if (
+          msg.includes("popup_closed_by_user") ||
+          msg.includes("user closed")
+        ) {
           errorMessage = "Sign in was cancelled.";
           errorCategory = "user_cancelled";
-        } else if (error.message.includes("network")) {
+        } else if (msg.includes("network") || msg.includes("fetch")) {
           errorMessage = "Network error. Please check your connection.";
           errorCategory = "network";
-        } else if (error.message.includes("redirect_uri_mismatch")) {
-          errorMessage = "Configuration error. Please contact support.";
-          errorCategory = "configuration";
-        } else if (error.message.includes("invalid_client")) {
+        } else if (msg.includes("redirect_uri_mismatch")) {
           errorMessage = "OAuth configuration error. Please contact support.";
+          errorCategory = "configuration";
+        } else if (msg.includes("invalid_client")) {
+          errorMessage =
+            "OAuth client configuration error. Please contact support.";
           errorCategory = "oauth_config";
-        } else if (error.message.includes("access_denied")) {
+        } else if (msg.includes("access_denied")) {
           errorMessage = "Access was denied. Please try again.";
           errorCategory = "access_denied";
+        } else if (msg.includes("unauthorized")) {
+          errorMessage = "Authentication failed. Please try again.";
+          errorCategory = "unauthorized";
+        } else if (msg.includes("timeout")) {
+          errorMessage = "Sign in timed out. Please try again.";
+          errorCategory = "timeout";
+        } else if (msg.includes("cors")) {
+          errorMessage = "Cross-origin error. Please contact support.";
+          errorCategory = "cors";
         }
       }
 
       authLog("warn", "sign_in_error_categorized", {
         category: errorCategory,
         userMessage: errorMessage,
+        originalError: error?.message,
+        environment: isProduction ? "production" : "development",
       });
 
       setAuthError(errorMessage);
@@ -458,8 +545,42 @@ export function AuthProvider({ children }: AuthProviderProps) {
       isLoading: value.isLoading,
       isAuthenticated: value.isAuthenticated,
       hasError: !!authError,
+      userId: value.user?.id ? `${value.user.id.slice(0, 8)}...` : null,
+      environment: isProduction ? "production" : "development",
+      timestamp: new Date().toISOString(),
     });
   }, [value.isLoading, value.isAuthenticated, value.user, authError]);
+
+  // Add window-level debugging for production
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      // Expose auth debug functions globally for production debugging
+      (window as any).authDebug = {
+        ...authDebug,
+        getCurrentState: () => ({
+          user: value.user,
+          isLoading: value.isLoading,
+          isAuthenticated: value.isAuthenticated,
+          hasError: !!authError,
+          error: authError,
+          metrics: authMetrics,
+          environment: isProduction ? "production" : "development",
+        }),
+        getLogs: () => {
+          try {
+            return JSON.parse(localStorage.getItem("auth-debug-logs") || "[]");
+          } catch {
+            return [];
+          }
+        },
+        clearLogs: () => {
+          localStorage.removeItem("auth-debug-logs");
+        },
+        testSignIn: () => signIn("google"),
+        testSignOut: () => signOut(),
+      };
+    }
+  }, [value, authError, signIn, signOut]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

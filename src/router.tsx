@@ -9,6 +9,7 @@ import { DefaultCatchBoundary } from "./components/DefaultCatchBoundary";
 import { NotFound } from "./components/NotFound";
 import { AuthProvider } from "./components/AuthProvider";
 import { AppDataLoader } from "./components/AppDataLoader";
+import "./utils/productionAuthDebug";
 
 export function createRouter() {
   const CONVEX_URL = (import.meta as any).env.VITE_CONVEX_URL!;
@@ -29,11 +30,11 @@ export function createRouter() {
         gcTime: 1000 * 60 * 15, // 15 minutes garbage collection
         retry: (failureCount, error) => {
           // Don't retry auth errors
-          if (error?.message?.includes('not authenticated')) return false;
+          if (error?.message?.includes("not authenticated")) return false;
           return failureCount < 3;
         },
         // Optimistic network mode for better offline experience
-        networkMode: 'offlineFirst',
+        networkMode: "offlineFirst",
         // Refetch on window focus to keep data fresh
         refetchOnWindowFocus: true,
         // Don't refetch on reconnect as Convex handles this
@@ -41,7 +42,7 @@ export function createRouter() {
       },
       mutations: {
         retry: (failureCount, error) => {
-          if (error?.message?.includes('not authenticated')) return false;
+          if (error?.message?.includes("not authenticated")) return false;
           return failureCount < 2;
         },
       },
