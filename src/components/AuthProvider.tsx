@@ -5,6 +5,123 @@ import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
 import { Lock, Loader2, AlertCircle } from "lucide-react";
+
+// Auth debugging utilities
+const DEBUG_PREFIX = "[AUTH]";
+const isProduction = import.meta.env.PROD;
+const isDevelopment = import.meta.env.DEV;
+
+interface AuthDebugEvent {
+  timestamp: number;
+  event: string;
+  data?: any;
+  level: "debug" | "info" | "warn" | "error";
+}
+
+interface AuthMetrics {
+  signInAttempts: number;
+  signInSuccesses: number;
+  signInFailures: number;
+  signOutAttempts: number;
+  signOutSuccesses: number;
+  signOutFailures: number;
+  queryErrors: number;
+  lastActivity: number;
+}
+
+// Global auth debug state
+let authDebugEvents: AuthDebugEvent[] = [];
+let authMetrics: AuthMetrics = {
+  signInAttempts: 0,
+  signInSuccesses: 0,
+  signInFailures: 0,
+  signOutAttempts: 0,
+  signOutSuccesses: 0,
+  signOutFailures: 0,
+  queryErrors: 0,
+  lastActivity: Date.now(),
+};
+
+// Debug logging function
+function authLog(
+  level: "debug" | "info" | "warn" | "error",
+  event: string,
+  data?: any,
+) {
+  const timestamp = Date.now();
+  const debugEvent: AuthDebugEvent = { timestamp, event, data, level };
+
+  // Store debug events (keep last 100)
+  authDebugEvents.push(debugEvent);
+  if (authDebugEvents.length > 100) {
+    authDebugEvents = authDebugEvents.slice(-100);
+  }
+
+  // Console logging with appropriate level
+  const logData = data ? ` - ${JSON.stringify(data)}` : "";
+  const logMessage = `${DEBUG_PREFIX} ${event}${logData}`;
+
+  if (isDevelopment) {
+    // Verbose logging in development
+    switch (level) {
+      case "debug":
+        console.debug(logMessage);
+        break;
+      case "info":
+        console.info(logMessage);
+        break;
+      case "warn":
+        console.warn(logMessage);
+        break;
+      case "error":
+        console.error(logMessage);
+        break;
+    }
+  } else if (isProduction && (level === "warn" || level === "error")) {
+    // Only warn/error in production, sanitized data
+    const sanitizedData = data
+      ? {
+          error: data?.message || "Unknown error",
+          type: data?.name || "Unknown",
+        }
+      : undefined;
+    const prodMessage = `${DEBUG_PREFIX} ${event}${sanitizedData ? ` - ${JSON.stringify(sanitizedData)}` : ""}`;
+
+    if (level === "warn") {
+      console.warn(prodMessage);
+    } else {
+      console.error(prodMessage);
+    }
+  }
+
+  // Update metrics
+  authMetrics.lastActivity = timestamp;
+  if (event.includes("query_error")) {
+    authMetrics.queryErrors++;
+  }
+}
+
+// Export debug utilities for external access
+export const authDebug = {
+  getEvents: () => [...authDebugEvents],
+  getMetrics: () => ({ ...authMetrics }),
+  clearEvents: () => {
+    authDebugEvents = [];
+  },
+  resetMetrics: () => {
+    authMetrics = {
+      signInAttempts: 0,
+      signInSuccesses: 0,
+      signInFailures: 0,
+      signOutAttempts: 0,
+      signOutSuccesses: 0,
+      signOutFailures: 0,
+      queryErrors: 0,
+      lastActivity: Date.now(),
+    };
+  },
+};
+
 // Simple auth state type for internal use
 interface AuthState {
   isAuthenticated: boolean;
@@ -39,15 +156,37 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [authError, setAuthError] = useState<string | null>(null);
   const [userSetupComplete, setUserSetupComplete] = useState(false);
 
+  // Debug initialization
+  useEffect(() => {
+    authLog("info", "AuthProvider_initialized", {
+      environment: isProduction ? "production" : "development",
+      convexUrl: import.meta.env.VITE_CONVEX_URL ? "configured" : "missing",
+      timestamp: new Date().toISOString(),
+    });
+
+    return () => {
+      authLog("info", "AuthProvider_unmounted");
+    };
+  }, []);
+
   // Get current user from Convex
   const userQuery = useQuery({
     ...convexQuery(api.auth.getUserProfile, {}),
     retry: (failureCount, error) => {
+      authLog("warn", "user_query_retry_attempt", {
+        failureCount,
+        errorMessage: error?.message,
+        errorType: error?.name,
+      });
+
       // Only retry on network errors, not auth errors
       if (
         error?.message?.includes("not authenticated") ||
         error?.message?.includes("Unauthorized")
       ) {
+        authLog("debug", "user_query_not_retrying_auth_error", {
+          errorMessage: error.message,
+        });
         return false;
       }
       return failureCount < 3;
@@ -56,10 +195,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
     refetchOnWindowFocus: false,
     refetchInterval: false, // Don't auto-refetch
     refetchOnReconnect: true, // Refetch when reconnecting
+    onError: (error) => {
+      authLog("error", "user_query_error", {
+        errorMessage: error?.message,
+        errorType: error?.name,
+        stack: isDevelopment ? error?.stack : undefined,
+      });
+    },
+    onSuccess: (data) => {
+      authLog("debug", "user_query_success", {
+        hasUser: !!data,
+        userId: data?._id ? `${data._id.slice(0, 8)}...` : null,
+      });
+    },
   });
 
   const user = userQuery.data;
   const isAuthenticated = !!user;
+
+  // Track auth state changes
+  useEffect(() => {
+    authLog("info", "auth_state_changed", {
+      isAuthenticated,
+      isLoading: userQuery.isLoading,
+      hasUser: !!user,
+      userId: user?._id ? `${user._id.slice(0, 8)}...` : null,
+    });
+  }, [isAuthenticated, userQuery.isLoading, user?._id]);
 
   // Setup user data mutation
   const setupUserDataMutation = useConvexMutation(api.auth.setupUserData);
@@ -67,9 +229,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Setup user data on first authentication
   useEffect(() => {
     if (isAuthenticated && !userSetupComplete && !authError) {
+      authLog("info", "starting_user_setup", {
+        userId: user?._id ? `${user._id.slice(0, 8)}...` : null,
+      });
+
       const handleSetup = async () => {
         try {
+          const startTime = Date.now();
           const result = await setupUserDataMutation({});
+          const duration = Date.now() - startTime;
+
+          authLog("info", "user_setup_completed", {
+            duration,
+            assigned: result.assigned,
+            collectionsCount: result.collectionsCount,
+            shoesCount: result.shoesCount,
+          });
+
           setUserSetupComplete(true);
           if (result.assigned) {
             toast.success(
@@ -77,7 +253,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
             );
           }
         } catch (error) {
-          console.error("User setup error:", error);
+          authLog("error", "user_setup_error", {
+            errorMessage: error?.message,
+            errorType: error?.name,
+          });
           // Don't show error toast for setup - just log it
           setUserSetupComplete(true); // Mark as complete to avoid retry loop
         }
@@ -85,7 +264,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       handleSetup();
     }
-  }, [isAuthenticated, userSetupComplete, authError, setupUserDataMutation]);
+  }, [
+    isAuthenticated,
+    userSetupComplete,
+    authError,
+    setupUserDataMutation,
+    user?._id,
+  ]);
 
   // Update prefetcher with auth state changes
   // Auth state is now handled internally by TanStack Router
@@ -94,43 +279,109 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     // Set loading to false once we've determined auth state
     if (!userQuery.isLoading) {
+      const wasLoading = isLoading;
       setIsLoading(false);
+
+      if (wasLoading) {
+        authLog("info", "auth_loading_completed", {
+          hasError: !!userQuery.error,
+          isAuthenticated,
+          loadingDuration: "unknown", // Could track this with timestamps if needed
+        });
+      }
 
       // Handle auth errors
       if (userQuery.error) {
         const errorMessage = userQuery.error?.message || "Authentication error";
+        authLog("warn", "auth_error_detected", {
+          errorMessage,
+          errorType: userQuery.error?.name,
+          isAuthError: errorMessage.includes("not authenticated"),
+        });
+
         if (!errorMessage.includes("not authenticated")) {
           setAuthError(errorMessage);
           toast.error("Authentication error. Please try signing in again.");
         }
       } else {
+        if (authError) {
+          authLog("info", "auth_error_cleared");
+        }
         setAuthError(null);
       }
     }
-  }, [userQuery.isLoading, userQuery.error]);
+  }, [
+    userQuery.isLoading,
+    userQuery.error,
+    isLoading,
+    isAuthenticated,
+    authError,
+  ]);
 
   const signIn = async (provider: "google") => {
+    const startTime = Date.now();
+    authMetrics.signInAttempts++;
+
+    authLog("info", "sign_in_started", {
+      provider,
+      timestamp: new Date().toISOString(),
+    });
+
     setIsLoading(true);
     setAuthError(null);
 
     try {
       await convexSignIn(provider);
+
+      const duration = Date.now() - startTime;
+      authMetrics.signInSuccesses++;
+
+      authLog("info", "sign_in_success", {
+        provider,
+        duration,
+      });
+
       setUserSetupComplete(false); // Reset setup state for new sign in
       // Success will be handled by the auth state change
     } catch (error: any) {
-      console.error("Sign in error:", error);
+      const duration = Date.now() - startTime;
+      authMetrics.signInFailures++;
+
+      authLog("error", "sign_in_error", {
+        provider,
+        duration,
+        errorMessage: error?.message,
+        errorType: error?.name,
+        errorCode: error?.code,
+        stack: isDevelopment ? error?.stack : undefined,
+      });
 
       let errorMessage = "Failed to sign in. Please try again.";
+      let errorCategory = "unknown";
 
       if (error?.message) {
         if (error.message.includes("popup_closed_by_user")) {
           errorMessage = "Sign in was cancelled.";
+          errorCategory = "user_cancelled";
         } else if (error.message.includes("network")) {
           errorMessage = "Network error. Please check your connection.";
+          errorCategory = "network";
         } else if (error.message.includes("redirect_uri_mismatch")) {
           errorMessage = "Configuration error. Please contact support.";
+          errorCategory = "configuration";
+        } else if (error.message.includes("invalid_client")) {
+          errorMessage = "OAuth configuration error. Please contact support.";
+          errorCategory = "oauth_config";
+        } else if (error.message.includes("access_denied")) {
+          errorMessage = "Access was denied. Please try again.";
+          errorCategory = "access_denied";
         }
       }
+
+      authLog("warn", "sign_in_error_categorized", {
+        category: errorCategory,
+        userMessage: errorMessage,
+      });
 
       setAuthError(errorMessage);
       toast.error(errorMessage);
@@ -141,14 +392,37 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const signOut = async () => {
+    const startTime = Date.now();
+    authMetrics.signOutAttempts++;
+
+    authLog("info", "sign_out_started", {
+      timestamp: new Date().toISOString(),
+    });
+
     setIsLoading(true);
     setAuthError(null);
 
     try {
       await convexSignOut();
+
+      const duration = Date.now() - startTime;
+      authMetrics.signOutSuccesses++;
+
+      authLog("info", "sign_out_success", {
+        duration,
+      });
+
       toast.success("Signed out successfully");
     } catch (error: any) {
-      console.error("Sign out error:", error);
+      const duration = Date.now() - startTime;
+      authMetrics.signOutFailures++;
+
+      authLog("error", "sign_out_error", {
+        duration,
+        errorMessage: error?.message,
+        errorType: error?.name,
+        stack: isDevelopment ? error?.stack : undefined,
+      });
 
       const errorMessage = error?.message || "Failed to sign out";
       setAuthError(errorMessage);
@@ -176,6 +450,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signIn,
     signOut,
   };
+
+  // Debug context value changes
+  useEffect(() => {
+    authLog("debug", "auth_context_value_updated", {
+      hasUser: !!value.user,
+      isLoading: value.isLoading,
+      isAuthenticated: value.isAuthenticated,
+      hasError: !!authError,
+    });
+  }, [value.isLoading, value.isAuthenticated, value.user, authError]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
