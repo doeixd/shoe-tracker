@@ -37,10 +37,14 @@ class ProductionAuthDebugger {
   private initializeDebugger() {
     console.log("🔧 Production Auth Debugger initialized");
     console.log("Available commands:");
-    console.log("- window.productionAuthDebug.getState() - Get current auth state");
+    console.log(
+      "- window.productionAuthDebug.getState() - Get current auth state",
+    );
     console.log("- window.productionAuthDebug.getLogs() - Get auth logs");
     console.log("- window.productionAuthDebug.testAuth() - Test auth flow");
-    console.log("- window.productionAuthDebug.exportLogs() - Export debug data");
+    console.log(
+      "- window.productionAuthDebug.exportLogs() - Export debug data",
+    );
     console.log("- window.productionAuthDebug.clearLogs() - Clear logs");
     console.log("- window.productionAuthDebug.help() - Show this help");
   }
@@ -82,7 +86,7 @@ class ProductionAuthDebugger {
     console.log(
       `%c[PROD-AUTH-DEBUG] ${level.toUpperCase()}: ${event}`,
       style,
-      data ? data : ""
+      data ? data : "",
     );
   }
 
@@ -106,14 +110,14 @@ class ProductionAuthDebugger {
     // Combine in-memory logs with localStorage logs
     try {
       const storedLogs = JSON.parse(
-        localStorage.getItem("prod-auth-debug-logs") || "[]"
+        localStorage.getItem("prod-auth-debug-logs") || "[]",
       );
       const allLogs = [...storedLogs, ...this.logs];
 
       // Remove duplicates based on timestamp
       const uniqueLogs = allLogs.filter(
         (log, index, self) =>
-          index === self.findIndex((l) => l.timestamp === log.timestamp)
+          index === self.findIndex((l) => l.timestamp === log.timestamp),
       );
 
       return uniqueLogs.sort((a, b) => a.timestamp - b.timestamp);
@@ -201,10 +205,13 @@ class ProductionAuthDebugger {
       if (convexUrl) {
         try {
           const startTime = Date.now();
-          const response = await fetch(convexUrl.replace(/\/$/, "") + "/api/ping", {
-            method: "GET",
-            timeout: 10000,
-          });
+          const response = await fetch(
+            convexUrl.replace(/\/$/, "") + "/api/ping",
+            {
+              method: "GET",
+              timeout: 10000,
+            },
+          );
           const duration = Date.now() - startTime;
           this.log("info", "convex_connectivity_test", {
             success: response.ok,
@@ -374,14 +381,14 @@ Example Usage:
 
 // Initialize and expose globally
 if (typeof window !== "undefined") {
-  const debugger = ProductionAuthDebugger.getInstance();
-  (window as any).productionAuthDebug = debugger;
+  const authDebugger = ProductionAuthDebugger.getInstance();
+  (window as any).productionAuthDebug = authDebugger;
 
   // Also expose shorter alias
-  (window as any).authDbg = debugger;
+  (window as any).authDbg = authDebugger;
 
   // Auto-log page loads
-  debugger.log("info", "page_loaded", {
+  authDebugger.log("info", "page_loaded", {
     url: window.location.href,
     referrer: document.referrer,
     timestamp: new Date().toISOString(),
@@ -389,7 +396,7 @@ if (typeof window !== "undefined") {
 
   // Log navigation events
   window.addEventListener("beforeunload", () => {
-    debugger.log("info", "page_unloading", {
+    authDebugger.log("info", "page_unloading", {
       url: window.location.href,
       timestamp: new Date().toISOString(),
     });
@@ -402,7 +409,7 @@ if (typeof window !== "undefined") {
       event.error?.message?.toLowerCase().includes("sign") ||
       event.error?.message?.toLowerCase().includes("token")
     ) {
-      debugger.log("error", "auth_related_js_error", {
+      authDebugger.log("error", "auth_related_js_error", {
         message: event.error.message,
         filename: event.filename,
         lineno: event.lineno,
@@ -419,14 +426,16 @@ if (typeof window !== "undefined") {
       event.reason?.message?.toLowerCase().includes("sign") ||
       event.reason?.message?.toLowerCase().includes("token")
     ) {
-      debugger.log("error", "auth_related_promise_rejection", {
+      authDebugger.log("error", "auth_related_promise_rejection", {
         message: event.reason.message,
         stack: event.reason.stack?.slice(0, 500),
       });
     }
   });
 
-  console.log("🚀 Production Auth Debugger loaded! Type 'window.productionAuthDebug.help()' for commands.");
+  console.log(
+    "🚀 Production Auth Debugger loaded! Type 'window.productionAuthDebug.help()' for commands.",
+  );
 }
 
 export default ProductionAuthDebugger;
