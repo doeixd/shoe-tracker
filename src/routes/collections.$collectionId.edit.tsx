@@ -1,7 +1,6 @@
 import {
   useNavigate,
   createFileRoute,
-  useSearch,
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useCollection } from "~/queries";
@@ -33,7 +32,7 @@ export const Route = createFileRoute("/collections/$collectionId/edit")({
 function EditCollection() {
   const navigate = useNavigate();
   const { collectionId } = Route.useParams();
-  const search = useSearch({ from: "/collections/$collectionId/edit" });
+  const search = Route.useSearch();
   const isMobile = useIsMobile();
   const isModal = search.modal;
   const { data: collection, isLoading: isCollectionLoading } = useCollection(collectionId);
