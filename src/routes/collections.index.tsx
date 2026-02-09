@@ -157,8 +157,8 @@ function Collections() {
                 navigate({ to: "/collections/new", search: { modal: false } });
               }
             }}
-            icon={<Plus className="w-5 h-5" />}
-            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg hover:shadow-xl px-6 py-3 font-semibold"
+            icon={<Plus className="w-4 h-4" />}
+            className="bg-gray-900 hover:bg-gray-800 text-white shadow-sm px-5 py-2.5 text-sm"
           >
             New Collection
           </Button>

@@ -374,8 +374,8 @@ function Runs() {
                 navigate({ to: "/runs/new", search: { modal: false } });
               }
             }}
-            icon={<Plus className="w-5 h-5" />}
-            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg hover:shadow-xl px-6 py-3 font-semibold"
+            icon={<Plus className="w-4 h-4" />}
+            className="bg-gray-900 hover:bg-gray-800 text-white shadow-sm px-5 py-2.5 text-sm"
           >
             Log Run
           </Button>
@@ -459,24 +459,22 @@ function Runs() {
           animate: { opacity: 1, y: 0 },
           transition: { duration: 0.5, delay: 0.2 },
         })}
-        className="bg-gradient-to-br from-white via-gray-50/50 to-white rounded-3xl shadow-medium border border-gray-100/80 p-4 sm:p-6"
+        className="bg-white rounded-2xl border border-gray-200/60 p-4 sm:p-5"
       >
         <button
           onClick={() => setFiltersExpanded(!filtersExpanded)}
-          className={`flex items-center justify-between w-full gap-3 ${filtersExpanded ? "mb-6" : ""} hover:bg-gray-50/50 rounded-2xl p-2 -m-2 transition-colors`}
+          className={`flex items-center justify-between w-full gap-3 ${filtersExpanded ? "mb-5" : ""} hover:bg-gray-50 rounded-xl p-2 -m-2 transition-colors`}
         >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
-              <Filter className="w-5 h-5 text-primary-600" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900">
+          <div className="flex items-center gap-2.5">
+            <Filter className="w-4 h-4 text-gray-400" />
+            <span className="text-sm font-medium text-gray-700">
               Filters & Sorting
-            </h3>
+            </span>
           </div>
           {filtersExpanded ? (
-            <ChevronUp className="w-6 h-6 text-gray-600" />
+            <ChevronUp className="w-4 h-4 text-gray-400" />
           ) : (
-            <ChevronDown className="w-6 h-6 text-gray-600" />
+            <ChevronDown className="w-4 h-4 text-gray-400" />
           )}
         </button>
 
@@ -611,7 +609,7 @@ function Runs() {
             }}
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {filteredRuns.map((run, index) => {
               const shoe = shoes.find((s) => s.id === run.shoeId);
               const runTypeOption = RUN_TYPE_OPTIONS.find(
@@ -622,101 +620,93 @@ function Runs() {
               );
 
               return (
-                <div key={run.id} className="h-full">
-                  <FeatureCard
-                    title={new Date(run.date).toLocaleDateString("en-US", {
-                      weekday: "short",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                    description={`${formatDistance(run.distance)} • ${
-                      run.duration ? formatDuration(run.duration) : "No time"
-                    }`}
-                    onClick={() =>
-                      navigate({
-                        to: "/runs/$runId",
-                        params: { runId: run.id },
-                      })
-                    }
-                    className={cn(
-                      "h-full transition-all duration-300 cursor-pointer hover:shadow-large hover:scale-[1.02] active:scale-[0.98]",
+                <Card
+                  key={run.id}
+                  hover
+                  onClick={() =>
+                    navigate({
+                      to: "/runs/$runId",
+                      params: { runId: run.id },
+                    })
+                  }
+                  padding="md"
+                  shadow="soft"
+                  className="group cursor-pointer hover:shadow-medium transition-all duration-200"
+                >
+                  {/* Header row: date + effort badge */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                        {getRunTypeIcon(run.runType)}
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-900">
+                          {new Date(run.date).toLocaleDateString("en-US", {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {runTypeOption?.label || run.runType}
+                        </div>
+                      </div>
+                    </div>
+                    {run.effort && (
+                      <span
+                        className={cn(
+                          "inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold",
+                          getEffortColor(run.effort),
+                        )}
+                      >
+                        {effortOption?.label || run.effort}
+                      </span>
                     )}
-                  >
-                    <div className="space-y-4">
-                      {/* Run Type and Effort */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          {getRunTypeIcon(run.runType)}
-                          <span className="text-sm font-medium text-gray-700">
-                            {runTypeOption?.label || run.runType}
-                          </span>
-                        </div>
-                        {run.effort && (
-                          <span
-                            className={cn(
-                              "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-                              getEffortColor(run.effort),
-                            )}
-                          >
-                            {effortOption?.label || run.effort}
-                          </span>
-                        )}
+                  </div>
+
+                  {/* Main stats row */}
+                  <div className="flex items-baseline gap-4 mb-3">
+                    <div>
+                      <span className="text-2xl font-bold text-gray-900 tabular-nums">
+                        {formatDistance(run.distance)}
+                      </span>
+                      <span className="text-xs text-gray-400 ml-1">mi</span>
+                    </div>
+                    {run.pace && (
+                      <div className="text-sm text-gray-600">
+                        <span className="font-semibold tabular-nums">{run.pace}</span>
+                        <span className="text-gray-400"> /mi</span>
                       </div>
-
-                      {/* Pace and Shoe */}
-                      <div className="space-y-3">
-                        {run.pace && (
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600 flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              Pace
-                            </span>
-                            <span className="font-semibold text-gray-900">
-                              {run.pace} /mi
-                            </span>
-                          </div>
-                        )}
-
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600 flex items-center gap-1">
-                            <Footprints className="w-3 h-3" />
-                            Shoe
-                          </span>
-                          <span className="font-medium text-gray-900">
-                            {shoe?.name || "Unknown"}
-                          </span>
-                        </div>
+                    )}
+                    {run.duration && (
+                      <div className="text-sm text-gray-500">
+                        {formatDuration(run.duration)}
                       </div>
+                    )}
+                  </div>
 
-                      {/* Weather and Route */}
-                      {(run.temperature || run.route) && (
-                        <div className="pt-3 border-t border-gray-100">
-                          {run.temperature && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                              <Thermometer className="w-3 h-3" />
-                              <span>{run.temperature}°F</span>
-                            </div>
-                          )}
-                          {run.route && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <MapPin className="w-3 h-3" />
-                              <span className="truncate">{run.route}</span>
-                            </div>
-                          )}
-                        </div>
+                  {/* Footer: shoe + extra info */}
+                  <div className="flex items-center justify-between pt-2.5 border-t border-gray-50">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <Footprints className="w-3 h-3" />
+                      <span className="truncate max-w-[120px]">{shoe?.name || "Unknown"}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                      {run.temperature && (
+                        <span>{run.temperature}°F</span>
                       )}
-
-                      {/* Notes Preview */}
-                      {run.notes && (
-                        <div className="pt-3 border-t border-gray-100">
-                          <p className="text-sm text-gray-600 line-clamp-2">
-                            {run.notes}
-                          </p>
-                        </div>
+                      {run.route && (
+                        <span className="truncate max-w-[80px]">{run.route}</span>
                       )}
                     </div>
-                  </FeatureCard>
-                </div>
+                  </div>
+
+                  {run.notes && (
+                    <p className="text-xs text-gray-400 mt-2 line-clamp-1">
+                      {run.notes}
+                    </p>
+                  )}
+                </Card>
               );
             })}
           </div>

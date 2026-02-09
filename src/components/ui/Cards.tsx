@@ -101,11 +101,11 @@ export function MetricCard({
   className,
 }: MetricCardProps) {
   const colorClasses = {
-    primary: "text-primary-600 bg-primary-50",
-    success: "text-green-600 bg-green-50",
-    warning: "text-orange-600 bg-orange-50",
-    danger: "text-red-600 bg-red-50",
-    neutral: "text-gray-600 bg-gray-50",
+    primary: "text-blue-600 bg-blue-50 ring-blue-100",
+    success: "text-emerald-600 bg-emerald-50 ring-emerald-100",
+    warning: "text-amber-600 bg-amber-50 ring-amber-100",
+    danger: "text-red-600 bg-red-50 ring-red-100",
+    neutral: "text-gray-600 bg-gray-50 ring-gray-100",
   };
 
   const trendColorClasses = trend?.positive
@@ -113,25 +113,37 @@ export function MetricCard({
     : "text-red-600 bg-red-50";
 
   return (
-    <Card className={cn("@container", className)} hover padding="lg">
-      <div className="flex items-start justify-between">
+    <Card className={cn("@container", className)} hover padding="md" shadow="soft">
+      <div className="flex items-start gap-3">
+        {icon && (
+          <div
+            className={cn(
+              "flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl ring-1",
+              colorClasses[color],
+            )}
+          >
+            <div className="[&>svg]:w-5 [&>svg]:h-5">
+              {icon}
+            </div>
+          </div>
+        )}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-gray-600 truncate">{title}</p>
-          <div className="mt-2 flex flex-col items-start">
-            <span className="text-3xl @[120px]:text-2xl @[100px]:text-xl font-bold text-gray-900">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider truncate">{title}</p>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="text-2xl @[120px]:text-xl font-bold text-gray-900 tabular-nums">
               {value}
             </span>
-            {subtitle && (
-              <span className="mt-1 text-sm @[100px]:text-xs text-gray-500">
-                {subtitle}
-              </span>
-            )}
           </div>
+          {subtitle && (
+            <span className="text-xs text-gray-400 mt-0.5 block">
+              {subtitle}
+            </span>
+          )}
           {trend && (
-            <div className="mt-3 flex items-center">
+            <div className="mt-2 flex items-center">
               <span
                 className={cn(
-                  "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
+                  "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
                   trendColorClasses,
                 )}
               >
@@ -141,18 +153,6 @@ export function MetricCard({
             </div>
           )}
         </div>
-        {icon && (
-          <div
-            className={cn(
-              "flex-shrink-0 w-12 h-12 @[130px]:w-8 @[130px]:h-8 @[100px]:w-6 @[100px]:h-6 flex items-center justify-center rounded-2xl @[130px]:rounded-xl @[100px]:rounded-lg",
-              colorClasses[color],
-            )}
-          >
-            <div className="@[130px]:[&>svg]:w-4 @[130px]:[&>svg]:h-4 @[100px]:[&>svg]:w-3 @[100px]:[&>svg]:h-3">
-              {icon}
-            </div>
-          </div>
-        )}
       </div>
     </Card>
   );
@@ -299,44 +299,48 @@ export function ActionCard({
   className,
 }: ActionCardProps) {
   const variantClasses = {
-    primary: "bg-gradient-to-br from-primary-500 to-primary-600 text-white",
-    secondary: "bg-white border-2 border-gray-200",
+    primary: "bg-gradient-to-br from-blue-600 to-indigo-600 text-white",
+    secondary: "bg-white border border-gray-200",
   };
 
   const textClasses = {
-    primary: "text-white/90",
-    secondary: "text-gray-600",
+    primary: "text-blue-100",
+    secondary: "text-gray-500",
   };
 
   return (
     <div
       className={cn(
-        "p-6 rounded-3xl shadow-large card-hover will-change-transform",
+        "p-6 rounded-2xl card-hover will-change-transform",
+        variant === "primary" ? "shadow-lg shadow-blue-500/20" : "shadow-soft",
         variantClasses[variant],
         className,
       )}
     >
       {icon && (
-        <div className="w-12 h-12 mb-4 flex items-center justify-center rounded-2xl bg-white/10">
+        <div className={cn(
+          "w-10 h-10 mb-4 flex items-center justify-center rounded-xl",
+          variant === "primary" ? "bg-white/15" : "bg-gray-100",
+        )}>
           {icon}
         </div>
       )}
       <h3
         className={cn(
-          "text-xl font-semibold mb-2",
+          "text-lg font-semibold mb-1.5",
           variant === "primary" ? "text-white" : "text-gray-900",
         )}
       >
         {title}
       </h3>
-      <p className={cn("mb-6", textClasses[variant])}>{description}</p>
+      <p className={cn("mb-5 text-sm leading-relaxed", textClasses[variant])}>{description}</p>
       <button
         onClick={onAction}
         className={cn(
-          "w-full py-3 px-4 rounded-2xl font-semibold transition-all duration-200",
+          "w-full py-2.5 px-4 rounded-xl font-semibold text-sm transition-all duration-200",
           variant === "primary"
-            ? "bg-white text-primary-600 hover:bg-gray-50"
-            : "bg-primary-600 text-white hover:bg-primary-700",
+            ? "bg-white text-blue-600 hover:bg-blue-50"
+            : "bg-gray-900 text-white hover:bg-gray-800",
         )}
       >
         {actionLabel}
@@ -364,18 +368,18 @@ export function EmptyStateCard({
   className,
 }: EmptyStateCardProps) {
   return (
-    <Card className={cn("text-center", className)} padding="xl">
+    <Card className={cn("text-center py-12", className)} padding="lg" border={false} shadow="none">
       {icon && (
-        <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-2xl bg-gray-100">
+        <div className="w-14 h-14 mx-auto mb-5 flex items-center justify-center rounded-2xl bg-gray-50 border border-gray-100">
           {icon}
         </div>
       )}
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
-      <p className="text-gray-600 mb-6 max-w-sm mx-auto">{description}</p>
+      <h3 className="text-base font-semibold text-gray-900 mb-1.5">{title}</h3>
+      <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto leading-relaxed">{description}</p>
       {actionLabel && onAction && (
         <button
           onClick={onAction}
-          className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-2xl text-white bg-primary-600 hover:bg-primary-700 transition-colors duration-200"
+          className="inline-flex items-center px-5 py-2.5 text-sm font-medium rounded-xl text-white bg-gray-900 hover:bg-gray-800 transition-colors duration-200"
         >
           {actionLabel}
         </button>
@@ -387,13 +391,13 @@ export function EmptyStateCard({
 // Loading Card Skeleton
 export function CardSkeleton({ className }: { className?: string }) {
   return (
-    <Card className={cn("animate-pulse", className)} padding="lg">
-      <div className="space-y-4">
-        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-        <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-        <div className="space-y-2">
-          <div className="h-3 bg-gray-200 rounded"></div>
-          <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+    <Card className={cn("animate-pulse", className)} padding="md" shadow="soft">
+      <div className="space-y-3">
+        <div className="h-3 bg-gray-100 rounded-full w-2/3"></div>
+        <div className="h-6 bg-gray-100 rounded-lg w-1/3"></div>
+        <div className="space-y-2 pt-1">
+          <div className="h-2.5 bg-gray-100 rounded-full"></div>
+          <div className="h-2.5 bg-gray-100 rounded-full w-4/5"></div>
         </div>
       </div>
     </Card>

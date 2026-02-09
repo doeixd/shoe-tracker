@@ -63,11 +63,11 @@ export function BottomTabNavigation() {
       {/* Bottom Tab Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
         {/* Background with blur effect */}
-        <div className="absolute inset-0 bg-white/80 backdrop-blur-lg border-t border-gray-200/50" />
+        <div className="absolute inset-0 bg-white/90 backdrop-blur-xl border-t border-gray-200/40" />
 
         {/* Safe area padding */}
         <div className="relative px-safe pb-safe">
-          <div className="flex items-center justify-around px-2 py-2 min-h-[64px]">
+          <div className="flex items-center justify-around px-2 py-1.5 min-h-[60px]">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = isTabActive(tab.to);
@@ -80,11 +80,10 @@ export function BottomTabNavigation() {
                     search={{ modal: true }}
                     className="flex flex-col items-center justify-center relative"
                   >
-                    {/* Center FAB */}
-                    <div className="w-14 h-14 -mt-6 bg-gradient-to-r from-green-500 to-green-600 rounded-full shadow-lg shadow-green-500/25 flex items-center justify-center hover:shadow-xl hover:shadow-green-500/30 transition-all duration-200 hover:scale-105 active:scale-95 ring-4 ring-white">
-                      <Icon className="w-7 h-7 text-white" />
+                    <div className="w-12 h-12 -mt-5 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl shadow-lg shadow-blue-500/30 flex items-center justify-center hover:shadow-xl transition-all duration-200 active:scale-95 ring-4 ring-white">
+                      <Icon className="w-5 h-5 text-white" />
                     </div>
-                    <span className="text-xs font-semibold text-green-600 mt-1">
+                    <span className="text-[10px] font-semibold text-blue-600 mt-1">
                       {tab.label}
                     </span>
                   </Link>
@@ -96,22 +95,27 @@ export function BottomTabNavigation() {
                   key={tab.to}
                   to={tab.to}
                   className={cn(
-                    "flex flex-col items-center justify-center px-3 py-2 min-w-[48px] transition-colors duration-200",
+                    "flex flex-col items-center justify-center px-3 py-1.5 min-w-[48px] rounded-xl transition-all duration-200",
                     isActive
                       ? "text-blue-600"
-                      : "text-gray-500 hover:text-gray-700",
+                      : "text-gray-400 hover:text-gray-600",
                   )}
                 >
-                  <Icon
-                    className={cn(
-                      "w-6 h-6 mb-1",
-                      isActive ? "text-blue-600" : "text-gray-500",
+                  <div className="relative">
+                    <Icon
+                      className={cn(
+                        "w-5 h-5",
+                        isActive ? "text-blue-600" : "text-gray-400",
+                      )}
+                    />
+                    {isActive && (
+                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-600" />
                     )}
-                  />
+                  </div>
                   <span
                     className={cn(
-                      "text-xs font-medium",
-                      isActive ? "text-blue-600" : "text-gray-500",
+                      "text-[10px] font-medium mt-1",
+                      isActive ? "text-blue-600" : "text-gray-400",
                     )}
                   >
                     {tab.label}
