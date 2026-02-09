@@ -175,9 +175,9 @@ export interface FileRoutesByFullPath {
   '/runs/new': typeof RunsNewRoute
   '/shoes/$shoeId': typeof ShoesShoeIdRouteWithChildren
   '/shoes/new': typeof ShoesNewRoute
-  '/collections': typeof CollectionsIndexRoute
-  '/runs': typeof RunsIndexRoute
-  '/shoes': typeof ShoesIndexRoute
+  '/collections/': typeof CollectionsIndexRoute
+  '/runs/': typeof RunsIndexRoute
+  '/shoes/': typeof ShoesIndexRoute
   '/collections/$collectionId/edit': typeof CollectionsCollectionIdEditRoute
   '/runs/$runId/edit': typeof RunsRunIdEditRoute
   '/shoes/$shoeId/edit': typeof ShoesShoeIdEditRoute
@@ -256,9 +256,9 @@ export interface FileRouteTypes {
     | '/runs/new'
     | '/shoes/$shoeId'
     | '/shoes/new'
-    | '/collections'
-    | '/runs'
-    | '/shoes'
+    | '/collections/'
+    | '/runs/'
+    | '/shoes/'
     | '/collections/$collectionId/edit'
     | '/runs/$runId/edit'
     | '/shoes/$shoeId/edit'
@@ -422,21 +422,21 @@ declare module '@tanstack/react-router' {
     '/shoes/': {
       id: '/shoes/'
       path: '/shoes'
-      fullPath: '/shoes'
+      fullPath: '/shoes/'
       preLoaderRoute: typeof ShoesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/runs/': {
       id: '/runs/'
       path: '/runs'
-      fullPath: '/runs'
+      fullPath: '/runs/'
       preLoaderRoute: typeof RunsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/collections/': {
       id: '/collections/'
       path: '/collections'
-      fullPath: '/collections'
+      fullPath: '/collections/'
       preLoaderRoute: typeof CollectionsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -577,3 +577,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
