@@ -97,11 +97,27 @@ export function EditCollectionForm({
     }
 
     try {
-      await updateCollectionMutation.mutateAsync({
+      const payload = {
         id: collection.id,
         ...formData,
         description: formData.description?.trim() || undefined,
-      });
+      };
+
+      try {
+        await updateCollectionMutation.mutateAsync(payload);
+      } catch (error: any) {
+        if (
+          payload.icon &&
+          (error?.message?.includes("Server Error") ||
+            error?.message?.includes("validation") ||
+            error?.message?.includes("Called by client"))
+        ) {
+          const { icon: _icon, ...legacyPayload } = payload;
+          await updateCollectionMutation.mutateAsync(legacyPayload);
+        } else {
+          throw error;
+        }
+      }
 
       toast.success("Collection updated successfully!");
 

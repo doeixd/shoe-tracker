@@ -296,8 +296,24 @@ export function Onboarding({ onComplete }: OnboardingProps) {
       const newCollections = [];
       for (const collection of validCollections) {
         try {
-          const collectionId =
-            await createCollectionMutation.mutateAsync(collection);
+          let collectionId: string;
+          try {
+            collectionId = await createCollectionMutation.mutateAsync(collection);
+          } catch (error: any) {
+            if (
+              collection.icon &&
+              (error?.message?.includes("Server Error") ||
+                error?.message?.includes("validation") ||
+                error?.message?.includes("Called by client"))
+            ) {
+              const { icon: _icon, ...legacyCollection } = collection;
+              collectionId =
+                await createCollectionMutation.mutateAsync(legacyCollection);
+            } else {
+              throw error;
+            }
+          }
+
           newCollections.push({ ...collection, id: collectionId });
           createdCount++;
         } catch (collectionError: any) {

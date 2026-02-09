@@ -83,10 +83,27 @@ export function CollectionForm({
     }
 
     try {
-      const collectionId = await createCollectionMutation.mutateAsync({
+      const payload = {
         ...formData,
         description: formData.description?.trim() || undefined,
-      });
+      };
+
+      let collectionId: string;
+      try {
+        collectionId = await createCollectionMutation.mutateAsync(payload);
+      } catch (error: any) {
+        if (
+          payload.icon &&
+          (error?.message?.includes("Server Error") ||
+            error?.message?.includes("validation") ||
+            error?.message?.includes("Called by client"))
+        ) {
+          const { icon: _icon, ...legacyPayload } = payload;
+          collectionId = await createCollectionMutation.mutateAsync(legacyPayload);
+        } else {
+          throw error;
+        }
+      }
 
       toast.success("Collection created successfully!");
 

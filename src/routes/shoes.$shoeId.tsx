@@ -3,7 +3,6 @@ import {
   Link,
   createFileRoute,
   useNavigate,
-  useSearch,
   Outlet,
   useMatches,
 } from "@tanstack/react-router";
@@ -178,7 +177,7 @@ function ShoeDetail() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const navigate = useNavigate();
   const { shoeId } = Route.useParams();
-  const search = useSearch({ from: "/shoes/$shoeId" });
+  const search = Route.useSearch();
   const isMobile = useIsMobile();
   const loaderData = Route.useLoaderData();
   const matches = useMatches();
@@ -187,16 +186,6 @@ function ShoeDetail() {
   const isEditRoute = matches.some(
     (match) => match.id === "/edit"
   ) || window.location.pathname.includes("/edit");
-
-  // Debug logging
-  console.log("Debug - Route matching:", {
-    currentPath: window.location.pathname,
-    matches: matches.map(m => ({ id: m.id, pathname: m.pathname, fullPath: m.fullPath })),
-    isEditRoute,
-    isMobile,
-    matchIds: matches.map(m => m.id),
-    hasEditInPath: window.location.pathname.includes("/edit"),
-  });
 
   // All hooks must be called before any early returns
   const retireShoeMutation = useRetireShoeMutation();
