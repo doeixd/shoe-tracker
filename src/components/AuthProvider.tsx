@@ -202,6 +202,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [userSetupComplete, setUserSetupComplete] = useState(false);
   const authProfileQuery = convexQuery(api.auth.getUserProfile, {});
 
+  const clearStaleAuthClientState = () => {
+    try {
+      const clearPrefixedKeys = (storage: Storage) => {
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < storage.length; i++) {
+          const key = storage.key(i);
+          if (key && (key.startsWith("__convexAuth") || key.startsWith("__Host-convexAuth"))) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach((key) => storage.removeItem(key));
+      };
+
+      clearPrefixedKeys(localStorage);
+      clearPrefixedKeys(sessionStorage);
+      authLog("warn", "cleared_stale_auth_client_state");
+    } catch (error: any) {
+      authLog("warn", "failed_to_clear_auth_client_state", {
+        errorMessage: error?.message,
+        errorType: error?.name,
+      });
+    }
+  };
+
   // Debug initialization
   useEffect(() => {
     authLog("info", "AuthProvider_initialized", {
@@ -427,6 +451,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       // Success will be handled by the auth state change
     } catch (error: any) {
+      const rawErrorMessage = String(error?.message || "");
+
+      if (rawErrorMessage.toLowerCase().includes("missing sign-in verifier")) {
+        authLog("warn", "missing_sign_in_verifier_detected", {
+          retrying: true,
+        });
+
+        clearStaleAuthClientState();
+
+        try {
+          await convexSignIn(provider);
+          authLog("info", "sign_in_retry_after_verifier_clear_success");
+          return;
+        } catch (retryError: any) {
+          authLog("error", "sign_in_retry_after_verifier_clear_failed", {
+            errorMessage: retryError?.message,
+            errorType: retryError?.name,
+          });
+          error = retryError;
+        }
+      }
+
       const duration = Date.now() - startTime;
       authMetrics.signInFailures++;
 
