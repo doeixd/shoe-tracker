@@ -58,7 +58,7 @@ export function Card({
   return (
     <Component
       className={cn(
-        "bg-white will-change-transform",
+        "w-full bg-white will-change-transform",
         noAnimation ? "" : "animate-fade-in-fast",
         paddingClasses[padding],
         shadowClasses[shadow],

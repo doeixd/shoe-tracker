@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import type { MouseEvent } from "react";
 import { EnhancedLoading } from "~/components/loading/EnhancedLoading";
 import { createQueryConfig } from "~/utils/routeLoading";
 
@@ -40,7 +39,6 @@ import {
   AlertTriangle,
   Gauge,
   Activity,
-  Palette,
   Calendar,
   Lock,
 } from "lucide-react";
@@ -222,41 +220,6 @@ function CollectionDetail() {
   const shoes = (shoesQuery.data as any[]) || [];
   const CollectionIcon = getCollectionIcon(collection?.icon);
 
-  const handleEditCollectionClick = (event: MouseEvent<HTMLButtonElement>) => {
-    const targetUrl = `/collections/${collectionId}/edit?modal=false`;
-    console.log("[Collections] Edit Collection click", {
-      collectionId,
-      currentPath: window.location.pathname,
-      targetUrl,
-      defaultPrevented: event.defaultPrevented,
-      buttonDisabled: event.currentTarget.disabled,
-    });
-
-    try {
-      navigate({
-        to: "/collections/$collectionId/edit",
-        params: { collectionId },
-        search: { modal: false },
-      });
-
-      window.setTimeout(() => {
-        if (!window.location.pathname.includes(`/collections/${collectionId}/edit`)) {
-          console.warn(
-            "[Collections] Router navigation did not change path, forcing URL fallback",
-            {
-              currentPath: window.location.pathname,
-              targetUrl,
-            },
-          );
-          window.location.assign(targetUrl);
-        }
-      }, 50);
-    } catch (error) {
-      console.error("[Collections] Edit navigate error, forcing URL fallback", error);
-      window.location.assign(targetUrl);
-    }
-  };
-
   const activeShoes = shoes.filter((shoe: any) => shoe && !shoe.isRetired);
   const retiredShoes = shoes.filter((shoe: any) => shoe && shoe.isRetired);
 
@@ -308,10 +271,6 @@ function CollectionDetail() {
                         {collection.description}
                       </p>
                     )}
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <Palette className="w-4 h-4" />
-                      <span>Color: {collection?.color || "#3b82f6"}</span>
-                    </div>
                   </div>
                 </div>
 
@@ -329,17 +288,17 @@ function CollectionDetail() {
                   >
                     Add Shoe
                   </Button>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClickCapture={() =>
-                      console.log("[Collections] Edit Collection click capture")
-                    }
-                    onClick={handleEditCollectionClick}
-                    icon={<Edit3 className="w-4 h-4" />}
+                  <Link
+                    to="/collections/$collectionId/edit"
+                    params={{ collectionId }}
+                    search={{ modal: false }}
+                    className="inline-flex items-center justify-center font-semibold rounded-2xl focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 bg-gray-100 hover:bg-gray-200 text-gray-900 focus:ring-gray-500 px-4 py-3 text-base will-change-transform transition-transform-fast hover:scale-[1.01] active:scale-[0.99]"
                   >
+                    <span className="mr-2">
+                      <Edit3 className="w-4 h-4" />
+                    </span>
                     Edit Collection
-                  </Button>
+                  </Link>
                 </div>
               </div>
             </Card>
