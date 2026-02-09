@@ -67,6 +67,7 @@ import * as React from "react";
 
 function HomePage() {
   const { isAuthenticated, isLoading } = useAuth();
+  console.log({ isAuthenticated, isLoading });
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -137,144 +138,126 @@ function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-b from-blue-50/80 via-white to-white">
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 sm:pt-24 sm:pb-32">
+      <div className="relative overflow-hidden">
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-sm font-medium mb-8"
-            >
-              <Footprints className="w-4 h-4" />
-              Built for runners, by runners
-            </motion.div>
-
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-5xl sm:text-6xl md:text-7xl font-extrabold text-gray-900 mb-6 tracking-tight"
+              transition={{ duration: 0.6 }}
+              className="text-4xl md:text-6xl font-bold text-gray-900 mb-6"
             >
-              Know your shoes.
-              <br />
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Run with confidence.
-              </span>
+              Track Your Running Shoes
+              <span className="text-blue-600 block">Like a Pro</span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.25 }}
-              className="text-lg sm:text-xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed"
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto"
             >
-              Track mileage, monitor wear, and get replacement alerts
-              so you always run on shoes that support you.
+              Monitor mileage, track wear patterns, and know exactly when to
+              replace your running shoes. Keep your feet happy and your runs
+              safer.
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex flex-col sm:flex-row gap-3 justify-center"
+              className="flex flex-col sm:flex-row gap-4 justify-center"
             >
               <Button
                 onClick={() => navigate({ to: "/auth/signin" })}
                 variant="primary"
-                icon={<ArrowRight className="w-5 h-5" />}
-                className="px-8 py-3.5 text-base bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30"
+                icon={<Footprints className="w-5 h-5" />}
+                className="px-8 py-3 text-lg"
               >
-                Get Started Free
+                Start Tracking
               </Button>
             </motion.div>
           </div>
         </div>
 
-        {/* Subtle grid background */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)] opacity-60" />
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width=%2260%22%20height=%2260%22%20viewBox=%220%200%2060%2060%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg%20fill=%22none%22%20fill-rule=%22evenodd%22%3E%3Cg%20fill=%22%239C92AC%22%20fill-opacity=%220.05%22%3E%3Cpath%20d=%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
       </div>
 
       {/* Features Section */}
-      <div className="py-24 sm:py-32">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
-              Everything you need
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Everything You Need to Track Your Shoes
             </h2>
-            <p className="text-lg text-gray-500 max-w-xl mx-auto">
-              Simple tools to help you get the most miles out of every pair.
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              From casual joggers to marathon runners, our app helps you get the
+              most out of your running shoes.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                icon: <Activity className="w-6 h-6" />,
-                color: "bg-blue-500",
-                title: "Mileage Tracking",
-                description: "Log runs and automatically track miles on each pair of shoes.",
-              },
-              {
-                icon: <AlertTriangle className="w-6 h-6" />,
-                color: "bg-amber-500",
-                title: "Smart Alerts",
-                description: "Get notified when shoes are nearing their replacement mileage.",
-              },
-              {
-                icon: <BarChart3 className="w-6 h-6" />,
-                color: "bg-emerald-500",
-                title: "Analytics",
-                description: "Understand your running patterns and shoe performance over time.",
-              },
-            ].map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 + index * 0.1 }}
-                className="p-6 rounded-2xl border border-gray-100 bg-white hover:border-gray-200 hover:shadow-lg transition-all duration-300 group"
-              >
-                <div className={`w-11 h-11 ${feature.color} rounded-xl flex items-center justify-center text-white mb-4 shadow-sm group-hover:scale-110 transition-transform`}>
-                  {feature.icon}
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-500 leading-relaxed text-sm">
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <FeatureCard
+                icon={<Activity className="w-8 h-8 text-blue-600" />}
+                title="Mileage Tracking"
+                description="Log every run and automatically track the miles on each pair of shoes"
+              />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <FeatureCard
+                icon={<AlertTriangle className="w-8 h-8 text-orange-600" />}
+                title="Replacement Alerts"
+                description="Get notified when your shoes are nearing their recommended replacement mileage"
+              />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <FeatureCard
+                icon={<BarChart3 className="w-8 h-8 text-green-600" />}
+                title="Analytics & Insights"
+                description="View detailed analytics about your running patterns and shoe performance"
+              />
+            </motion.div>
           </div>
         </div>
       </div>
 
       {/* CTA Section */}
-      <div className="py-20 sm:py-24">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:2rem_2rem]" />
-            <div className="relative z-10">
-              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 tracking-tight">
-                Ready to start tracking?
-              </h2>
-              <p className="text-lg text-gray-400 mb-8 max-w-lg mx-auto">
-                Join runners who use ShoeTracker to maximize shoe lifespan and
-                running performance.
-              </p>
-              <Button
-                onClick={() => navigate({ to: "/auth/signin" })}
-                variant="primary"
-                icon={<ArrowRight className="w-5 h-5" />}
-                className="px-8 py-3.5 text-base bg-white text-gray-900 hover:bg-gray-100 shadow-none"
-              >
-                Get Started Free
-              </Button>
-            </div>
-          </div>
+      <div className="py-24 bg-blue-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Ready to Start Tracking?
+          </h2>
+          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+            Join thousands of runners who are already using Shoe Tracker to
+            maximize their shoe lifespan and running performance.
+          </p>
+          <Button
+            onClick={() => navigate({ to: "/auth/signin" })}
+            variant="secondary"
+            icon={<Footprints className="w-5 h-5" />}
+            className="px-8 py-3 text-lg bg-white text-blue-600 hover:bg-gray-50"
+          >
+            Get Started Free
+          </Button>
         </div>
       </div>
     </div>
@@ -337,7 +320,7 @@ function Dashboard() {
   const monthlyDistance = safeStats.monthlyDistance || 0;
 
   return (
-    <div className="min-h-dvh bg-gray-50/50 pb-safe">
+    <div className="min-h-dvh bg-gradient-to-br from-gray-50 via-white to-blue-50/30 pb-safe">
       <PageContainer>
         <PageHeader
           title="Dashboard"
@@ -456,30 +439,36 @@ function Dashboard() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="bg-amber-50 border border-amber-200/60 rounded-2xl p-4 sm:p-5"
+              className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-3xl p-6 shadow-soft"
             >
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 mt-0.5">
-                  <AlertTriangle className="h-5 w-5 text-amber-500" />
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center">
+                    <AlertTriangle className="h-6 w-6 text-red-600" />
+                  </div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-semibold text-amber-900 mb-1">
-                    {shoesNeedingReplacement.length} shoe{shoesNeedingReplacement.length > 1 ? "s" : ""} at 90%+ usage
+                  <h3 className="text-lg font-semibold text-red-900 mb-2">
+                    Shoes Need Replacement
                   </h3>
-                  <div className="flex flex-wrap gap-1.5 mt-2">
+                  <p className="text-red-700 mb-4">
+                    {shoesNeedingReplacement.length} of your shoes are at 90%+
+                    usage and may need replacement soon.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
                     {shoesNeedingReplacement.slice(0, 3).map((shoe, index) => (
                       <Link
                         key={shoe?.id || index}
                         to="/shoes/$shoeId"
                         params={{ shoeId: shoe?.id || "" }}
-                        className="inline-flex items-center px-2.5 py-1 bg-amber-100/80 text-amber-800 text-xs font-medium rounded-lg hover:bg-amber-200 transition-colors"
+                        className="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-800 text-sm font-medium rounded-xl hover:bg-red-200 transition-colors"
                       >
                         {shoe?.name || "Unknown shoe"}
                         <ArrowRight className="w-3 h-3 ml-1" />
                       </Link>
                     ))}
                     {shoesNeedingReplacement.length > 3 && (
-                      <span className="text-xs text-amber-600 px-2.5 py-1">
+                      <span className="text-sm text-red-600 px-3 py-1.5">
                         +{shoesNeedingReplacement.length - 3} more
                       </span>
                     )}
@@ -501,9 +490,14 @@ function Dashboard() {
             className="space-y-6"
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Collections
-              </h2>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-primary-100 flex items-center justify-center">
+                  <Package className="w-6 h-6 text-primary-600" />
+                </div>
+                <h2 className="text-2xl font-semibold text-gray-900">
+                  Collections
+                </h2>
+              </div>
               <Link
                 to="/collections"
                 search={{ modal: false }}
@@ -548,31 +542,34 @@ function Dashboard() {
                       <Link
                         to="/collections/$collectionId"
                         params={{ collectionId: collection.id }}
-                        className="flex items-center justify-between p-3.5 rounded-xl bg-white hover:bg-gray-50 border border-gray-100 hover:border-gray-200 transition-all duration-150 group"
+                        className="flex items-center justify-between p-4 rounded-2xl bg-white hover:bg-gray-50 border border-gray-100 shadow-soft hover:shadow-medium transition-all duration-200 group"
                       >
-                        <div className="flex items-center gap-3 min-w-0">
+                        <div className="flex items-center gap-4">
                           <div
-                            className="w-3 h-3 rounded-full flex-shrink-0"
+                            className="w-4 h-4 rounded-full flex-shrink-0"
                             style={{
                               backgroundColor: collection.color || "#3b82f6",
                             }}
                           />
                           <div className="min-w-0 flex-1">
-                            <h3 className="text-sm font-semibold text-gray-900 truncate">
+                            <h3 className="font-semibold text-gray-900 truncate">
                               {collection.name || "Unnamed Collection"}
                             </h3>
                             {collection.description && (
-                              <p className="text-xs text-gray-500 truncate">
+                              <p className="text-sm text-gray-600 truncate">
                                 {collection.description}
                               </p>
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2.5">
-                          <span className="text-xs text-gray-400 tabular-nums">
-                            {shoesInCollection} shoes
-                          </span>
-                          <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 flex-shrink-0 transition-colors" />
+                        <div className="flex items-center gap-3">
+                          <div className="text-right">
+                            <div className="text-sm font-medium text-gray-900">
+                              {shoesInCollection}
+                            </div>
+                            <div className="text-xs text-gray-500">shoes</div>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 group-hover:translate-x-1 transition-all" />
                         </div>
                       </Link>
                     </motion.div>
@@ -592,9 +589,14 @@ function Dashboard() {
             className="space-y-6"
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Recent Runs
-              </h2>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-green-100 flex items-center justify-center">
+                  <Activity className="w-6 h-6 text-green-600" />
+                </div>
+                <h2 className="text-2xl font-semibold text-gray-900">
+                  Recent Runs
+                </h2>
+              </div>
               <Link
                 to="/runs"
                 search={{ modal: false }}
@@ -663,29 +665,32 @@ function Dashboard() {
                         <Link
                           to="/runs/$runId"
                           params={{ runId: run.id }}
-                          className="flex items-center justify-between p-3.5 rounded-xl bg-white hover:bg-gray-50 border border-gray-100 hover:border-gray-200 transition-all duration-150 group"
+                          className="flex items-center justify-between p-4 rounded-2xl bg-white hover:bg-gray-50 border border-gray-100 shadow-soft hover:shadow-medium transition-all duration-200 group"
                         >
-                          <div className="flex items-center gap-3 min-w-0">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center flex-shrink-0">
+                              <Activity className="w-6 h-6 text-green-600" />
+                            </div>
                             <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-2 mb-0.5">
-                                <span className="text-sm font-semibold text-gray-900 tabular-nums">
-                                  {formatDistance(run.distance || 0)} mi
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-semibold text-gray-900">
+                                  {formatDistance(run.distance || 0)}
                                 </span>
                                 {run.pace && (
-                                  <span className="text-xs text-gray-400 tabular-nums">
+                                  <span className="text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded-lg">
                                     {run.pace}/mi
                                   </span>
                                 )}
                               </div>
-                              <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                              <div className="flex items-center gap-2 text-sm text-gray-600">
                                 <span>
                                   {run.date
-                                    ? new Date(run.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                                    : "Unknown"}
+                                    ? new Date(run.date).toLocaleDateString()
+                                    : "Unknown date"}
                                 </span>
                                 {run.shoe && run.shoe.name && (
                                   <>
-                                    <span className="text-gray-300">·</span>
+                                    <span>•</span>
                                     <span className="truncate">
                                       {run.shoe.name}
                                     </span>
@@ -694,7 +699,19 @@ function Dashboard() {
                               </div>
                             </div>
                           </div>
-                          <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 flex-shrink-0 transition-colors" />
+                          <div className="flex items-center gap-3">
+                            <div className="text-right">
+                              <div className="text-sm font-medium text-gray-900 capitalize">
+                                {run.runType || "Run"}
+                              </div>
+                              {run.duration && (
+                                <div className="text-xs text-gray-500">
+                                  {formatDuration(run.duration)}
+                                </div>
+                              )}
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 group-hover:translate-x-1 transition-all" />
+                          </div>
                         </Link>
                       </motion.div>
                     );
@@ -711,9 +728,14 @@ function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, delay: 0.15, ease: "easeOut" }}
         >
-          <h2 className="text-lg font-semibold text-gray-900 mb-5">
-            Quick Actions
-          </h2>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-2xl bg-blue-100 flex items-center justify-center">
+              <Zap className="w-6 h-6 text-blue-600" />
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-900">
+              Quick Actions
+            </h2>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <ActionCard

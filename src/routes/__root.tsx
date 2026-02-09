@@ -188,25 +188,19 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  const [isHydrated, setIsHydrated] = React.useState(false);
-
-  React.useEffect(() => {
-    setIsHydrated(true);
-  }, []);
-
   return (
-    <html className="ios-viewport-fix" suppressHydrationWarning>
+    <html className="ios-viewport-fix">
       <head>
         <PWAHead />
         <HeadContent />
       </head>
-      <body className="ios-bounce-fix" suppressHydrationWarning>
-        {isHydrated ? <IOSStatusBar /> : null}
-        {isHydrated ? <AppUpdateBanner /> : null}
+      <body className="ios-bounce-fix">
+        <IOSStatusBar />
+        <AppUpdateBanner />
 
         <div className="h-screen flex flex-col min-h-0 ios-viewport-fix">
-          <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200/60 shadow-sm pwa-navigation sticky top-0 z-40">
-            <div className="flex items-center justify-between py-3 px-4 sm:py-3.5 sm:px-6 lg:px-8 safe-area-p relative max-w-7xl mx-auto w-full">
+          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/50 shadow-lg pwa-navigation">
+            <div className="flex items-center justify-between py-3 px-4 sm:py-4 sm:px-6 lg:px-8 safe-area-p relative">
               <div className="flex items-center gap-4 lg:gap-8">
                 <HeaderLeft />
                 <div className="hidden lg:block">
@@ -222,39 +216,37 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
           <div className="flex-grow min-h-0 h-full flex flex-col">
             <div className="flex-1 pb-20 lg:pb-0 safe-area-p">{children}</div>
-            {isHydrated ? (
-              <Toaster
-                position="top-center"
-                expand={true}
-                richColors={true}
-                closeButton={true}
-                duration={4000}
-                className="lg:!bottom-4 lg:!right-4 lg:!top-auto lg:!left-auto lg:!transform-none safe-area-top"
-                toastOptions={{
-                  className:
-                    "backdrop-blur-sm bg-white/90 dark:bg-gray-900/90 border border-gray-200/50 dark:border-gray-700/50 shadow-xl",
-                  style: {
-                    background: "rgba(255, 255, 255, 0.95)",
-                    backdropFilter: "blur(20px)",
-                    WebkitBackdropFilter: "blur(20px)",
-                    border: "1px solid rgba(229, 231, 235, 0.5)",
-                    boxShadow:
-                      "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-                    borderRadius: "12px",
-                    color: "#111827",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                  },
-                }}
-              />
-            ) : null}
+            <Toaster
+              position="top-center"
+              expand={true}
+              richColors={true}
+              closeButton={true}
+              duration={4000}
+              className="lg:!bottom-4 lg:!right-4 lg:!top-auto lg:!left-auto lg:!transform-none safe-area-top"
+              toastOptions={{
+                className:
+                  "backdrop-blur-sm bg-white/90 dark:bg-gray-900/90 border border-gray-200/50 dark:border-gray-700/50 shadow-xl",
+                style: {
+                  background: "rgba(255, 255, 255, 0.95)",
+                  backdropFilter: "blur(20px)",
+                  WebkitBackdropFilter: "blur(20px)",
+                  border: "1px solid rgba(229, 231, 235, 0.5)",
+                  boxShadow:
+                    "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                  borderRadius: "12px",
+                  color: "#111827",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                },
+              }}
+            />
           </div>
           <BottomTabNavigation />
         </div>
 
-        {isHydrated ? <IOSInstallBanner /> : null}
+        <IOSInstallBanner />
         <ServiceWorkerIntegration />
-        {import.meta.env.DEV && (
+        {process.env.NODE_ENV === "development" && (
           <>
             <ReactQueryDevtools />
             <TanStackRouterDevtools position="bottom-right" />
@@ -273,9 +265,9 @@ function LoadingIndicator() {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50">
-      <div className="h-0.5 bg-gray-100">
-        <div className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-500 relative overflow-hidden animate-pulse">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-[shimmer_1.5s_infinite] transform -skew-x-12" />
+      <div className="h-1 bg-gray-200 dark:bg-gray-700">
+        <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-[shimmer_1.5s_infinite] transform -skew-x-12" />
         </div>
       </div>
     </div>
@@ -285,24 +277,24 @@ function LoadingIndicator() {
 function HeaderLeft() {
   return (
     <div className="flex items-center gap-2 sm:gap-4 lg:hidden">
+      {/* Online Indicator - Show on all screen sizes */}
       <OnlineIndicator />
+
+      <div className="hidden sm:flex items-center gap-2">
+        <LoadingIndicator />
+      </div>
     </div>
   );
 }
 
 function HeaderCenter() {
   return (
-    <Link to="/" className="flex items-center gap-2.5 group">
-      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-        <span className="text-sm">🏃🏼‍♀️</span>
+    <Link to="/" className="contents">
+      <div className="font-black text-xl sm:text-2xl text-white lg:text-left">
+        🏃🏼‍♀️ MyShoeTracker
       </div>
-      <div>
-        <div className="font-bold text-lg sm:text-xl text-gray-900 leading-tight">
-          ShoeTracker
-        </div>
-        <div className="text-gray-500 text-xs hidden sm:block leading-tight lg:text-left">
-          Track your running shoes
-        </div>
+      <div className="text-slate-400 text-xs sm:text-sm hidden sm:block lg:text-left">
+        Track your running shoe stats with ease
       </div>
     </Link>
   );
@@ -384,7 +376,7 @@ function Navigation() {
           <Link
             to="/auth/signin"
             search={{ redirect: "/" }}
-            className="text-gray-600 hover:text-gray-900 transition-colors font-medium px-4 py-2 rounded-xl hover:bg-gray-100 text-sm"
+            className="text-slate-300 hover:text-white transition-colors font-medium px-4 py-2 rounded-lg hover:bg-slate-800"
           >
             Sign In
           </Link>
@@ -403,36 +395,39 @@ function Navigation() {
   return (
     <>
       {/* Desktop Navigation */}
-      <nav className="hidden lg:flex items-center gap-1">
+      <nav className="hidden lg:flex items-center gap-6">
         {navigationLinks.map(({ to, icon: Icon, label }) => (
           <Link
             key={to}
             to={to}
-            className="flex items-center text-gray-600 hover:text-gray-900 transition-colors font-medium px-3 py-2 rounded-xl hover:bg-gray-100/80 text-sm"
+            className="flex items-center text-slate-300 hover:text-white transition-colors font-medium px-3 py-2 rounded-lg hover:bg-slate-800/50"
           >
-            <Icon className="w-4 h-4 mr-1.5 opacity-70" />
+            <Icon className="w-4 h-4 mr-2" />
             {label}
           </Link>
         ))}
 
-        <div className="w-px h-6 bg-gray-200 mx-2" />
+        {/* Desktop PWA Status Bar */}
+        <div className="hidden xl:flex items-center gap-4">
+          {/* <PWAStatusBar /> */}
+        </div>
 
         <Link
           to="/runs/new"
           search={{ modal: false }}
-          className="flex items-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-4 py-2 rounded-xl font-medium text-sm transition-all shadow-sm hover:shadow-md"
+          className="flex items-center bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-xl font-medium transition-all shadow-md hover:shadow-lg button-hover"
         >
-          <Plus className="w-4 h-4 mr-1.5" />
+          <Plus className="w-4 h-4 mr-2" />
           Log Run
         </Link>
 
         {/* User Menu */}
-        <div className="relative ml-1">
+        <div className="relative">
           <button
             onClick={() => setUserMenuOpen(!userMenuOpen)}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors p-1.5 rounded-xl hover:bg-gray-100/80"
+            className="flex items-center space-x-2 text-slate-300 hover:text-white transition-colors p-2 rounded-lg hover:bg-slate-800/50"
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center ring-2 ring-white shadow-sm">
+            <div className="w-8 h-8 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center shadow-inner">
               {user?.image ? (
                 <img
                   src={user.image}
@@ -447,7 +442,7 @@ function Navigation() {
                 />
               ) : null}
               <div
-                className={`flex items-center justify-center w-full h-full text-white text-sm font-semibold ${user?.image ? "hidden" : ""}`}
+                className={`flex items-center justify-center w-full h-full text-white ${user?.image ? "hidden" : ""}`}
               >
                 {user?.name?.charAt(0) || user?.email?.charAt(0) || (
                   <User className="w-4 h-4" />
@@ -455,42 +450,40 @@ function Navigation() {
               </div>
             </div>
             <ChevronDown
-              className={`w-3.5 h-3.5 text-gray-400 transition-transform ${userMenuOpen ? "rotate-180" : ""}`}
+              className={`w-4 h-4 transition-transform ${userMenuOpen ? "rotate-180" : ""}`}
             />
           </button>
 
           {userMenuOpen && (
             <div
-              className="absolute right-0 mt-2 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-large border border-gray-200/60 py-1.5 z-50"
+              className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200/50 py-2 z-50 backdrop-blur-sm"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="px-4 py-3 border-b border-gray-100">
-                <div className="font-semibold text-sm text-gray-900 truncate">
+              <div className="px-4 py-3 text-sm text-gray-700 border-b border-gray-100">
+                <div className="font-semibold truncate">
                   {user?.name || "User"}
                 </div>
                 {user?.email && (
-                  <div className="text-gray-500 truncate text-xs mt-0.5">
+                  <div className="text-gray-500 truncate text-xs mt-1">
                     {user.email}
                   </div>
                 )}
               </div>
-              <div className="py-1">
-                <Link
-                  to="/profile"
-                  className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"
-                  onClick={() => setUserMenuOpen(false)}
-                >
-                  <Settings className="w-4 h-4 mr-3 text-gray-400" />
-                  Profile Settings
-                </Link>
-                <button
-                  onClick={handleSignOut}
-                  className="flex items-center w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors rounded-lg mx-1.5"
-                >
-                  <LogOut className="w-4 h-4 mr-3 text-gray-400" />
-                  Sign Out
-                </button>
-              </div>
+              <Link
+                to="/profile"
+                className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                onClick={() => setUserMenuOpen(false)}
+              >
+                <Settings className="w-4 h-4 mr-3" />
+                Profile Settings
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="flex items-center w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <LogOut className="w-4 h-4 mr-3" />
+                Sign Out
+              </button>
             </div>
           )}
         </div>
@@ -500,12 +493,12 @@ function Navigation() {
       <div className="lg:hidden flex items-center gap-2">
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 text-gray-600 hover:text-gray-900 transition-colors rounded-xl hover:bg-gray-100/80"
+          className="p-2 text-slate-300 hover:text-white transition-colors rounded-lg hover:bg-slate-800/50"
         >
           {mobileMenuOpen ? (
-            <X className="w-5 h-5" />
+            <X className="w-6 h-6" />
           ) : (
-            <Menu className="w-5 h-5" />
+            <Menu className="w-6 h-6" />
           )}
         </button>
       </div>
@@ -520,44 +513,39 @@ function Navigation() {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed top-0 right-0 h-full w-80 max-w-[80vw] bg-white/95 backdrop-blur-xl shadow-2xl z-50 transform transition-transform duration-300 lg:hidden ${
+        className={`fixed top-0 right-0 h-full w-80 max-w-[80vw] bg-white shadow-2xl z-50 transform transition-transform duration-300 lg:hidden ${
           mobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="p-5 border-b border-gray-100">
+        <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
-                <span className="text-sm">🏃🏼‍♀️</span>
-              </div>
-              <span className="font-bold text-gray-900">ShoeTracker</span>
-            </div>
+            <h2 className="text-lg font-semibold text-gray-900">Navigation</h2>
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-xl hover:bg-gray-100"
+              className="p-2 text-gray-500 hover:text-gray-700 transition-colors rounded-lg hover:bg-gray-100"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        <div className="p-4 space-y-1">
+        <div className="p-6 space-y-4">
           {navigationLinks.map(({ to, icon: Icon, label }) => (
             <Link
               key={to}
               to={to}
-              className="flex items-center text-gray-700 hover:text-gray-900 transition-colors p-3 rounded-xl hover:bg-gray-50 font-medium"
+              className="flex items-center text-gray-700 hover:text-gray-900 transition-colors p-3 rounded-lg hover:bg-gray-50 font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <Icon className="w-5 h-5 mr-3 text-gray-400" />
+              <Icon className="w-5 h-5 mr-3" />
               {label}
             </Link>
           ))}
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 border-t border-gray-100 p-4 bg-gray-50/50">
-          <div className="flex items-center gap-3 mb-4 p-3 bg-white rounded-2xl border border-gray-100">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-sm">
+        <div className="border-t border-gray-200 p-6">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center shadow-inner">
               {user?.image ? (
                 <img
                   src={user.image}
@@ -572,39 +560,39 @@ function Navigation() {
                 />
               ) : null}
               <div
-                className={`flex items-center justify-center w-full h-full text-white font-semibold ${user?.image ? "hidden" : ""}`}
+                className={`flex items-center justify-center w-full h-full text-white ${user?.image ? "hidden" : ""}`}
               >
                 {user?.name?.charAt(0) || user?.email?.charAt(0) || (
                   <User className="w-5 h-5" />
                 )}
               </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="font-semibold text-gray-900 truncate text-sm">
+            <div className="flex-1">
+              <div className="font-semibold text-gray-900 truncate">
                 {user?.name || "User"}
               </div>
               {user?.email && (
-                <div className="text-gray-500 truncate text-xs">
+                <div className="text-gray-500 truncate text-sm">
                   {user.email}
                 </div>
               )}
             </div>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-2">
             <Link
               to="/profile"
-              className="flex items-center text-gray-700 hover:text-gray-900 transition-colors p-2.5 rounded-xl hover:bg-white font-medium text-sm"
+              className="flex items-center text-gray-700 hover:text-gray-900 transition-colors p-3 rounded-lg hover:bg-gray-50 font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <Settings className="w-4 h-4 mr-3 text-gray-400" />
+              <Settings className="w-5 h-5 mr-3" />
               Profile Settings
             </Link>
             <button
               onClick={handleSignOut}
-              className="flex items-center w-full text-left text-red-600 hover:text-red-700 transition-colors p-2.5 rounded-xl hover:bg-red-50 font-medium text-sm"
+              className="flex items-center w-full text-left text-gray-700 hover:text-gray-900 transition-colors p-3 rounded-lg hover:bg-gray-50 font-medium"
             >
-              <LogOut className="w-4 h-4 mr-3" />
+              <LogOut className="w-5 h-5 mr-3" />
               Sign Out
             </button>
           </div>
