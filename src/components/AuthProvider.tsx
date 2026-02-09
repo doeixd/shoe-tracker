@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
-import { Lock, Loader2, AlertCircle } from "lucide-react";
+import { Footprints, Loader2, AlertCircle } from "lucide-react";
 
 // Auth debugging utilities
 const DEBUG_PREFIX = "[AUTH]";
@@ -699,20 +699,26 @@ export function withAuth<P extends object>(
 
 function SignInRequired() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-6">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Lock className="w-8 h-8 text-blue-600" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 via-white to-blue-50 px-4 py-12">
+      <div className="relative max-w-md w-full">
+        <div className="absolute -top-16 -left-8 h-40 w-40 rounded-full bg-blue-200/40 blur-3xl" />
+        <div className="absolute -bottom-12 -right-10 h-44 w-44 rounded-full bg-slate-200/50 blur-3xl" />
+
+        <div className="relative space-y-8 rounded-3xl border border-gray-200/70 bg-white/90 backdrop-blur-sm p-7 sm:p-8 shadow-soft">
+          <div className="text-center">
+            <div className="w-14 h-14 rounded-2xl bg-gray-900 flex items-center justify-center mx-auto mb-4 shadow-soft">
+              <Footprints className="w-7 h-7 text-white" />
+            </div>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-2 tracking-tight">
+              Authentication Required
+            </h2>
+            <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+              Please sign in to access your shoe tracking dashboard
+            </p>
           </div>
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-2">
-            Authentication Required
-          </h2>
-          <p className="text-sm text-gray-600">
-            Please sign in to access your shoe tracking dashboard
-          </p>
+
+          <SignInForm />
         </div>
-        <SignInForm />
       </div>
     </div>
   );
@@ -739,7 +745,7 @@ function SignInForm() {
       <button
         onClick={handleSignIn}
         disabled={isLoading || attemptingSignIn}
-        className="group relative w-full flex justify-center py-4 px-6 border border-gray-300 text-lg font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
+        className="group relative w-full flex justify-center py-4 px-6 border border-gray-300 text-lg font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
       >
         <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
           <path

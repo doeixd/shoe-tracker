@@ -291,19 +291,19 @@ function CollectionDetail() {
                   >
                     Add Shoe
                   </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={() =>
-                      navigate({
-                        to: "/collections/$collectionId/edit",
-                        params: { collectionId },
-                        search: { modal: false },
-                      })
-                    }
-                    icon={<Edit3 className="w-4 h-4" />}
+                  <Link
+                    to="/collections/$collectionId/edit"
+                    params={{ collectionId }}
+                    search={{ modal: false }}
                   >
-                    Edit Collection
-                  </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      icon={<Edit3 className="w-4 h-4" />}
+                    >
+                      Edit Collection
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </Card>

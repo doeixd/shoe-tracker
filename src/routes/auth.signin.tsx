@@ -6,6 +6,7 @@ import {
 import { useEffect } from "react";
 import { useAuth } from "~/components/AuthProvider";
 import { getRedirectUrl } from "~/utils/auth";
+import { Footprints } from "lucide-react";
 
 export const Route = createFileRoute("/auth/signin")({
   component: SignIn,
@@ -38,37 +39,29 @@ function SignIn() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center">
-            <svg
-              className="h-12 w-12 text-blue-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-              />
-            </svg>
-          </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Welcome to Shoe Tracker
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Track your running shoes and monitor your progress
-          </p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 via-white to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="relative max-w-md w-full">
+        <div className="absolute -top-16 -left-8 h-40 w-40 rounded-full bg-blue-200/40 blur-3xl" />
+        <div className="absolute -bottom-12 -right-10 h-44 w-44 rounded-full bg-slate-200/50 blur-3xl" />
 
-        <div className="mt-8 space-y-6">
+        <div className="relative space-y-8 rounded-3xl border border-gray-200/70 bg-white/90 backdrop-blur-sm p-7 sm:p-8 shadow-soft">
+          <div>
+            <div className="mx-auto h-14 w-14 rounded-2xl bg-gray-900 flex items-center justify-center shadow-soft">
+              <Footprints className="h-7 w-7 text-white" />
+            </div>
+            <h2 className="mt-6 text-center font-display text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
+              Welcome to Shoe Tracker
+            </h2>
+            <p className="mt-2 text-center text-sm sm:text-base text-gray-600 leading-relaxed">
+              Track your rotation, log every mile, and know exactly when to retire each pair.
+            </p>
+          </div>
+
+          <div className="mt-8 space-y-6">
           <button
             onClick={() => signIn("google")}
             disabled={isLoading}
-            className="group relative w-full flex justify-center py-4 px-6 border border-gray-300 text-lg font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+            className="group relative w-full flex justify-center py-4 px-6 border border-gray-300 text-lg font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md"
           >
             <span className="absolute left-0 inset-y-0 flex items-center pl-4">
               <svg className="w-6 h-6" viewBox="0 0 24 24">
@@ -99,7 +92,7 @@ function SignIn() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-gray-50 text-gray-500">
+                <span className="px-2 bg-white text-gray-500">
                   Secure authentication powered by Convex Auth
                 </span>
               </div>
@@ -113,6 +106,7 @@ function SignIn() {
               experience.
             </p>
           </div>
+        </div>
         </div>
       </div>
     </div>

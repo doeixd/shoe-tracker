@@ -571,7 +571,7 @@ export function Form({
   };
 
   return (
-    <div className={cn("mx-auto px-4 sm:px-6", maxWidthClasses[maxWidth])}>
+    <div className={cn("mx-auto px-4 sm:px-6 pb-8 sm:pb-10", maxWidthClasses[maxWidth])}>
       {(title || description) && (
         <div className="mb-8 text-center">
           {title && (

@@ -1,42 +1,48 @@
-import { useQuery } from "@tanstack/react-query";
 import {
-  Link,
   createFileRoute,
   useNavigate,
   useSearch,
 } from "@tanstack/react-router";
-import { useAppData } from "~/hooks/useAppData";
 import { useAppDataSuspense } from "~/hooks/useSuspenseQueries";
 import { requireAuth } from "~/utils/auth";
 import * as React from "react";
 import { useAuth } from "~/components/AuthProvider";
 import { ErrorBoundary } from "~/components/ErrorBoundary";
 import {
-  PageLoading,
-  EmptyState,
-  ErrorState,
-} from "~/components/LoadingStates";
-import {
   FolderOpen,
   Archive,
   Plus,
   Footprints,
   ChevronRight,
-  Palette,
   Package,
   Lock,
   Loader2,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { FeatureCard, EmptyStateCard, ActionCard } from "~/components/ui/Cards";
-import { Button, Input, Textarea, FormGrid } from "~/components/FormComponents";
+import { EmptyStateCard } from "~/components/ui/Cards";
+import { Button } from "~/components/FormComponents";
 import { FormModalSheet } from "~/components/navigation/ModalSheet";
 import { CollectionForm } from "~/components/CollectionForm";
-import { useState } from "react";
 import { useMobileDetection } from "~/hooks/useMobileDetection";
 import { useFirstVisit, getAnimationProps } from "~/hooks/useFirstVisit";
 import { PageHeader, PageContainer } from "~/components/PageHeader";
 import { shoeQueries, runQueries } from "~/queries";
+
+function withAlpha(hexColor: string | undefined, alpha: number) {
+  const hex = (hexColor || "#3b82f6").replace("#", "");
+  const normalized = hex.length === 3
+    ? hex.split("").map((char) => `${char}${char}`).join("")
+    : hex;
+
+  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
+    return `rgba(59, 130, 246, ${alpha})`;
+  }
+
+  const r = parseInt(normalized.slice(0, 2), 16);
+  const g = parseInt(normalized.slice(2, 4), 16);
+  const b = parseInt(normalized.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
 function CollectionsPage() {
   return (
@@ -214,45 +220,70 @@ function Collections() {
                   })}
                   className="w-full"
                 >
-                  <FeatureCard
-                    title={collection.name || "Unnamed Collection"}
-                    description={collection.description}
+                  <button
+                    type="button"
                     onClick={() =>
                       navigate({
                         to: "/collections/$collectionId",
                         params: { collectionId: collection.id },
                       })
                     }
-                    className="h-full group cursor-pointer w-full"
+                    className="group relative w-full overflow-hidden rounded-2xl border bg-white/95 p-5 sm:p-6 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-soft"
+                    style={{
+                      borderColor: withAlpha(collection.color, 0.28),
+                      boxShadow: `inset 4px 0 0 ${collection.color || "#3b82f6"}`,
+                    }}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0 space-y-2">
+                        <div className="flex items-center gap-2">
                           <div
-                            className="w-3 h-3 rounded-full"
-                            style={{
-                              backgroundColor: collection.color || "#3b82f6",
-                            }}
+                            className="h-2.5 w-2.5 rounded-full"
+                            style={{ backgroundColor: collection.color || "#3b82f6" }}
                           />
-                          <Footprints className="w-4 h-4" />
-                          <span className="text-sm font-medium">
-                            {collectionShoes.length}
-                          </span>
+                          <h3 className="font-display text-lg sm:text-xl font-bold text-gray-900 truncate">
+                            {collection.name || "Unnamed Collection"}
+                          </h3>
                         </div>
-                        {retiredShoes.length > 0 && (
-                          <div className="flex items-center gap-1 text-gray-400">
-                            <Archive className="w-3 h-3" />
-                            <span className="text-xs">
-                              {retiredShoes.length} retired
-                            </span>
-                          </div>
+                        {collection.description && (
+                          <p className="text-sm sm:text-base text-gray-600 leading-relaxed line-clamp-2">
+                            {collection.description}
+                          </p>
                         )}
                       </div>
-                      <div className="flex items-center text-primary-600 group-hover:translate-x-1 transition-transform">
-                        <ChevronRight className="w-4 h-4" />
-                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-700 group-hover:translate-x-1 transition-all" />
                     </div>
-                  </FeatureCard>
+
+                    <div className="mt-5 flex flex-wrap items-center gap-3">
+                      <div
+                        className="inline-flex items-end gap-2 rounded-xl border px-3 py-2"
+                        style={{
+                          backgroundColor: withAlpha(collection.color, 0.1),
+                          borderColor: withAlpha(collection.color, 0.25),
+                        }}
+                      >
+                        <Footprints
+                          className="w-4 h-4 mb-0.5"
+                          style={{ color: collection.color || "#3b82f6" }}
+                        />
+                        <span className="font-display text-2xl leading-none font-bold text-gray-900">
+                          {collectionShoes.length}
+                        </span>
+                        <span className="text-xs uppercase tracking-wide text-gray-600 mb-0.5">
+                          active shoes
+                        </span>
+                      </div>
+
+                      {retiredShoes.length > 0 && (
+                        <div className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-gray-600">
+                          <Archive className="w-3.5 h-3.5" />
+                          <span className="text-xs font-medium">
+                            {retiredShoes.length} retired
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </button>
                 </motion.div>
               );
             })}
@@ -294,33 +325,53 @@ function Collections() {
                   })}
                   className="w-full"
                 >
-                  <FeatureCard
-                    title={collection.name}
-                    description={collection.description}
-                    badge="ARCHIVED"
-                    badgeColor="warning"
+                  <button
+                    type="button"
                     onClick={() =>
                       navigate({
                         to: "/collections/$collectionId",
                         params: { collectionId: collection.id },
                       })
                     }
-                    className="h-full opacity-75 hover:opacity-100 transition-opacity cursor-pointer w-full"
+                    className="group relative w-full overflow-hidden rounded-2xl border bg-white/80 p-5 text-left transition-all duration-200 opacity-80 hover:opacity-100"
+                    style={{
+                      borderColor: withAlpha(collection.color, 0.2),
+                      boxShadow: `inset 4px 0 0 ${withAlpha(collection.color, 0.75)}`,
+                    }}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-gray-500">
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: collection.color }}
-                        />
-                        <Footprints className="w-4 h-4" />
-                        <span className="text-sm">
-                          {collectionShoes.length} shoes
-                        </span>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0 space-y-1.5">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="h-2.5 w-2.5 rounded-full"
+                            style={{ backgroundColor: collection.color || "#6b7280" }}
+                          />
+                          <h3 className="font-display text-base sm:text-lg font-semibold text-gray-900 truncate">
+                            {collection.name}
+                          </h3>
+                          <span className="inline-flex items-center rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
+                            Archived
+                          </span>
+                        </div>
+                        {collection.description && (
+                          <p className="text-sm text-gray-500 line-clamp-2">
+                            {collection.description}
+                          </p>
+                        )}
                       </div>
-                      <ChevronRight className="w-4 h-4 text-gray-400 group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight className="w-5 h-5 text-gray-400 group-hover:translate-x-1 transition-transform" />
                     </div>
-                  </FeatureCard>
+
+                    <div className="mt-4 inline-flex items-end gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-gray-700">
+                      <Footprints className="w-4 h-4 mb-0.5" />
+                      <span className="font-display text-xl leading-none font-semibold">
+                        {collectionShoes.length}
+                      </span>
+                      <span className="text-xs uppercase tracking-wide mb-0.5">
+                        total shoes
+                      </span>
+                    </div>
+                  </button>
                 </motion.div>
               );
             })}

@@ -332,6 +332,7 @@ function OnlineIndicator() {
 
 function Navigation() {
   const { isAuthenticated, user, signOut, isLoading } = useAuth();
+  const navigate = useNavigate();
   const [userMenuOpen, setUserMenuOpen] = React.useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
@@ -356,6 +357,7 @@ function Navigation() {
       setUserMenuOpen(false);
       setMobileMenuOpen(false);
       await signOut();
+      navigate({ to: "/" });
     } catch (error) {
       console.error("Sign out error:", error);
     }

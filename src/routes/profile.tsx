@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "~/components/AuthProvider";
@@ -17,6 +17,7 @@ export const Route = createFileRoute("/profile")({
 
 function Profile() {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -24,6 +25,7 @@ function Profile() {
     try {
       await signOut();
       toast.success("Signed out successfully");
+      navigate({ to: "/" });
     } catch (error) {
       toast.error("Failed to sign out");
     }
