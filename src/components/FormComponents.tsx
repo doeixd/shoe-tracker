@@ -623,7 +623,7 @@ export function FormSection({
     >
       <div className="space-y-2">
         {title && (
-          <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+          <h2 className="text-2xl font-semibold text-gray-900">{title}</h2>
         )}
         {description && <p className="text-gray-600">{description}</p>}
       </div>
