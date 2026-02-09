@@ -495,14 +495,14 @@ function Navigation() {
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[60] lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
 
       {/* Mobile Menu */}
       <div
-        className={`fixed top-0 right-0 h-full w-80 max-w-[80vw] bg-white shadow-2xl z-50 transform transition-transform duration-300 lg:hidden ${
+        className={`fixed top-0 right-0 h-full w-80 max-w-[80vw] bg-white/95 backdrop-blur-xl border-l border-gray-200/70 shadow-2xl z-[70] transform transition-transform duration-300 lg:hidden ${
           mobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
