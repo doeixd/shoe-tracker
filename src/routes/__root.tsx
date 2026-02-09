@@ -220,7 +220,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <div className="flex-grow min-h-0 h-full flex flex-col">
+          <div className="flex-grow min-h-0 h-full flex flex-col overflow-y-auto">
             <div className="flex-1 pb-20 lg:pb-0 safe-area-p">{children}</div>
             {isHydrated ? (
               <Toaster
