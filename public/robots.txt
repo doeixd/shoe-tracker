@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://myshoetracker.fun/sitemap.xml
+Sitemap: https://shoetracker.app/sitemap.xml

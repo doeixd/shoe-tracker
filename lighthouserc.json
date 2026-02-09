@@ -2,7 +2,7 @@
   "ci": {
     "collect": {
       "url": [
-        "https://myshoetracker.fun"
+        "https://shoetracker.app"
       ],
       "numberOfRuns": 1,
       "settings": {

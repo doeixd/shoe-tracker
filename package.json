@@ -17,7 +17,7 @@
     "pwa:generate-icons": "bun scripts/generate-icons.js",
     "pwa:generate-splash": "bun scripts/generate-splash-screens.js",
     "pwa:setup": "bun scripts/setup-pwa.js",
-    "pwa:check": "lighthouse --chrome-flags=\"--headless\" --output=html --output-path=./pwa-audit.html https://myshoetracker.fun",
+    "pwa:check": "lighthouse --chrome-flags=\"--headless\" --output=html --output-path=./pwa-audit.html https://shoetracker.app",
     "pwa:serve": "bunx serve .output/public -s",
     "auth:test": "node scripts/test-auth-comprehensive.js",
     "auth:test-dev": "node test-auth-flow.js",

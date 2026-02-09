@@ -44,7 +44,7 @@ console.log("✓ Created browserconfig.xml");
 const robotsTxt = `User-agent: *
 Allow: /
 
-Sitemap: https://myshoetracker.fun/sitemap.xml`;
+Sitemap: https://shoetracker.app/sitemap.xml`;
 
 fs.writeFileSync(path.join(__dirname, "..", "public", "robots.txt"), robotsTxt);
 console.log("✓ Created robots.txt");
@@ -305,7 +305,7 @@ packageJson.scripts = {
   "pwa:generate-splash": "bun scripts/generate-splash-screens.js",
   "pwa:setup": "bun scripts/setup-pwa.js",
   "pwa:check":
-    'lighthouse --chrome-flags="--headless" --output=html --output-path=./pwa-audit.html https://myshoetracker.fun',
+    'lighthouse --chrome-flags="--headless" --output=html --output-path=./pwa-audit.html https://shoetracker.app',
   "pwa:serve": "bunx serve .output/public -s",
 };
 
@@ -425,7 +425,7 @@ console.log("✓ Created GitHub workflow for PWA testing");
 const lighthouseConfig = {
   ci: {
     collect: {
-      url: ["https://myshoetracker.fun"],
+      url: ["https://shoetracker.app"],
       numberOfRuns: 1,
       settings: {
         chromeFlags: "--no-sandbox --headless",

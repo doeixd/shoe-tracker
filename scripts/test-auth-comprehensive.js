@@ -25,7 +25,7 @@ const TEST_CONFIG = {
     name: 'Development',
   },
   prod: {
-    url: process.env.PROD_URL || 'https://myshoetracker.fun',
+    url: process.env.PROD_URL || 'https://shoetracker.app',
     name: 'Production',
   },
 };

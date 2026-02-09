@@ -81,8 +81,8 @@ export function PWAHead() {
       content:
         "Track your running shoes, monitor mileage, and log your runs with comprehensive analytics and insights.",
     });
-    addMetaTag({ property: "og:url", content: "https://myshoetracker.fun" });
-    addMetaTag({ property: "og:image", content: "https://myshoetracker.fun/og-image.png" });
+    addMetaTag({ property: "og:url", content: "https://shoetracker.app" });
+    addMetaTag({ property: "og:image", content: "https://shoetracker.app/og-image.png" });
     addMetaTag({ property: "og:image:width", content: "1200" });
     addMetaTag({ property: "og:image:height", content: "630" });
     addMetaTag({
@@ -104,7 +104,7 @@ export function PWAHead() {
       content:
         "Track your running shoes, monitor mileage, and log your runs with comprehensive analytics and insights.",
     });
-    addMetaTag({ name: "twitter:image", content: "https://myshoetracker.fun/twitter-card.png" });
+    addMetaTag({ name: "twitter:image", content: "https://shoetracker.app/twitter-card.png" });
 
     // CSP and Security
     addMetaTag({ httpEquiv: "X-Content-Type-Options", content: "nosniff" });
@@ -138,7 +138,7 @@ export function PWAHead() {
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet"
       />
-      <link rel="canonical" href="https://myshoetracker.fun" />
+      <link rel="canonical" href="https://shoetracker.app" />
 
       {/* Fix hydration mismatch for dynamic theme-color */}
       <meta
@@ -298,7 +298,7 @@ export function PWAHead() {
             "@context": "https://schema.org",
             "@type": "MobileApplication",
             name: "MyShoeTracker",
-            url: "https://myshoetracker.fun",
+            url: "https://shoetracker.app",
             description:
               "Track your running shoes, monitor mileage, and log your runs with comprehensive analytics and insights.",
             applicationCategory: "HealthApplication",

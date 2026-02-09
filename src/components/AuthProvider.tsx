@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
@@ -196,9 +196,11 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const { signIn: convexSignIn, signOut: convexSignOut } = useAuthActions();
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
   const [userSetupComplete, setUserSetupComplete] = useState(false);
+  const authProfileQuery = convexQuery(api.auth.getUserProfile, {});
 
   // Debug initialization
   useEffect(() => {
@@ -227,7 +229,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Get current user from Convex
   const userQuery = useQuery({
-    ...convexQuery(api.auth.getUserProfile, {}),
+    ...authProfileQuery,
     retry: (failureCount, error) => {
       authLog("warn", "user_query_retry_attempt", {
         failureCount,
@@ -407,6 +409,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
 
       setUserSetupComplete(false); // Reset setup state for new sign in
+
+      // Force a refresh of auth-dependent state to avoid stale unauthenticated cache
+      try {
+        await queryClient.invalidateQueries({
+          queryKey: authProfileQuery.queryKey,
+          exact: true,
+        });
+        await userQuery.refetch();
+        authLog("info", "sign_in_profile_refetched");
+      } catch (refreshError: any) {
+        authLog("warn", "sign_in_profile_refresh_failed", {
+          errorMessage: refreshError?.message,
+          errorType: refreshError?.name,
+        });
+      }
+
       // Success will be handled by the auth state change
     } catch (error: any) {
       const duration = Date.now() - startTime;

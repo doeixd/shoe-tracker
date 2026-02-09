@@ -110,7 +110,7 @@ show_setup_instructions() {
     echo "   - Create OAuth 2.0 credentials"
     echo "   - Add these redirect URIs:"
     echo "     • Development: http://localhost:3000/api/auth/callback/google"
-    echo "     • Production: https://myshoetracker.fun/api/auth/callback/google"
+    echo "     • Production: https://shoetracker.app/api/auth/callback/google"
     echo ""
     echo "3. UPDATE LOCAL ENVIRONMENT:"
     echo "   Edit .env.local and replace the Convex URL with your actual deployment URL"
