@@ -1,11 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Loader } from "~/components/Loader";
-import { Form } from "~/components/FormComponents";
 import { ErrorBoundary } from "~/components/ErrorBoundary";
 import { withAuth } from "~/components/AuthProvider";
 import { ShoeForm } from "~/components/ShoeForm";
 import { useIsMobileSSR } from "~/hooks/useIsMobile";
+import { PageContainer, PageHeader } from "~/components/PageHeader";
 
 function NewShoePage() {
   return (
@@ -55,15 +54,17 @@ function NewShoe() {
   }
 
   return (
-    <div className="min-h-dvh bg-gradient-to-br from-gray-50 via-white to-gray-50 p-4 pb-safe">
-      <Form
-        title="Add New Shoe"
-        description="Add a beautiful new pair of running shoes to your collection"
-        maxWidth="xl"
-        renderForm={false}
-      >
-        <ShoeForm />
-      </Form>
+    <div className="min-h-dvh bg-gray-50/50 pb-safe">
+      <PageContainer className="max-w-6xl">
+        <PageHeader
+          title="Add New Shoe"
+          description="Add a new pair to your rotation and start tracking mileage."
+          animate={false}
+        />
+        <div className="max-w-4xl">
+          <ShoeForm />
+        </div>
+      </PageContainer>
     </div>
   );
 }

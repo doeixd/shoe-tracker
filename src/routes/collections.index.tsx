@@ -36,6 +36,7 @@ import { useState } from "react";
 import { useMobileDetection } from "~/hooks/useMobileDetection";
 import { useFirstVisit, getAnimationProps } from "~/hooks/useFirstVisit";
 import { PageHeader, PageContainer } from "~/components/PageHeader";
+import { shoeQueries, runQueries } from "~/queries";
 
 function CollectionsPage() {
   return (

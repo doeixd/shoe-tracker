@@ -22,7 +22,7 @@ export function Card({
   hover = false,
   padding = "md",
   shadow = "soft",
-  rounded = "2xl",
+  rounded = "lg",
   border = true,
   gradient = false,
   onClick,
@@ -48,8 +48,8 @@ export function Card({
     sm: "rounded-lg",
     md: "rounded-xl",
     lg: "rounded-2xl",
-    xl: "rounded-3xl",
-    "2xl": "rounded-3xl",
+    xl: "rounded-2xl",
+    "2xl": "rounded-2xl",
     "3xl": "rounded-3xl",
   };
 
@@ -191,7 +191,7 @@ export function FeatureCard({
       hover={!!onClick}
       onClick={onClick}
       padding="none"
-      shadow="medium"
+      shadow="soft"
     >
       {image && (
         <div className="aspect-video w-full overflow-hidden rounded-t-2xl bg-gray-100 flex items-center justify-center">
@@ -257,7 +257,7 @@ interface StatsCardProps {
 
 export function StatsCard({ title, stats, className }: StatsCardProps) {
   return (
-    <Card className={className} padding="lg" shadow="medium">
+    <Card className={className} padding="lg" shadow="soft">
       <h3 className="text-lg font-semibold text-gray-900 mb-6">{title}</h3>
       <div className="grid grid-cols-2 gap-4">
         {stats.map((stat, index) => (

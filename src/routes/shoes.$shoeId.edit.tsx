@@ -5,12 +5,11 @@ import {
 } from "@tanstack/react-router";
 import { useShoe } from "~/queries";
 import { Loader } from "~/components/Loader";
-import { Form } from "~/components/FormComponents";
 import { EditShoeForm } from "~/components/EditShoeForm";
 import { useAuth } from "~/components/AuthProvider";
 import { useIsMobile } from "~/hooks/useIsMobile";
 import { requireAuth } from "~/utils/auth";
-import { useEffect } from "react";
+import { PageContainer, PageHeader } from "~/components/PageHeader";
 
 export const Route = createFileRoute("/shoes/$shoeId/edit")({
   component: EditShoe,
@@ -122,23 +121,25 @@ function EditShoe() {
   }
 
   return (
-    <div className="min-h-dvh bg-gradient-to-br from-gray-50 via-white to-gray-50 p-4 pb-safe">
-      <Form
-        title="Edit Shoe"
-        description="Update the details of your running shoe"
-        maxWidth="xl"
-        renderForm={false}
-      >
-        <EditShoeForm
-          shoe={shoe}
-          onSuccess={(shoeId) => {
-            navigate({ to: "/shoes/$shoeId", params: { shoeId }, search: { editModal: false } });
-          }}
-          onCancel={() => {
-            navigate({ to: "/shoes/$shoeId", params: { shoeId }, search: { editModal: false } });
-          }}
+    <div className="min-h-dvh bg-gray-50/50 pb-safe">
+      <PageContainer className="max-w-6xl">
+        <PageHeader
+          title="Edit Shoe"
+          description="Update the details of your running shoe."
+          animate={false}
         />
-      </Form>
+        <div className="max-w-4xl">
+          <EditShoeForm
+            shoe={shoe}
+            onSuccess={(shoeId) => {
+              navigate({ to: "/shoes/$shoeId", params: { shoeId }, search: { editModal: false } });
+            }}
+            onCancel={() => {
+              navigate({ to: "/shoes/$shoeId", params: { shoeId }, search: { editModal: false } });
+            }}
+          />
+        </div>
+      </PageContainer>
     </div>
   );
 }

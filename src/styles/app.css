@@ -1,5 +1,5 @@
 /* Import mobile optimizations */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Grotesk:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100;0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;0,9..40,1000;1,9..40,100;1,9..40,200;1,9..40,300;1,9..40,400;1,9..40,500;1,9..40,600;1,9..40,700;1,9..40,800;1,9..40,900;1,9..40,1000&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 /* @import "./mobile-optimizations.css"; */
@@ -183,7 +183,7 @@
   /* Enhanced card hover effects */
   .card-hover {
     @apply transition-all duration-300 ease-out;
-    @apply hover:shadow-glow hover:-translate-y-1;
+    @apply hover:shadow-soft hover:-translate-y-0.5;
     transform-origin: center;
   }
 
@@ -317,7 +317,7 @@
   }
 
   .card-hover {
-    @apply transform hover:-translate-y-1 hover:shadow-medium;
+    @apply transform hover:-translate-y-0.5 hover:shadow-soft;
     @apply transition-all duration-300 ease-out;
     @apply will-change-transform;
     /* iOS scroll performance */
@@ -434,20 +434,20 @@
 
   .shadow-medium {
     box-shadow:
-      0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      0 2px 4px -1px rgba(0, 0, 0, 0.08),
+      0 1px 2px -1px rgba(0, 0, 0, 0.05);
   }
 
   .shadow-large {
     box-shadow:
-      0 10px 15px -3px rgba(0, 0, 0, 0.1),
-      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      0 6px 10px -4px rgba(0, 0, 0, 0.1),
+      0 3px 6px -4px rgba(0, 0, 0, 0.06);
   }
 
   .shadow-xl {
     box-shadow:
-      0 20px 25px -5px rgba(0, 0, 0, 0.1),
-      0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      0 10px 18px -8px rgba(0, 0, 0, 0.12),
+      0 6px 8px -8px rgba(0, 0, 0, 0.08);
   }
 
   .shadow-inner-soft {
@@ -456,9 +456,9 @@
 
   .shadow-glow {
     box-shadow:
-      0 0 0 1px rgba(59, 130, 246, 0.1),
-      0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      0 0 0 1px rgba(59, 130, 246, 0.08),
+      0 2px 4px -1px rgba(0, 0, 0, 0.08),
+      0 1px 2px -1px rgba(0, 0, 0, 0.05);
   }
 
   /* Modern gradient backgrounds */
@@ -565,11 +565,11 @@
 
   /* Modern rounded corners */
   .rounded-3xl {
-    border-radius: 1.5rem;
+    border-radius: 1rem;
   }
 
   .rounded-4xl {
-    border-radius: 2rem;
+    border-radius: 1.25rem;
   }
 
   /* Enhanced focus utilities */

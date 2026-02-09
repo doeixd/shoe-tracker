@@ -22,8 +22,8 @@ export function ShoeCardSkeleton({
       <Card
         className="h-full overflow-hidden flex flex-row md:flex-col md:h-auto"
         padding="none"
-        shadow="medium"
-        rounded="3xl"
+        shadow="soft"
+        rounded="lg"
       >
         {/* Image Skeleton */}
         <div className="relative w-44 h-full md:w-full md:h-auto md:aspect-[4/3] flex-shrink-0 overflow-hidden bg-gray-100">
@@ -141,7 +141,7 @@ export function ShoeCardSkeleton({
         </div>
 
         {/* Subtle animated overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-purple-500/0 animate-pulse opacity-20 pointer-events-none rounded-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-purple-500/0 animate-pulse opacity-20 pointer-events-none rounded-2xl" />
       </Card>
     </motion.div>
   );

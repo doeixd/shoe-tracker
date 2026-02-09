@@ -43,7 +43,7 @@ export function ShoeCard({
       <Card
         className={cn(
           "mt-0 group relative overflow-hidden transition-all duration-300 h-full",
-          "hover:shadow-glow hover:-translate-y-1",
+          "hover:-translate-y-0.5",
           "w-full",
           "flex flex-row md:flex-col md:h-auto", // Horizontal layout on mobile, vertical on desktop
           shoe.isRetired ? "opacity-80 hover:opacity-100" : "",
@@ -51,8 +51,8 @@ export function ShoeCard({
         hover={!!onClick}
         onClick={onClick}
         padding="none"
-        shadow="medium"
-        rounded="3xl"
+        shadow="soft"
+        rounded="lg"
       >
         {/* Retired overlay */}
         {shoe.isRetired && (
