@@ -63,6 +63,7 @@ import {
   Lock,
 } from "lucide-react";
 import { cn } from "~/components/ui/ui";
+import { getCollectionIcon } from "~/lib/collectionIcons";
 
 function ShoeDetailPage() {
   return <ShoeDetail />;
@@ -322,6 +323,7 @@ function ShoeDetail() {
   const collection = collections.find(
     (c: any) => c?.id === shoeData?.collectionId,
   );
+  const CollectionIcon = getCollectionIcon(collection?.icon);
 
   // If we're on the edit route, render the outlet instead of the detail view
   if (isEditRoute) {
@@ -355,13 +357,15 @@ function ShoeDetail() {
             <Card className="p-6 lg:p-8" shadow="medium">
               <div className="flex flex-col lg:flex-row lg:items-start gap-6">
                 {/* Image */}
-                <div className="w-full lg:w-48 h-48 bg-gray-100 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden">
-                  <ImageDisplay
-                    src={shoeData.imageUrl}
-                    alt={shoeData.name}
-                    className="w-full h-full rounded-2xl object-cover"
-                  />
-                </div>
+                {shoeData.imageUrl && (
+                  <div className="w-full lg:w-48 h-48 rounded-2xl flex-shrink-0 overflow-hidden">
+                    <ImageDisplay
+                      src={shoeData.imageUrl}
+                      alt={shoeData.name}
+                      className="w-full h-full rounded-2xl object-cover"
+                    />
+                  </div>
+                )}
 
                 {/* Shoe Info */}
                 <div className="flex-1 space-y-4">
@@ -383,9 +387,15 @@ function ShoeDetail() {
                       {collection && (
                         <div className="flex items-center gap-2">
                           <div
-                            className="w-4 h-4 rounded-full"
-                            style={{ backgroundColor: collection.color }}
-                          />
+                            className="w-6 h-6 rounded-md border flex items-center justify-center"
+                            style={{
+                              color: collection.color || "#3b82f6",
+                              backgroundColor: `${collection.color || "#3b82f6"}1A`,
+                              borderColor: `${collection.color || "#3b82f6"}40`,
+                            }}
+                          >
+                            <CollectionIcon className="w-3.5 h-3.5" />
+                          </div>
                           <Link
                             to="/collections/$collectionId"
                             params={{ collectionId: collection.id }}

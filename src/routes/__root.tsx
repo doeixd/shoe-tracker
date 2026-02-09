@@ -212,31 +212,31 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
           <div className="flex-grow min-h-0 h-full flex flex-col overflow-y-auto">
             <div className="flex-1 pb-20 lg:pb-0 safe-area-p">{children}</div>
-            <Toaster
-              position="top-center"
-              expand={true}
-              richColors={true}
-              closeButton={true}
-              duration={4000}
-              className="lg:!bottom-4 lg:!right-4 lg:!top-auto lg:!left-auto lg:!transform-none safe-area-top"
-              toastOptions={{
-                className:
-                  "backdrop-blur-sm bg-white/90 dark:bg-gray-900/90 border border-gray-200/50 dark:border-gray-700/50 shadow-xl",
-                style: {
-                  background: "rgba(255, 255, 255, 0.95)",
-                  backdropFilter: "blur(20px)",
-                  WebkitBackdropFilter: "blur(20px)",
-                  border: "1px solid rgba(229, 231, 235, 0.5)",
-                  boxShadow:
-                    "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-                  borderRadius: "12px",
-                  color: "#111827",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                },
-              }}
-            />
           </div>
+          <Toaster
+            position="bottom-center"
+            expand={true}
+            richColors={true}
+            closeButton={true}
+            duration={4000}
+            className="!bottom-24 sm:!bottom-8 lg:!bottom-4 lg:!right-4 lg:!left-auto lg:!transform-none"
+            toastOptions={{
+              className:
+                "backdrop-blur-sm bg-white/90 border border-gray-200/50 shadow-xl",
+              style: {
+                background: "rgba(255, 255, 255, 0.95)",
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)",
+                border: "1px solid rgba(229, 231, 235, 0.5)",
+                boxShadow:
+                  "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                borderRadius: "12px",
+                color: "#111827",
+                fontSize: "14px",
+                fontWeight: "500",
+              },
+            }}
+          />
           <BottomTabNavigation />
         </div>
 
@@ -336,20 +336,19 @@ function Navigation() {
   const [userMenuOpen, setUserMenuOpen] = React.useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
-  // Close menus when clicking outside
+  // Close desktop user menu when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (userMenuOpen || mobileMenuOpen) {
+      if (userMenuOpen) {
         setUserMenuOpen(false);
-        setMobileMenuOpen(false);
       }
     };
 
-    if (userMenuOpen || mobileMenuOpen) {
+    if (userMenuOpen) {
       document.addEventListener("click", handleClickOutside);
       return () => document.removeEventListener("click", handleClickOutside);
     }
-  }, [userMenuOpen, mobileMenuOpen]);
+  }, [userMenuOpen]);
 
   // Handle sign out with error handling
   const handleSignOut = async () => {
@@ -502,7 +501,7 @@ function Navigation() {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed top-0 right-0 h-full w-80 max-w-[80vw] bg-white/95 backdrop-blur-xl border-l border-gray-200/70 shadow-2xl z-[70] transform transition-transform duration-300 lg:hidden ${
+        className={`fixed top-0 right-0 h-full w-80 max-w-[80vw] bg-white border-l border-gray-200 shadow-2xl z-[70] transform transition-transform duration-300 overflow-y-auto lg:hidden ${
           mobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >

@@ -27,6 +27,7 @@ import { useMobileDetection } from "~/hooks/useMobileDetection";
 import { useFirstVisit, getAnimationProps } from "~/hooks/useFirstVisit";
 import { PageHeader, PageContainer } from "~/components/PageHeader";
 import { shoeQueries, runQueries } from "~/queries";
+import { getCollectionIcon } from "~/lib/collectionIcons";
 
 function withAlpha(hexColor: string | undefined, alpha: number) {
   const hex = (hexColor || "#3b82f6").replace("#", "");
@@ -209,6 +210,7 @@ function Collections() {
                 (shoe) =>
                   shoe && shoe.collectionId === collection.id && shoe.isRetired,
               );
+              const CollectionIcon = getCollectionIcon(collection.icon);
 
               return (
                 <motion.div
@@ -238,9 +240,15 @@ function Collections() {
                       <div className="min-w-0 space-y-2">
                         <div className="flex items-center gap-2">
                           <div
-                            className="h-2.5 w-2.5 rounded-full"
-                            style={{ backgroundColor: collection.color || "#3b82f6" }}
-                          />
+                            className="h-7 w-7 rounded-lg border flex items-center justify-center"
+                            style={{
+                              color: collection.color || "#3b82f6",
+                              backgroundColor: withAlpha(collection.color, 0.12),
+                              borderColor: withAlpha(collection.color, 0.24),
+                            }}
+                          >
+                            <CollectionIcon className="w-4 h-4" />
+                          </div>
                           <h3 className="font-display text-lg sm:text-xl font-bold text-gray-900 truncate">
                             {collection.name || "Unnamed Collection"}
                           </h3>
@@ -269,7 +277,10 @@ function Collections() {
                         <span className="font-display text-2xl leading-none font-bold text-gray-900">
                           {collectionShoes.length}
                         </span>
-                        <span className="text-xs uppercase tracking-wide text-gray-600 mb-0.5">
+                        <span
+                          className="text-xs uppercase tracking-wide mb-0.5"
+                          style={{ color: withAlpha(collection.color, 0.82) }}
+                        >
                           active shoes
                         </span>
                       </div>
@@ -314,6 +325,7 @@ function Collections() {
               const collectionShoes = shoes.filter(
                 (shoe) => shoe.collectionId === collection.id,
               );
+              const CollectionIcon = getCollectionIcon(collection.icon);
 
               return (
                 <motion.div
@@ -343,9 +355,15 @@ function Collections() {
                       <div className="min-w-0 space-y-1.5">
                         <div className="flex items-center gap-2">
                           <div
-                            className="h-2.5 w-2.5 rounded-full"
-                            style={{ backgroundColor: collection.color || "#6b7280" }}
-                          />
+                            className="h-7 w-7 rounded-lg border flex items-center justify-center"
+                            style={{
+                              color: collection.color || "#6b7280",
+                              backgroundColor: withAlpha(collection.color, 0.1),
+                              borderColor: withAlpha(collection.color, 0.2),
+                            }}
+                          >
+                            <CollectionIcon className="w-4 h-4" />
+                          </div>
                           <h3 className="font-display text-base sm:text-lg font-semibold text-gray-900 truncate">
                             {collection.name}
                           </h3>

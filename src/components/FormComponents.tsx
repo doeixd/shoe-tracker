@@ -124,7 +124,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               type={inputType}
               className={cn(
                 // Base styles
-                "w-full bg-transparent border-0 outline-none transition-colors duration-200 py-0",
+                "w-full border-0 outline-none transition-colors duration-200 py-0",
                 // Padding with gap from icon
                 icon ? "pl-3.5" : "pl-4",
                 isPassword ? "pr-12" : "pr-4",
@@ -137,6 +137,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                     ? "text-lg"
                     : "text-base",
                 className,
+                props.readOnly ? "bg-white" : "bg-transparent",
               )}
               onFocus={props.onFocus}
               onBlur={props.onBlur}

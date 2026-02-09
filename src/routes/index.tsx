@@ -53,6 +53,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useFirstVisit, getAnimationProps } from "~/hooks/useFirstVisit";
+import { getCollectionIcon } from "~/lib/collectionIcons";
 import { PageHeader, PageContainer } from "~/components/PageHeader";
 import {
   MetricCard,
@@ -512,6 +513,7 @@ function Dashboard() {
             ) : (
               <div className="space-y-3">
                 {collections.slice(0, 5).map((collection, index) => {
+                  const CollectionIcon = getCollectionIcon(collection.icon);
                   // Safely count shoes in this collection
                   const shoesInCollection = shoes.filter(
                     (shoe) => shoe && shoe.collectionId === collection.id,
@@ -537,11 +539,15 @@ function Dashboard() {
                       >
                         <div className="flex items-center gap-3">
                           <div
-                            className="w-3 h-3 rounded-full flex-shrink-0"
+                            className="w-6 h-6 rounded-md border flex-shrink-0 flex items-center justify-center"
                             style={{
-                              backgroundColor: collection.color || "#3b82f6",
+                              color: collection.color || "#3b82f6",
+                              backgroundColor: `${collection.color || "#3b82f6"}1A`,
+                              borderColor: `${collection.color || "#3b82f6"}40`,
                             }}
-                          />
+                          >
+                            <CollectionIcon className="w-3.5 h-3.5" />
+                          </div>
                           <div className="min-w-0 flex-1">
                             <h3 className="text-sm font-medium text-gray-900 truncate">
                               {collection.name || "Unnamed Collection"}

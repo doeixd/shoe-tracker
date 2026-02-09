@@ -36,7 +36,7 @@ function EditCollection() {
   const search = useSearch({ from: "/collections/$collectionId/edit" });
   const isMobile = useIsMobile();
   const isModal = search.modal;
-  const { data: collection } = useCollection(collectionId);
+  const { data: collection, isLoading: isCollectionLoading } = useCollection(collectionId);
 
   // Redirect mobile users to modal
   useEffect(() => {
@@ -52,6 +52,10 @@ function EditCollection() {
 
   // Show loading while redirecting on mobile
   if (isMobile && !isModal) {
+    return <Loader />;
+  }
+
+  if (isCollectionLoading || !collection) {
     return <Loader />;
   }
 

@@ -551,7 +551,9 @@ function NewRun() {
         description="Record the details of your running session"
         formHeight="large"
       >
-        <div className="space-y-6">{formContent}</div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {formContent}
+        </form>
       </FormModalSheet>
     );
   }

@@ -12,6 +12,11 @@ import type { CreateCollectionForm, Collection } from "~/types";
 import { motion } from "motion/react";
 import { Save, Package, Palette } from "lucide-react";
 import { FormBackButton } from "~/components/ui/BackButton";
+import {
+  COLLECTION_ICON_OPTIONS,
+  DEFAULT_COLLECTION_ICON,
+  getCollectionIcon,
+} from "~/lib/collectionIcons";
 
 interface EditCollectionFormProps {
   collection: Collection;
@@ -35,6 +40,7 @@ export function EditCollectionForm({
     name: "",
     description: "",
     color: "#3b82f6",
+    icon: DEFAULT_COLLECTION_ICON,
   });
 
   const [errors, setErrors] = useState<
@@ -48,6 +54,7 @@ export function EditCollectionForm({
         name: collection.name || "",
         description: collection.description || "",
         color: collection.color || "#3b82f6",
+        icon: collection.icon || DEFAULT_COLLECTION_ICON,
       });
     }
   }, [collection]);
@@ -201,6 +208,34 @@ export function EditCollectionForm({
                 </button>
               ))}
             </div>
+          </div>
+        </FormSection>
+
+        <FormSection
+          title="Collection Icon"
+          description="Choose an icon for quick recognition"
+        >
+          <div className="grid grid-cols-5 sm:grid-cols-10 gap-3">
+            {COLLECTION_ICON_OPTIONS.map((option) => {
+              const Icon = getCollectionIcon(option.key);
+              const isActive = (formData.icon || DEFAULT_COLLECTION_ICON) === option.key;
+
+              return (
+                <button
+                  key={option.key}
+                  type="button"
+                  onClick={() => handleInputChange("icon", option.key)}
+                  className={`flex items-center justify-center w-full aspect-square rounded-xl border transition-all duration-150 ${
+                    isActive
+                      ? "border-primary-500 bg-primary-50 text-primary-700"
+                      : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                  }`}
+                  title={option.label}
+                >
+                  <Icon className="w-4 h-4" />
+                </button>
+              );
+            })}
           </div>
         </FormSection>
 

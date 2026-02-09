@@ -44,6 +44,7 @@ import {
   Lock,
 } from "lucide-react";
 import { cn } from "~/components/ui/ui";
+import { getCollectionIcon } from "~/lib/collectionIcons";
 
 function CollectionDetailPage() {
   return <CollectionDetail />;
@@ -218,6 +219,7 @@ function CollectionDetail() {
 
   const collection = collectionQuery.data as any;
   const shoes = (shoesQuery.data as any[]) || [];
+  const CollectionIcon = getCollectionIcon(collection?.icon);
 
   const activeShoes = shoes.filter((shoe: any) => shoe && !shoe.isRetired);
   const retiredShoes = shoes.filter((shoe: any) => shoe && shoe.isRetired);
@@ -259,7 +261,7 @@ function CollectionDetail() {
                     className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0"
                     style={{ backgroundColor: collection?.color || "#3b82f6" }}
                   >
-                    <Package className="w-8 h-8 text-white" />
+                    <CollectionIcon className="w-8 h-8 text-white" />
                   </div>
                   <div className="space-y-2">
                     <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">

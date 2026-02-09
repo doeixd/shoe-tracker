@@ -11,6 +11,7 @@ const schema = defineSchema({
     name: v.string(),
     description: v.optional(v.string()),
     color: v.string(),
+    icon: v.optional(v.string()),
     isArchived: v.optional(v.boolean()),
     userId: v.optional(v.id("users")), // Link to authenticated user
   })
@@ -82,6 +83,7 @@ export const createCollectionSchema = v.object({
   name: collection.fields.name,
   description: v.optional(collection.fields.description),
   color: collection.fields.color,
+  icon: v.optional(collection.fields.icon),
 });
 
 export const updateCollectionSchema = v.object({
@@ -89,6 +91,7 @@ export const updateCollectionSchema = v.object({
   name: v.optional(collection.fields.name),
   description: v.optional(collection.fields.description),
   color: v.optional(collection.fields.color),
+  icon: v.optional(collection.fields.icon),
   isArchived: v.optional(collection.fields.isArchived),
 });
 

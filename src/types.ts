@@ -4,6 +4,7 @@ export interface Collection {
   name: string;
   description?: string;
   color: string;
+  icon?: string;
   isArchived?: boolean;
 }
 
@@ -258,6 +259,7 @@ export interface CreateCollectionForm {
   name: string;
   description?: string;
   color: string;
+  icon?: string;
 }
 
 export interface CreateShoeForm {

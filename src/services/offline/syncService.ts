@@ -230,6 +230,7 @@ class SyncService {
           name: data.name,
           description: data.description,
           color: data.color,
+          icon: data.icon,
         });
 
         // Update local data with server ID if it was a create operation

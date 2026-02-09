@@ -54,7 +54,7 @@ function Profile() {
   }
 
   return (
-    <div className="p-2 max-w-4xl mx-auto space-y-8">
+    <div className="p-2 pt-4 sm:pt-6 max-w-4xl mx-auto space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-black text-gray-900">Profile Settings</h1>
@@ -92,13 +92,13 @@ function Profile() {
                 label="Name"
                 value={user.name || ""}
                 readOnly
-                className="bg-gray-50"
+                className="bg-white"
               />
               <Input
                 label="Email"
                 value={user.email || ""}
                 readOnly
-                className="bg-gray-50"
+                className="bg-white"
               />
             </div>
             <p className="text-sm text-gray-500">

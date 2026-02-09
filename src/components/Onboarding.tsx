@@ -23,9 +23,30 @@ import {
   Zap,
 } from "lucide-react";
 import { cn } from "./ui/ui";
+import {
+  COLLECTION_ICON_OPTIONS,
+  DEFAULT_COLLECTION_ICON,
+  getCollectionIcon,
+} from "~/lib/collectionIcons";
 
 interface OnboardingProps {
   onComplete: () => void;
+}
+
+function withAlpha(hexColor: string | undefined, alpha: number) {
+  const hex = (hexColor || "#3b82f6").replace("#", "");
+  const normalized = hex.length === 3
+    ? hex.split("").map((char) => `${char}${char}`).join("")
+    : hex;
+
+  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
+    return `rgba(59, 130, 246, ${alpha})`;
+  }
+
+  const r = parseInt(normalized.slice(0, 2), 16);
+  const g = parseInt(normalized.slice(2, 4), 16);
+  const b = parseInt(normalized.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 export function Onboarding({ onComplete }: OnboardingProps) {
@@ -42,16 +63,19 @@ export function Onboarding({ onComplete }: OnboardingProps) {
       name: "Road",
       description: "Daily training and road running shoes",
       color: "#3b82f6",
+      icon: "footprints",
     },
     {
       name: "Trail",
       description: "Off-road and trail running shoes",
       color: "#16a34a",
+      icon: "mountain",
     },
     {
       name: "Racing",
       description: "Competition and tempo run shoes",
       color: "#ef4444",
+      icon: "trophy",
     },
   ]);
   const [isCreating, setIsCreating] = useState(false);
@@ -218,6 +242,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         name: "",
         description: "",
         color: "#8b5cf6",
+        icon: DEFAULT_COLLECTION_ICON,
       },
     ]);
   };
@@ -613,12 +638,12 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   }
 
   return (
-    <div className="min-h-dvh bg-gradient-to-br from-primary-50 via-white to-blue-50 flex items-center justify-center p-4 pb-safe relative overflow-hidden">
+    <div className="min-h-dvh bg-gray-50/80 flex items-center justify-center p-4 pb-safe relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-60 -right-60 w-96 h-96 bg-gradient-radial from-primary-100/30 to-transparent rounded-full animate-float" />
+        <div className="absolute -top-60 -right-60 w-96 h-96 bg-gradient-radial from-blue-100/35 to-transparent rounded-full animate-float" />
         <div
-          className="absolute -bottom-60 -left-60 w-96 h-96 bg-gradient-radial from-blue-100/30 to-transparent rounded-full animate-float"
+          className="absolute -bottom-60 -left-60 w-96 h-96 bg-gradient-radial from-slate-100/60 to-transparent rounded-full animate-float"
           style={{ animationDelay: "1.5s" }}
         />
       </div>
@@ -631,7 +656,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
             animate: { opacity: 1, y: 0 },
             transition: { duration: 0.5 },
           })}
-          className="text-center mb-10"
+          className="text-center mb-8"
         >
           <motion.div
             {...getAnimationProps(isFirstVisit, {
@@ -639,11 +664,9 @@ export function Onboarding({ onComplete }: OnboardingProps) {
               animate: { scale: 1, rotate: 0 },
               transition: { delay: 0.2, type: "spring", stiffness: 200 },
             })}
-            className="w-20 h-20 bg-gradient-to-br from-primary-500 via-primary-600 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl floating-element relative"
+            className="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-soft relative"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-3xl" />
-            <FolderOpen className="w-10 h-10 text-white relative z-10" />
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary-400 to-blue-400 rounded-3xl blur opacity-30 animate-pulse-gentle" />
+            <FolderOpen className="w-8 h-8 text-primary-600" />
           </motion.div>
           <motion.h1
             {...getAnimationProps(isFirstVisit, {
@@ -651,7 +674,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
               animate: { opacity: 1, y: 0 },
               transition: { delay: 0.3 },
             })}
-            className="text-3xl sm:text-4xl lg:text-5xl font-black text-gradient mb-6"
+            className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-4"
           >
             Set Up Your Collections
           </motion.h1>
@@ -659,11 +682,11 @@ export function Onboarding({ onComplete }: OnboardingProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed"
+            className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed"
           >
             Collections help you organize your shoes by type or purpose. We've
             suggested some common ones, but feel free to customize them to fit
-            your style! 🎯
+            your style.
           </motion.p>
 
           <AnimatePresence>
@@ -690,7 +713,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
             animate: { opacity: 1, y: 0 },
             transition: { delay: 0.2, duration: 0.6 },
           })}
-          className="space-y-6 mb-10"
+          className="space-y-4 mb-8"
         >
           <AnimatePresence mode="popLayout">
             {collections.map((collection, index) => (
@@ -704,18 +727,34 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                   delay: index * 0.1,
                   type: "spring",
                 }}
-                className="bg-white rounded-2xl shadow-soft border border-gray-200 hover:shadow-medium hover:border-gray-300 overflow-hidden group relative transition-all duration-300"
+                className="bg-white rounded-2xl shadow-soft border overflow-hidden group relative transition-all duration-300 hover:shadow-medium"
+                style={{ borderColor: withAlpha(collection.color, 0.26) }}
               >
+                <div
+                  className="absolute top-0 left-0 right-0 h-1"
+                  style={{ backgroundColor: collection.color }}
+                />
                 <div className="p-6">
                   {/* Enhanced Header */}
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        className="w-6 h-6 rounded-lg border-2 border-gray-200 shadow-sm"
-                        style={{ backgroundColor: collection.color }}
-                      />
-                      <h3 className="text-xl font-semibold text-gray-900">
+                      {(() => {
+                        const Icon = getCollectionIcon(collection.icon);
+                        return (
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            className="w-8 h-8 rounded-lg border shadow-sm flex items-center justify-center"
+                            style={{
+                              backgroundColor: withAlpha(collection.color, 0.12),
+                              borderColor: withAlpha(collection.color, 0.3),
+                              color: collection.color,
+                            }}
+                          >
+                            <Icon className="w-4 h-4" />
+                          </motion.div>
+                        );
+                      })()}
+                      <h3 className="font-display text-lg sm:text-xl font-semibold text-gray-900">
                         {collection.name || `Collection ${index + 1}`}
                       </h3>
                     </div>
@@ -738,7 +777,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
                   {/* Enhanced Form Fields */}
                   <div className="space-y-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                       <motion.div
                         {...getAnimationProps(isFirstVisit, {
                           initial: { opacity: 0, x: -20 },
@@ -777,6 +816,44 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                           }
                         />
                       </motion.div>
+
+                      <motion.div
+                        {...getAnimationProps(isFirstVisit, {
+                          initial: { opacity: 0, x: 20 },
+                          animate: { opacity: 1, x: 0 },
+                          transition: { delay: 0.25 + index * 0.1 },
+                        })}
+                      >
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Collection Icon
+                        </label>
+                        <div className="grid grid-cols-5 gap-2">
+                          {COLLECTION_ICON_OPTIONS.map((option) => {
+                            const Icon = getCollectionIcon(option.key);
+                            const isActive =
+                              (collection.icon || DEFAULT_COLLECTION_ICON) === option.key;
+
+                            return (
+                              <button
+                                key={option.key}
+                                type="button"
+                                onClick={() =>
+                                  handleUpdateCollection(index, "icon", option.key)
+                                }
+                                className={cn(
+                                  "flex items-center justify-center rounded-lg border aspect-square transition-colors",
+                                  isActive
+                                    ? "border-primary-500 bg-primary-50 text-primary-700"
+                                    : "border-gray-200 bg-white text-gray-600 hover:border-gray-300",
+                                )}
+                                title={option.label}
+                              >
+                                <Icon className="w-4 h-4" />
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
                     </div>
 
                     <motion.div
@@ -814,19 +891,16 @@ export function Onboarding({ onComplete }: OnboardingProps) {
             animate: { opacity: 1 },
             transition: { delay: 0.4, duration: 0.5 },
           })}
-          className="flex justify-center mb-10"
+          className="flex justify-center mb-8"
         >
           <motion.button
             onClick={handleAddCollection}
-            className="flex items-center gap-3 px-8 py-4 text-primary-600 hover:text-primary-700 font-bold bg-gradient-to-r from-white to-primary-50/50 hover:from-primary-50 hover:to-primary-100 border-2 border-dashed border-primary-300 hover:border-primary-400 rounded-3xl shadow-soft hover:shadow-medium transition-all duration-300 group"
-            whileHover={{ scale: 1.05, y: -2 }}
+            className="flex items-center gap-3 px-6 py-3.5 text-primary-700 hover:text-primary-800 font-semibold bg-white hover:bg-primary-50 border border-primary-200 hover:border-primary-300 rounded-xl shadow-soft transition-all duration-200"
+            whileHover={{ scale: 1.02, y: -1 }}
             whileTap={{ scale: 0.95 }}
           >
-            <div className="text-primary-500 group-hover:text-primary-600">
-              <Plus className="w-5 h-5" />
-            </div>
+            <Plus className="w-5 h-5" />
             <span>Add Another Collection</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-primary-400/20 to-blue-400/20 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </motion.button>
         </motion.div>
 
@@ -837,7 +911,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
             animate: { opacity: 1, y: 0 },
             transition: { delay: 0.5, duration: 0.5 },
           })}
-          className="flex flex-col sm:flex-row justify-center gap-6 mb-10"
+          className="flex flex-col sm:flex-row justify-center gap-4 mb-8"
         >
           <motion.div
             whileHover={isFirstVisit ? { scale: 1.02 } : {}}
@@ -859,14 +933,11 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                   <CheckCircle className="w-5 h-5" />
                 )
               }
-              className="text-lg px-10 py-5 bg-gradient-to-r from-primary-500 via-primary-600 to-blue-600 hover:from-primary-600 hover:via-primary-700 hover:to-blue-700 shadow-large hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
+              className="text-base sm:text-lg px-8 py-4 bg-gray-900 hover:bg-black shadow-soft transition-all duration-200"
             >
-              <span className="relative z-10">
-                {isCreating
-                  ? "Creating Collections..."
-                  : "Create Collections & Continue"}
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              {isCreating
+                ? "Creating Collections..."
+                : "Create Collections & Continue"}
             </Button>
           </motion.div>
           <motion.div
@@ -878,7 +949,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
               onClick={handleSkip}
               disabled={isCreating}
               size="lg"
-              className="text-lg px-10 py-5 border-2 border-gray-300 hover:border-primary-300 hover:bg-primary-50/50 text-gray-700 hover:text-primary-700 transition-all duration-300"
+              className="text-base sm:text-lg px-8 py-4 border border-gray-300 hover:border-gray-400 hover:bg-white text-gray-700 transition-all duration-200"
             >
               Skip for Now
             </Button>
@@ -890,14 +961,14 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}
-          className="text-center space-y-6"
+          className="text-center space-y-4"
         >
-          <div className="inline-flex items-center gap-3 px-6 py-3 bg-blue-50 border border-blue-200 rounded-2xl shadow-soft hover:shadow-medium transition-all duration-300 group">
-            <div className="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center">
+          <div className="inline-flex items-center gap-3 px-5 py-3 bg-blue-50 border border-blue-200 rounded-xl shadow-soft">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-blue-600" />
             </div>
-            <p className="text-sm text-blue-800 font-medium leading-relaxed">
-              <strong className="text-blue-900">💡 Pro Tip:</strong> You can
+            <p className="text-sm text-blue-800 leading-relaxed">
+              <strong className="text-blue-900">Pro Tip:</strong> You can
               always add, edit, or remove collections later from the Collections
               page!
             </p>
