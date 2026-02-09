@@ -59,7 +59,6 @@ export function createRouter() {
   const router = routerWithQueryClient(
     createTanStackRouter({
       routeTree,
-      trailingSlash: "never",
       defaultErrorComponent: DefaultCatchBoundary,
       defaultNotFoundComponent: () => <NotFound />,
       defaultPreload: "intent", // Prefetch on hover/focus
