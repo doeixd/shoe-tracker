@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import type { MouseEvent } from "react";
 import { EnhancedLoading } from "~/components/loading/EnhancedLoading";
 import { createQueryConfig } from "~/utils/routeLoading";
 
@@ -221,6 +222,41 @@ function CollectionDetail() {
   const shoes = (shoesQuery.data as any[]) || [];
   const CollectionIcon = getCollectionIcon(collection?.icon);
 
+  const handleEditCollectionClick = (event: MouseEvent<HTMLButtonElement>) => {
+    const targetUrl = `/collections/${collectionId}/edit?modal=false`;
+    console.log("[Collections] Edit Collection click", {
+      collectionId,
+      currentPath: window.location.pathname,
+      targetUrl,
+      defaultPrevented: event.defaultPrevented,
+      buttonDisabled: event.currentTarget.disabled,
+    });
+
+    try {
+      navigate({
+        to: "/collections/$collectionId/edit",
+        params: { collectionId },
+        search: { modal: false },
+      });
+
+      window.setTimeout(() => {
+        if (!window.location.pathname.includes(`/collections/${collectionId}/edit`)) {
+          console.warn(
+            "[Collections] Router navigation did not change path, forcing URL fallback",
+            {
+              currentPath: window.location.pathname,
+              targetUrl,
+            },
+          );
+          window.location.assign(targetUrl);
+        }
+      }, 50);
+    } catch (error) {
+      console.error("[Collections] Edit navigate error, forcing URL fallback", error);
+      window.location.assign(targetUrl);
+    }
+  };
+
   const activeShoes = shoes.filter((shoe: any) => shoe && !shoe.isRetired);
   const retiredShoes = shoes.filter((shoe: any) => shoe && shoe.isRetired);
 
@@ -296,13 +332,10 @@ function CollectionDetail() {
                   <Button
                     type="button"
                     variant="secondary"
-                    onClick={() =>
-                      navigate({
-                        to: "/collections/$collectionId/edit",
-                        params: { collectionId },
-                        search: { modal: false },
-                      })
+                    onClickCapture={() =>
+                      console.log("[Collections] Edit Collection click capture")
                     }
+                    onClick={handleEditCollectionClick}
                     icon={<Edit3 className="w-4 h-4" />}
                   >
                     Edit Collection

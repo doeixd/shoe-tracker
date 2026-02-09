@@ -37,9 +37,20 @@ function EditCollection() {
   const isModal = search.modal;
   const { data: collection, isLoading: isCollectionLoading } = useCollection(collectionId);
 
+  console.log("[EditCollection] route state", {
+    collectionId,
+    isMobile,
+    isModal,
+    isCollectionLoading,
+    hasCollection: !!collection,
+    currentPath: window.location.pathname,
+    search,
+  });
+
   // Redirect mobile users to modal
   useEffect(() => {
     if (isMobile && !isModal) {
+      console.log("[EditCollection] mobile redirect to modal=true", { collectionId });
       navigate({
         to: "/collections/$collectionId/edit",
         params: { collectionId },
