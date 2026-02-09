@@ -268,11 +268,44 @@ const handleMutationError = (error: any, navigate?: any) => {
   }
 };
 
+const shouldRetryCreateCollectionWithoutIcon = (
+  error: any,
+  payload: Record<string, unknown>,
+) => {
+  if (!payload?.icon) {
+    return false;
+  }
+
+  const message = String(error?.message ?? "").toLowerCase();
+
+  return (
+    message.includes("extra field `icon`") ||
+    message.includes("extra field icon") ||
+    (message.includes("icon") &&
+      (message.includes("validator") ||
+        message.includes("argumentvalidationerror") ||
+        message.includes("validation") ||
+        message.includes("server error") ||
+        message.includes("called by client")))
+  );
+};
+
 // Collection mutations
 export function useCreateCollectionMutation() {
   const mutationFn = useConvexMutation(api.shoes.createCollection);
   return useMutation({
-    mutationFn,
+    mutationFn: async (payload: Record<string, unknown>) => {
+      try {
+        return await mutationFn(payload as any);
+      } catch (error) {
+        if (!shouldRetryCreateCollectionWithoutIcon(error, payload)) {
+          throw error;
+        }
+
+        const { icon: _icon, ...legacyPayload } = payload;
+        return await mutationFn(legacyPayload as any);
+      }
+    },
     onError: handleMutationError,
   });
 }

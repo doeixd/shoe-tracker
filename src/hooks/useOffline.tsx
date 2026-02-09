@@ -306,6 +306,14 @@ export function usePWAInstall() {
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: any) => {
+      const wasDismissed =
+        typeof window !== "undefined" &&
+        localStorage.getItem("pwa-install-dismissed") === "true";
+
+      if (wasDismissed) {
+        return;
+      }
+
       e.preventDefault();
       setInstallPrompt(e);
       setIsInstallable(true);
