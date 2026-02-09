@@ -482,7 +482,7 @@ function Shoes() {
               }
             }}
             icon={<Plus className="w-5 h-5" />}
-            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg hover:shadow-xl px-6 py-3 font-semibold"
+            className="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 font-medium"
           >
             Add Shoe
           </Button>
@@ -599,18 +599,16 @@ function Shoes() {
           animate: { opacity: 1, y: 0 },
           transition: { duration: 0.5, delay: 0.2 },
         })}
-        className="bg-gradient-to-br from-white via-gray-50/50 to-white rounded-3xl shadow-medium border border-gray-100/80 p-4 sm:p-6"
+        className="bg-white rounded-2xl border border-gray-200 p-4"
       >
         <button
           onClick={() => setFiltersExpanded(!filtersExpanded)}
-          className={`flex items-center justify-between w-full gap-3 ${filtersExpanded ? "mb-6" : ""} hover:bg-gray-50/50 rounded-2xl p-2 -m-2 transition-colors`}
+          className={`flex items-center justify-between w-full gap-3 ${filtersExpanded ? "mb-4" : ""} hover:bg-gray-50 rounded-xl p-1.5 -m-1.5 transition-colors`}
         >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
-              <Filter className="w-5 h-5 text-primary-600" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900">
-              Filters & Sorting
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-gray-400" />
+            <h3 className="text-sm font-medium text-gray-700">
+              Filters & Sort
             </h3>
           </div>
           {filtersExpanded ? (

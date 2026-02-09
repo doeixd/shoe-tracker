@@ -66,14 +66,14 @@ export function PageHeader({
 
   const titleClasses = cn(
     // Base styles
-    "font-black leading-tight",
+    "font-display font-bold leading-tight tracking-tight",
     // Size variants
     size === "large"
-      ? "text-4xl sm:text-5xl lg:text-6xl"
-      : "text-4xl sm:text-5xl",
+      ? "text-3xl sm:text-4xl"
+      : "text-2xl sm:text-3xl",
     // Color variants
     gradient
-      ? "text-gradient bg-gradient-to-r from-primary-600 via-blue-600 to-purple-600 bg-clip-text text-transparent"
+      ? "text-gradient bg-gradient-to-r from-gray-900 via-primary-700 to-primary-600 bg-clip-text text-transparent"
       : "text-gray-900",
   );
 
@@ -136,10 +136,10 @@ export function PageHeader({
             <motion.p
               {...descriptionAnimation}
               className={cn(
-                "text-gray-600 font-medium leading-relaxed text-balance",
+                "text-gray-500 leading-relaxed text-balance",
                 size === "large"
-                  ? "text-lg sm:text-xl"
-                  : "text-base sm:text-lg",
+                  ? "text-base sm:text-lg"
+                  : "text-sm sm:text-base",
               )}
             >
               {description}
@@ -212,7 +212,7 @@ export function PageContainer({ children, className }: PageContainerProps) {
   return (
     <div
       className={cn(
-        "p-4 sm:p-6 lg:p-8 space-y-8 animate-fade-in relative z-10",
+        "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8 animate-fade-in relative z-10",
         className,
       )}
     >

@@ -80,11 +80,10 @@ export function BottomTabNavigation() {
                     search={{ modal: true }}
                     className="flex flex-col items-center justify-center relative"
                   >
-                    {/* Center FAB */}
-                    <div className="w-14 h-14 -mt-6 bg-gradient-to-r from-green-500 to-green-600 rounded-full shadow-lg shadow-green-500/25 flex items-center justify-center hover:shadow-xl hover:shadow-green-500/30 transition-all duration-200 hover:scale-105 active:scale-95 ring-4 ring-white">
-                      <Icon className="w-7 h-7 text-white" />
+                    <div className="w-12 h-12 -mt-5 bg-gray-900 rounded-2xl shadow-lg flex items-center justify-center hover:bg-gray-800 transition-all duration-200 active:scale-95 ring-4 ring-white">
+                      <Icon className="w-6 h-6 text-white" />
                     </div>
-                    <span className="text-xs font-semibold text-green-600 mt-1">
+                    <span className="text-[10px] font-semibold text-gray-900 mt-1">
                       {tab.label}
                     </span>
                   </Link>
@@ -96,26 +95,29 @@ export function BottomTabNavigation() {
                   key={tab.to}
                   to={tab.to}
                   className={cn(
-                    "flex flex-col items-center justify-center px-3 py-2 min-w-[48px] transition-colors duration-200",
+                    "flex flex-col items-center justify-center px-3 py-2 min-w-[48px] transition-colors duration-200 relative",
                     isActive
-                      ? "text-blue-600"
-                      : "text-gray-500 hover:text-gray-700",
+                      ? "text-gray-900"
+                      : "text-gray-400 hover:text-gray-600",
                   )}
                 >
                   <Icon
                     className={cn(
-                      "w-6 h-6 mb-1",
-                      isActive ? "text-blue-600" : "text-gray-500",
+                      "w-5 h-5 mb-1",
+                      isActive ? "text-gray-900" : "text-gray-400",
                     )}
                   />
                   <span
                     className={cn(
-                      "text-xs font-medium",
-                      isActive ? "text-blue-600" : "text-gray-500",
+                      "text-[10px] font-medium",
+                      isActive ? "text-gray-900" : "text-gray-400",
                     )}
                   >
                     {tab.label}
                   </span>
+                  {isActive && (
+                    <div className="absolute -bottom-1 w-1 h-1 rounded-full bg-gray-900" />
+                  )}
                 </Link>
               );
             })}

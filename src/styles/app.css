@@ -1,4 +1,6 @@
 /* Import mobile optimizations */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Grotesk:wght@300..700&display=swap');
+
 @tailwind base;
 /* @import "./mobile-optimizations.css"; */
 
@@ -45,8 +47,8 @@
 
   html,
   body {
-    @apply text-gray-900 bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30;
-    @apply dark:bg-gradient-to-br dark:from-gray-950 dark:via-slate-900 dark:to-gray-950;
+    @apply text-gray-900 bg-white;
+    @apply dark:bg-gray-950;
     @apply dark:text-gray-200;
     font-feature-settings:
       "rlig" 1,

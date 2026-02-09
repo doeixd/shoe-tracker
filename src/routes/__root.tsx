@@ -157,17 +157,13 @@ function RootComponent() {
     return (
       <RootDocument>
         <div className="min-h-screen flex items-center justify-center bg-white relative">
-          {/* Main loading content */}
           <div className="text-center px-6 max-w-md mx-auto">
-            {/* Logo and branding */}
             <div className="mb-8">
-              <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl mb-4 shadow-lg">
-                <span className="text-4xl">🏃🏼‍♀️</span>
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-900 rounded-2xl mb-4">
+                <Footprints className="w-8 h-8 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">MyShoeTracker</h1>
-              <p className="text-gray-600 text-lg">
-                Track your running journey
-              </p>
+              <h1 className="text-2xl font-display font-bold text-gray-900 mb-1 tracking-tight">ShoeTracker</h1>
+              <p className="text-gray-500 text-sm">Loading...</p>
             </div>
           </div>
         </div>
@@ -199,8 +195,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <AppUpdateBanner />
 
         <div className="h-screen flex flex-col min-h-0 ios-viewport-fix">
-          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/50 shadow-lg pwa-navigation">
-            <div className="flex items-center justify-between py-3 px-4 sm:py-4 sm:px-6 lg:px-8 safe-area-p relative">
+          <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-lg border-b border-gray-200/60 pwa-navigation">
+            <div className="max-w-7xl mx-auto flex items-center justify-between py-3 px-4 sm:py-3 sm:px-6 lg:px-8 safe-area-p relative">
               <div className="flex items-center gap-4 lg:gap-8">
                 <HeaderLeft />
                 <div className="hidden lg:block">
@@ -212,9 +208,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               </div>
               <Navigation />
             </div>
-          </div>
+          </header>
 
-          <div className="flex-grow min-h-0 h-full flex flex-col">
+          <div className="flex-grow min-h-0 h-full flex flex-col overflow-y-auto">
             <div className="flex-1 pb-20 lg:pb-0 safe-area-p">{children}</div>
             <Toaster
               position="top-center"
@@ -265,10 +261,8 @@ function LoadingIndicator() {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50">
-      <div className="h-1 bg-gray-200 dark:bg-gray-700">
-        <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-[shimmer_1.5s_infinite] transform -skew-x-12" />
-        </div>
+      <div className="h-0.5 bg-gray-100">
+        <div className="h-full bg-primary-600 relative overflow-hidden w-full animate-pulse" />
       </div>
     </div>
   );
@@ -290,11 +284,9 @@ function HeaderLeft() {
 function HeaderCenter() {
   return (
     <Link to="/" className="contents">
-      <div className="font-black text-xl sm:text-2xl text-white lg:text-left">
-        🏃🏼‍♀️ MyShoeTracker
-      </div>
-      <div className="text-slate-400 text-xs sm:text-sm hidden sm:block lg:text-left">
-        Track your running shoe stats with ease
+      <div className="font-display font-bold text-lg sm:text-xl text-gray-900 tracking-tight lg:text-left flex items-center gap-2">
+        <Footprints className="w-5 h-5 text-primary-600" />
+        ShoeTracker
       </div>
     </Link>
   );
@@ -330,7 +322,7 @@ function OnlineIndicator() {
     <div className="flex items-center gap-1">
       <div
         className={`w-2 h-2 rounded-full ${
-          isOnline ? "bg-green-400" : "bg-red-400"
+          isOnline ? "bg-green-500" : "bg-red-500"
         }`}
         title={isOnline ? "Online" : "Offline"}
       />
@@ -376,7 +368,7 @@ function Navigation() {
           <Link
             to="/auth/signin"
             search={{ redirect: "/" }}
-            className="text-slate-300 hover:text-white transition-colors font-medium px-4 py-2 rounded-lg hover:bg-slate-800"
+            className="text-gray-600 hover:text-gray-900 transition-colors font-medium px-4 py-2 rounded-lg hover:bg-gray-100"
           >
             Sign In
           </Link>
@@ -395,39 +387,34 @@ function Navigation() {
   return (
     <>
       {/* Desktop Navigation */}
-      <nav className="hidden lg:flex items-center gap-6">
+      <nav className="hidden lg:flex items-center gap-1">
         {navigationLinks.map(({ to, icon: Icon, label }) => (
           <Link
             key={to}
             to={to}
-            className="flex items-center text-slate-300 hover:text-white transition-colors font-medium px-3 py-2 rounded-lg hover:bg-slate-800/50"
+            className="flex items-center text-gray-600 hover:text-gray-900 transition-colors font-medium px-3 py-2 rounded-lg hover:bg-gray-100"
           >
             <Icon className="w-4 h-4 mr-2" />
             {label}
           </Link>
         ))}
 
-        {/* Desktop PWA Status Bar */}
-        <div className="hidden xl:flex items-center gap-4">
-          {/* <PWAStatusBar /> */}
-        </div>
-
         <Link
           to="/runs/new"
           search={{ modal: false }}
-          className="flex items-center bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-xl font-medium transition-all shadow-md hover:shadow-lg button-hover"
+          className="flex items-center bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-xl font-medium transition-all ml-2"
         >
           <Plus className="w-4 h-4 mr-2" />
           Log Run
         </Link>
 
         {/* User Menu */}
-        <div className="relative">
+        <div className="relative ml-2">
           <button
             onClick={() => setUserMenuOpen(!userMenuOpen)}
-            className="flex items-center space-x-2 text-slate-300 hover:text-white transition-colors p-2 rounded-lg hover:bg-slate-800/50"
+            className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-100"
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center shadow-inner">
+            <div className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center">
               {user?.image ? (
                 <img
                   src={user.image}
@@ -493,7 +480,7 @@ function Navigation() {
       <div className="lg:hidden flex items-center gap-2">
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 text-slate-300 hover:text-white transition-colors rounded-lg hover:bg-slate-800/50"
+          className="p-2 text-gray-600 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-100"
         >
           {mobileMenuOpen ? (
             <X className="w-6 h-6" />
@@ -545,7 +532,7 @@ function Navigation() {
 
         <div className="border-t border-gray-200 p-6">
           <div className="flex items-center space-x-3 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center shadow-inner">
+            <div className="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center">
               {user?.image ? (
                 <img
                   src={user.image}

@@ -101,11 +101,11 @@ export function MetricCard({
   className,
 }: MetricCardProps) {
   const colorClasses = {
-    primary: "text-primary-600 bg-primary-50",
-    success: "text-green-600 bg-green-50",
-    warning: "text-orange-600 bg-orange-50",
-    danger: "text-red-600 bg-red-50",
-    neutral: "text-gray-600 bg-gray-50",
+    primary: "text-primary-600",
+    success: "text-green-600",
+    warning: "text-orange-600",
+    danger: "text-red-600",
+    neutral: "text-gray-500",
   };
 
   const trendColorClasses = trend?.positive
@@ -113,47 +113,45 @@ export function MetricCard({
     : "text-red-600 bg-red-50";
 
   return (
-    <Card className={cn("@container", className)} hover padding="lg">
-      <div className="flex items-start justify-between">
+    <Card className={cn("@container", className)} hover padding="md">
+      <div className="flex items-center gap-3">
+        {icon && (
+          <div
+            className={cn(
+              "flex-shrink-0 [&>svg]:w-5 [&>svg]:h-5",
+              colorClasses[color],
+            )}
+          >
+            {icon}
+          </div>
+        )}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-gray-600 truncate">{title}</p>
-          <div className="mt-2 flex flex-col items-start">
-            <span className="text-3xl @[120px]:text-2xl @[100px]:text-xl font-bold text-gray-900">
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wider truncate">{title}</p>
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl @[120px]:text-xl @[100px]:text-lg font-display font-bold text-gray-900">
               {value}
             </span>
             {subtitle && (
-              <span className="mt-1 text-sm @[100px]:text-xs text-gray-500">
+              <span className="text-xs text-gray-400">
                 {subtitle}
               </span>
             )}
           </div>
-          {trend && (
-            <div className="mt-3 flex items-center">
-              <span
-                className={cn(
-                  "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-                  trendColorClasses,
-                )}
-              >
-                {trend.positive ? "+" : ""}
-                {trend.value}% {trend.label}
-              </span>
-            </div>
-          )}
         </div>
-        {icon && (
-          <div
+      </div>
+      {trend && (
+        <div className="mt-2 flex items-center">
+          <span
             className={cn(
-              "flex-shrink-0 w-12 h-12 @[130px]:w-8 @[130px]:h-8 @[100px]:w-6 @[100px]:h-6 flex items-center justify-center rounded-2xl @[130px]:rounded-xl @[100px]:rounded-lg",
-              colorClasses[color],
+              "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
+              trendColorClasses,
             )}
           >
-            <div className="@[130px]:[&>svg]:w-4 @[130px]:[&>svg]:h-4 @[100px]:[&>svg]:w-3 @[100px]:[&>svg]:h-3">
-              {icon}
-            </div>
-          </div>
-        )}
-      </div>
+            {trend.positive ? "+" : ""}
+            {trend.value}% {trend.label}
+          </span>
+        </div>
+      )}
     </Card>
   );
 }
@@ -299,44 +297,47 @@ export function ActionCard({
   className,
 }: ActionCardProps) {
   const variantClasses = {
-    primary: "bg-gradient-to-br from-primary-500 to-primary-600 text-white",
-    secondary: "bg-white border-2 border-gray-200",
+    primary: "bg-gray-900 text-white",
+    secondary: "bg-white border border-gray-200",
   };
 
   const textClasses = {
-    primary: "text-white/90",
-    secondary: "text-gray-600",
+    primary: "text-gray-400",
+    secondary: "text-gray-500",
   };
 
   return (
     <div
       className={cn(
-        "p-6 rounded-3xl shadow-large card-hover will-change-transform",
+        "p-5 rounded-2xl card-hover will-change-transform",
         variantClasses[variant],
         className,
       )}
     >
       {icon && (
-        <div className="w-12 h-12 mb-4 flex items-center justify-center rounded-2xl bg-white/10">
+        <div className={cn(
+          "w-10 h-10 mb-3 flex items-center justify-center rounded-xl",
+          variant === "primary" ? "bg-white/10" : "bg-gray-100",
+        )}>
           {icon}
         </div>
       )}
       <h3
         className={cn(
-          "text-xl font-semibold mb-2",
+          "text-base font-display font-semibold mb-1",
           variant === "primary" ? "text-white" : "text-gray-900",
         )}
       >
         {title}
       </h3>
-      <p className={cn("mb-6", textClasses[variant])}>{description}</p>
+      <p className={cn("text-sm mb-4", textClasses[variant])}>{description}</p>
       <button
         onClick={onAction}
         className={cn(
-          "w-full py-3 px-4 rounded-2xl font-semibold transition-all duration-200",
+          "w-full py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200",
           variant === "primary"
-            ? "bg-white text-primary-600 hover:bg-gray-50"
-            : "bg-primary-600 text-white hover:bg-primary-700",
+            ? "bg-white text-gray-900 hover:bg-gray-100"
+            : "bg-gray-900 text-white hover:bg-gray-800",
         )}
       >
         {actionLabel}
@@ -364,18 +365,18 @@ export function EmptyStateCard({
   className,
 }: EmptyStateCardProps) {
   return (
-    <Card className={cn("text-center", className)} padding="xl">
+    <Card className={cn("text-center", className)} padding="lg">
       {icon && (
-        <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-2xl bg-gray-100">
+        <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center rounded-xl bg-gray-100">
           {icon}
         </div>
       )}
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
-      <p className="text-gray-600 mb-6 max-w-sm mx-auto">{description}</p>
+      <h3 className="text-base font-display font-semibold text-gray-900 mb-1">{title}</h3>
+      <p className="text-sm text-gray-500 mb-5 max-w-sm mx-auto">{description}</p>
       {actionLabel && onAction && (
         <button
           onClick={onAction}
-          className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-2xl text-white bg-primary-600 hover:bg-primary-700 transition-colors duration-200"
+          className="inline-flex items-center px-5 py-2.5 text-sm font-medium rounded-xl text-white bg-gray-900 hover:bg-gray-800 transition-colors duration-200"
         >
           {actionLabel}
         </button>

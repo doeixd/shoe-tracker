@@ -375,7 +375,7 @@ function Runs() {
               }
             }}
             icon={<Plus className="w-5 h-5" />}
-            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg hover:shadow-xl px-6 py-3 font-semibold"
+            className="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 font-medium"
           >
             Log Run
           </Button>
@@ -459,18 +459,16 @@ function Runs() {
           animate: { opacity: 1, y: 0 },
           transition: { duration: 0.5, delay: 0.2 },
         })}
-        className="bg-gradient-to-br from-white via-gray-50/50 to-white rounded-3xl shadow-medium border border-gray-100/80 p-4 sm:p-6"
+        className="bg-white rounded-2xl border border-gray-200 p-4"
       >
         <button
           onClick={() => setFiltersExpanded(!filtersExpanded)}
-          className={`flex items-center justify-between w-full gap-3 ${filtersExpanded ? "mb-6" : ""} hover:bg-gray-50/50 rounded-2xl p-2 -m-2 transition-colors`}
+          className={`flex items-center justify-between w-full gap-3 ${filtersExpanded ? "mb-4" : ""} hover:bg-gray-50 rounded-xl p-1.5 -m-1.5 transition-colors`}
         >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
-              <Filter className="w-5 h-5 text-primary-600" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900">
-              Filters & Sorting
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-gray-400" />
+            <h3 className="text-sm font-medium text-gray-700">
+              Filters & Sort
             </h3>
           </div>
           {filtersExpanded ? (
@@ -622,101 +620,65 @@ function Runs() {
               );
 
               return (
-                <div key={run.id} className="h-full">
-                  <FeatureCard
-                    title={new Date(run.date).toLocaleDateString("en-US", {
-                      weekday: "short",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                    description={`${formatDistance(run.distance)} • ${
-                      run.duration ? formatDuration(run.duration) : "No time"
-                    }`}
-                    onClick={() =>
-                      navigate({
-                        to: "/runs/$runId",
-                        params: { runId: run.id },
-                      })
-                    }
-                    className={cn(
-                      "h-full transition-all duration-300 cursor-pointer hover:shadow-large hover:scale-[1.02] active:scale-[0.98]",
-                    )}
-                  >
-                    <div className="space-y-4">
-                      {/* Run Type and Effort */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          {getRunTypeIcon(run.runType)}
-                          <span className="text-sm font-medium text-gray-700">
-                            {runTypeOption?.label || run.runType}
-                          </span>
-                        </div>
-                        {run.effort && (
-                          <span
-                            className={cn(
-                              "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-                              getEffortColor(run.effort),
-                            )}
-                          >
-                            {effortOption?.label || run.effort}
-                          </span>
-                        )}
+                <Card
+                  key={run.id}
+                  className="h-full cursor-pointer hover:border-gray-300 transition-colors"
+                  onClick={() =>
+                    navigate({
+                      to: "/runs/$runId",
+                      params: { runId: run.id },
+                    })
+                  }
+                  hover
+                  padding="md"
+                >
+                  {/* Date + Distance header */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <span className="text-xs text-gray-400">
+                        {new Date(run.date).toLocaleDateString("en-US", {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                      <div className="flex items-baseline gap-1.5 mt-0.5">
+                        <span className="text-2xl font-display font-bold text-gray-900">
+                          {formatDistance(run.distance)}
+                        </span>
+                        <span className="text-xs text-gray-400">mi</span>
                       </div>
-
-                      {/* Pace and Shoe */}
-                      <div className="space-y-3">
-                        {run.pace && (
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600 flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              Pace
-                            </span>
-                            <span className="font-semibold text-gray-900">
-                              {run.pace} /mi
-                            </span>
-                          </div>
-                        )}
-
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600 flex items-center gap-1">
-                            <Footprints className="w-3 h-3" />
-                            Shoe
-                          </span>
-                          <span className="font-medium text-gray-900">
-                            {shoe?.name || "Unknown"}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Weather and Route */}
-                      {(run.temperature || run.route) && (
-                        <div className="pt-3 border-t border-gray-100">
-                          {run.temperature && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                              <Thermometer className="w-3 h-3" />
-                              <span>{run.temperature}°F</span>
-                            </div>
-                          )}
-                          {run.route && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <MapPin className="w-3 h-3" />
-                              <span className="truncate">{run.route}</span>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Notes Preview */}
-                      {run.notes && (
-                        <div className="pt-3 border-t border-gray-100">
-                          <p className="text-sm text-gray-600 line-clamp-2">
-                            {run.notes}
-                          </p>
-                        </div>
-                      )}
                     </div>
-                  </FeatureCard>
-                </div>
+                    {run.effort && (
+                      <span
+                        className={cn(
+                          "inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-medium ring-1 ring-inset",
+                          getEffortColor(run.effort),
+                        )}
+                      >
+                        {effortOption?.label || run.effort}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Stats row */}
+                  <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                    {run.pace && <span>{run.pace}/mi</span>}
+                    {run.duration && <span>{formatDuration(run.duration)}</span>}
+                    {runTypeOption && <span>{runTypeOption.label}</span>}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                    <span className="text-xs text-gray-400 truncate">
+                      {shoe?.name || "Unknown shoe"}
+                    </span>
+                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                      {run.temperature && <span>{run.temperature}°F</span>}
+                      {run.route && <span className="truncate max-w-20">{run.route}</span>}
+                    </div>
+                  </div>
+                </Card>
               );
             })}
           </div>

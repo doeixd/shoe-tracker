@@ -16,7 +16,6 @@ import {
   EmptyState,
   ErrorState,
 } from "~/components/LoadingStates";
-import { EnhancedLoading } from "~/components/loading/EnhancedLoading";
 import {
   FolderOpen,
   Archive,
@@ -124,20 +123,6 @@ function Collections() {
       </div>
     );
   }
-  // Data is now instantly available from app data cache
-
-  if (isLoading && collections.length === 0) {
-    return (
-      <EnhancedLoading
-        message="Loading collections..."
-        layout="list"
-        holdDelay={100}
-        skeletonDelay={200}
-        showProgress={true}
-      />
-    );
-  }
-
   return (
     <PageContainer>
       <PageHeader
@@ -158,7 +143,7 @@ function Collections() {
               }
             }}
             icon={<Plus className="w-5 h-5" />}
-            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg hover:shadow-xl px-6 py-3 font-semibold"
+            className="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 font-medium"
           >
             New Collection
           </Button>
