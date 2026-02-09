@@ -9,7 +9,7 @@
 
 @layer base {
   html {
-    color-scheme: light dark;
+    color-scheme: light;
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
@@ -37,7 +37,7 @@
   }
 
   * {
-    @apply border-gray-200 dark:border-gray-800;
+    @apply border-gray-200;
   }
 
   /* Custom gray color for skeletons */
@@ -48,8 +48,6 @@
   html,
   body {
     @apply text-gray-900 bg-white;
-    @apply dark:bg-gray-950;
-    @apply dark:text-gray-200;
     font-feature-settings:
       "rlig" 1,
       "calt" 1;

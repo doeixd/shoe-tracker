@@ -38,8 +38,8 @@ export function PWAHead() {
     // PWA Meta Tags
     addMetaTag({ name: "application-name", content: "MyShoeTracker" });
     // theme-color moved to static JSX to prevent hydration mismatch
-    addMetaTag({ name: "color-scheme", content: "light dark" });
-    addMetaTag({ name: "supported-color-schemes", content: "light dark" });
+    addMetaTag({ name: "color-scheme", content: "light" });
+    addMetaTag({ name: "supported-color-schemes", content: "light" });
 
     // iOS Specific Meta Tags
     addMetaTag({ name: "apple-mobile-web-app-capable", content: "yes" });
